@@ -15,5 +15,5 @@
   "homepage": "https://bitbucket.org/cs499seniorproject/instructor_grading_system#readme",
   "dependencies": {
     "express": "4.16.3"
-  }
+  },
 }
