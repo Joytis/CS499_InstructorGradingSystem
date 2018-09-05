@@ -14,10 +14,7 @@
             "error",
             4
         ],
-        "linebreak-style": [
-            "error",
-            "windows"
-        ],
+        "no-unused-vars": ["error", { "varsIgnorePattern": "[iI]gnored" }],
         "quotes": [
             "error",
             "single"

@@ -8,7 +8,7 @@ yarn-error.log*
 # Runtime data
 pids
 *.pid
-*.seedt
+*.seed
 *.pid.lock
 
 #sublime workspace 
