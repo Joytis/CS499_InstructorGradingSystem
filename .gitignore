@@ -1,3 +1,8 @@
+.DS_Store
+dist/electron/*
+dist/web/*
+build/*
+!build/icons
 # Logs
 logs
 *.log
@@ -37,10 +42,10 @@ build/Release
 
 # Dependency directories
 node_modules/
-jspm_packages/
-
-# TypeScript v1 declaration files
-typings/
+npm-debug.log
+npm-debug.log.*
+thumbs.db
+!.gitkeep
 
 # Optional npm cache directory
 .npm
