@@ -1,8 +1,8 @@
 'use strict'
 
 import { app, BrowserWindow } from 'electron'
-var logger = require('../config/winston.js')
-var db = require('../database')
+// var logger = require('../config/winston.js')
+// var db = require('../database')
 
 /**
  * Set `__static` path to static files in production
@@ -12,20 +12,20 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-db.sequelize
-  .authenticate()
-  .then(async () => {
-    logger.info('Connection has been established successfully.')
-    // Force a sync
-    await db.student.sync({force: true})
-    await db.student.create({
-      firstName: 'John',
-      lastName: 'Hancock'
-    })
-  })
-  .catch(err => {
-    logger.error('Unable to connect to the database:', err)
-  })
+// db.sequelize
+//   .authenticate()
+//   .then(async () => {
+//     logger.info('Connection has been established successfully.')
+//     // Force a sync
+//     await db.student.sync({force: true})
+//     await db.student.create({
+//       firstName: 'John',
+//       lastName: 'Hancock'
+//     })
+//   })
+//   .catch(err => {
+//     logger.error('Unable to connect to the database:', err)
+//   })
 
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
