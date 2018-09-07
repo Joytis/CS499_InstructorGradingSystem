@@ -1,4 +1,5 @@
-module.exports = function (sequelize, DataTypes) {
+'use strict'
+export default function (sequelize, DataTypes) {
   var Student = sequelize.define('student', {
     firstName: {
       type: DataTypes.STRING
