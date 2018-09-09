@@ -13,14 +13,8 @@ if (process.env.NODE_ENV !== 'development') {
 
 db.sequelize
   .authenticate()
-  .then(async () => {
-    for (var key in db.tables) {
-      await db.tables[key].sync()
-    }
-  })
-  .catch(err => {
-    console.log('Unable to connect to the database:', err)
-  })
+  .then(async () => { await db.sequelize.sync() })
+  .catch(err => { console.log('Unable to connect to the database:', err) })
 
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'

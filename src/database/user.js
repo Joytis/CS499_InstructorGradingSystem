@@ -4,12 +4,7 @@ export default (sequelize, DataTypes) => {
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
     // Validate email with email regex
-    email: {
-      type: DataTypes.STRING,
-      validate: {
-        isEmail: true
-      }
-    },
+    email: { type: DataTypes.STRING, validate: { isEmail: true } },
     birthdate: DataTypes.DATE
   })
 

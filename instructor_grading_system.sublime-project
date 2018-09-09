@@ -3,7 +3,7 @@
 	[
 		{
 			"path": ".",
-            "folder_exclude_patterns": ["node_modules", "doc"]
+            "folder_exclude_patterns": ["node_modules", "doc", "build", "logs"]
 		}
 	],
     "linters": {

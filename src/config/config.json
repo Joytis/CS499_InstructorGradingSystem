@@ -11,6 +11,17 @@
       "min": 0,
       "acquire": 30000,
       "idle": 10000
+    },
+    "define": {
+      "underscored": false,
+      "freezeTableName": false,
+      "charset": "utf8",
+      "dialectOptions": {
+        "collate": "utf8_general_ci"
+      }
+    },
+    "sync": { 
+      "force": true 
     }
   }
 }
