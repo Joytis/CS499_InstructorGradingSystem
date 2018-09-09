@@ -14,17 +14,14 @@ if (process.env.NODE_ENV !== 'development') {
 db.sequelize
   .authenticate()
   .then(async () => {
-    logger.info('Connection has been established successfully.')
-    // Force a sync
-    await db.student.sync()
-    // await db.student.create({
-    //   firstName: 'Chris',
-    //   lastName: 'MyMan'
-    // })
+    for (var key in db.tables) {
+      await db.tables[key].sync()
+    }
   })
   .catch(err => {
-    logger.error('Unable to connect to the database:', err)
+    console.log('Unable to connect to the database:', err)
   })
+
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`

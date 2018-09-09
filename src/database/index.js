@@ -1,33 +1,37 @@
-import somefile from './student.js'
-import * as fs from 'fs'
-import * as path from 'path'
-import * as Sequelize from 'sequelize'
-import * as globalConfig from '../config/config.json'
-const config = globalConfig['sequelize']
-const basename = path.basename(__filename)
+// Dependencies
+import Sequelize from 'sequelize'
+import { config, logger } from '../config'
+// Tables
+import student from './student.js'
+import assignment from './assignment.js'
+import assignmentCategory from './assignmentCategory.js'
+import user from './user.js'
+
+const sqlConfig = config['sequelize']
 const db = {}
+db.tables = {}
+
+const includedTableConstructors = {
+  'student': student,
+  'assignment': assignment,
+  'assignmentCategory': assignmentCategory,
+  'user': user
+}
 
 // Create sequelize instance
-const sequelize = new Sequelize(config.database, config.user, config.password, config)
+const sequelize = new Sequelize(sqlConfig.database, sqlConfig.user, sqlConfig.password, sqlConfig)
 
-// Read all files in firectory and add them as models to db
-fs.readdirSync(__dirname)
-  .filter(file => {
-    // console.log(file)
-    // console.log(filename)
-    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js')
-  })
-  .forEach(file => {
-    // console.log(file)
-    // console.log(typeof file)
-    var model = somefile(sequelize, Sequelize)
-    db[model.name] = model
-  })
+// NOTE: I would iterate over the files, but nodejs was really giving me trouble there.
+for (var key in includedTableConstructors) {
+  logger.info('Creating sequelize database table: ' + key)
+  db.tables[key] = includedTableConstructors[key](sequelize, Sequelize.DataTypes)
+}
 
+// Stuff all the tables into the database object.
 // Add model associations to db.
-Object.keys(db).forEach(modelName => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db)
+Object.keys(db.tables).forEach(modelName => {
+  if (db.tables[modelName].associate) {
+    db.tables[modelName].associate(db)
   }
 })
 

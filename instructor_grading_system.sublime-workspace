@@ -1,0 +1,1012 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"assign",
+				"assignmentCategory"
+			],
+			[
+				"assignment",
+				"assignmentCategory\t(assignmentCategory.js)"
+			],
+			[
+				"global",
+				"globalConfig"
+			],
+			[
+				"modul",
+				"modelModule"
+			],
+			[
+				"models",
+				"modelsPath"
+			],
+			[
+				"win",
+				"winston.js\t(index.js)"
+			],
+			[
+				"Shader",
+				"ShaderNonsense"
+			],
+			[
+				"light",
+				"lightingData"
+			],
+			[
+				"Color",
+				"ColorCauldron\t(GameDirectionalLightingData.cs)"
+			],
+			[
+				"native",
+				"nativeResolution"
+			],
+			[
+				"PixelP",
+				"PixelPerfectCamera"
+			],
+			[
+				"PixelPer",
+				"PixelPerfectCamera\t(PixelPerfectCamera.cs)"
+			],
+			[
+				"Builtin",
+				"BuiltinRenderTextureType"
+			],
+			[
+				"m_b",
+				"m_BlitMaterial"
+			],
+			[
+				"downscale",
+				"downscaleRT"
+			],
+			[
+				"Clear",
+				"ClearFlag"
+			],
+			[
+				"RenderBuf",
+				"RenderBufferStoreAction"
+			],
+			[
+				"color",
+				"colorRT"
+			],
+			[
+				"DownscalePixel",
+				"DownscalePixelBuffer\t(LightweightForwardRenderer.cs)"
+			],
+			[
+				"Execute",
+				"ExecuteCommandBuffer"
+			],
+			[
+				"Cam",
+				"CameraTarget"
+			],
+			[
+				"desc",
+				"descriptor"
+			],
+			[
+				"depthBu",
+				"depthBufferBits"
+			],
+			[
+				"RenderTe",
+				"RenderTextureDescriptor"
+			],
+			[
+				"CommandBuf",
+				"CommandBufferPool"
+			],
+			[
+				"camera",
+				"cameraData"
+			],
+			[
+				"colorAtta",
+				"colorAttachmentHandle"
+			],
+			[
+				"colorA",
+				"colorAttachmentHandle"
+			],
+			[
+				"Camera",
+				"CameraData"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "src/database/student.js",
+			"settings":
+			{
+				"buffer_size": 251,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/database/assignmentCategory.js",
+			"settings":
+			{
+				"buffer_size": 343,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/database/index.js",
+			"settings":
+			{
+				"buffer_size": 1206,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/database/user.js",
+			"settings":
+			{
+				"buffer_size": 413,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"javas",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"rename",
+				"Rename File"
+			],
+			[
+				"delete",
+				"File: Delete"
+			],
+			[
+				"err",
+				"SublimeLinter: Goto Error"
+			],
+			[
+				"rein",
+				"Indentation: Reindent Lines"
+			],
+			[
+				"reset",
+				"Git: Reset (unstage) Current File"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"diff",
+				"Git: Diff Current File"
+			],
+			[
+				"reload",
+				"SublimeLinter: Reload SublimeLinter and its Plugins"
+			],
+			[
+				"relo",
+				"SublimeLinter: Reload SublimeLinter and its Plugins"
+			],
+			[
+				"update",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"push",
+				"Git: Push"
+			],
+			[
+				"quick com",
+				"Git: Quick Commit (repo)"
+			],
+			[
+				"relad",
+				"SublimeLinter: Reload SublimeLinter and its Plugins"
+			],
+			[
+				"name",
+				"File: Copy Name"
+			],
+			[
+				"locate",
+				"File: Locate"
+			],
+			[
+				"git checkout ",
+				"Git: Checkout Current File"
+			],
+			[
+				"git reset",
+				"Git: Reset (unstage) Current File"
+			],
+			[
+				"open",
+				"Terminal: Open"
+			],
+			[
+				"git graph",
+				"Git: Graph All"
+			],
+			[
+				"termianl settings",
+				"Preferences: Terminal Settings – Default"
+			],
+			[
+				"settings terminal",
+				"Preferences: Terminal Settings – Default"
+			],
+			[
+				"color",
+				"UI: Select Color Scheme"
+			],
+			[
+				"colro ",
+				"UI: Select Color Scheme"
+			],
+			[
+				"theme",
+				"UI: Select Theme"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 158.0,
+		"history":
+		[
+			"eslint",
+			"import urllib.request,os,hashlib; h = '6f4c264a24d933ce70df5dedcf1dcaee' + 'ebe013ee18cced0ef93d5f746d80ef60'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) ",
+			" import urllib.request,os,hashlib; h = '6f4c264a24d933ce70df5dedcf1dcaee' + 'ebe013ee18cced0ef93d5f746d80ef60'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) "
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Users/clark/Documents/Programming/instructor_grading_system",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/research",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/database"
+	],
+	"file_history":
+	[
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/database/assignment.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/database/assignmentCategory.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/config/winston.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/main/index.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/config/index.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/database/student.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/database/index.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/config/config.json",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/package.json",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/dist/electron/index.html",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/main/index.dev.js",
+		"/C/Program Files/Unity/Hub/Editor/2018.2.6f1/Editor/Data/Tools/mergespecfile.txt",
+		"/C/Users/clark/Desktop/mergespecfile.txt",
+		"/C/Program Files/Unity/Hub/Editor/2018.2.6f1/Editor/Data/Tools/mergerules.txt",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/index.ejs",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/.gitignore",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/index.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/database/models/student.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/.eslintrc.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/models/index.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/client/tables/student.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/config/config.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/client/dbconnection.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/dist/electron/main.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/instructor_grading_system.sublime-project",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/config/winston.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/.eslintrc.json",
+		"/C/Users/clark/Documents/Programming/spooky_test_game/Assets/Plugins/Editor/FMOD/EventManager.cs",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/src/dbconnection.js",
+		"/C/Users/clark/Documents/Programming/instructor_grading_system/node_modules/.bin/eslint",
+		"/C/Users/clark/Documents/Programming/TestSomeOdinStuff/Assets/Plugins/Sirenix/Demos/Attributes Overview/Scripts/ValueDropdownExamples.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/Game/5-Systems/ColorCauldron/Code/Potion.cs",
+		"/C/Users/clark/Documents/Programming/TestSomeOdinStuff/Assets/Plugins/Sirenix/Demos/Attributes Overview/Scripts/PrefabRelatedAttributesExamples.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/Game/3-Environments/ProcGen/Code/ChunkMetadata.cs",
+		"/C/Users/clark/Documents/Programming/TestSomeOdinStuff/Assets/Plugins/Sirenix/Demos/Custom Attribute Processors/Scripts/AttributeProcessorPriorityExample.cs",
+		"/C/Users/clark/Documents/Programming/TestSomeOdinStuff/Assets/Plugins/Sirenix/Demos/Custom Attribute Processors/Scripts/TabGroupByDeclaringType.cs",
+		"/C/Users/clark/Documents/Programming/TestSomeOdinStuff/Assets/Plugins/Sirenix/Demos/Custom Attribute Processors/Scripts/PutAttributesOnAnyType.cs",
+		"/C/Users/clark/Documents/Programming/TestSomeOdinStuff/Assets/Plugins/Sirenix/Demos/Custom Attribute Processors/Scripts/CustomizeDictionaryKeyValueExample.cs",
+		"/C/Users/clark/Documents/Programming/TestSomeOdinStuff/Assets/Plugins/Sirenix/Demos/Custom Attribute Processors/Scripts/BasicAttributeProcessorExample.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/LWG/Code/Utilities/SerDictionary.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/External/JMO Assets/Cartoon FX/CartoonFX Free.txt",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.core/CoreRP/Textures/TextureCache.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/Passes/DirectionalShadowsPass.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/Passes/LocalShadowsPass.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/Passes/ScreenSpaceShadowResolvePass.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.core/CoreRP/Editor/TextureCombiner/TextureCombiner.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.core/CoreRP/Shadow/Shadow.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.core/CoreRP/Shadow/ShadowBase.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/Game/5-Systems/ColorCauldron/Code/GameDirectionalLightingData.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/External/OdinInspector/Editor/ScriptableObjectCreator.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/Game/5-Systems/Camera/Code/LWRPPixelatedRenderScaleDriver.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/LightweightPipeline.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/Game/5-Systems/Movement/ActorMovement.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/Game/5-Systems/ColorCauldron/Code/MapTransformRotationToLightingData.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Temp/ParsedCombinations-graph_player_pinkSteam.shader",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/Passes/ForwardLitPass.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/Game/5-Systems/Camera/Code/CameraFollow2D.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/mini_clungeons.sublime-project",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.core/CoreRP/Camera/PixelPerfectCamera.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/Data/LightweightPipelineAsset.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.core/CoreRP/Utilities/CoreUtils.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.high-definition/HDRP/RenderPipeline/HDUtils.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/Editor/LightweightPipelineAssetEditor.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.high-definition/HDRP/RenderPipeline/HDRenderPipeline.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/LightweightForwardRenderer.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/LightweightUtils.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/LightweightShaderUtils.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/LightweightPipelineCore.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.high-definition/HDRP/RenderPipeline/HDStringConstants.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/LightweightConstantBuffer.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.core/CoreRP/Textures/RTHandleSystem.RTHandle.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/Passes/ScriptableRenderPass.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/Game/2-Actors/Player/Code/PlayerController.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ProjectSettings/ProjectSettings.asset",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/LWG/Code/Editor/Windows/OdinProjectValidator.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.high-definition/HDRP/Lighting/LightLoop/LightLoop.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/Assets/External/ResonanceAudio/Scripts/FmodResonanceAudio.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.lightweight/LWRP/Editor/ShaderGraph/LightWeightPBRSubShader.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.high-definition/HDRP/Lighting/LightLoop/GlobalLightLoopSettings.cs",
+		"/C/Users/clark/Documents/Programming/main_game_lfs/ScriptableRenderPipeline/com.unity.render-pipelines.core/CoreRP/Common/CommandBufferPool.cs",
+		"/C/Users/clark/AppData/Roaming/Sublime Text 3/Packages/Terminal/Terminal.sublime-settings"
+	],
+	"find":
+	{
+		"height": 41.0
+	},
+	"find_in_files":
+	{
+		"height": 105.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"AssignmentCategory",
+			"sequalie",
+			"included_tables_constructors",
+			"includedTableConstructors",
+			"included_tables_constructors",
+			"MyMan",
+			"globalConfig",
+			"sqlCOnfig",
+			"config",
+			"somefile",
+			"logger",
+			"John",
+			"database",
+			"sequelize",
+			"database",
+			"db",
+			"var",
+			"require",
+			"somefile",
+			"filename",
+			"= ",
+			"somefile",
+			"file",
+			"logger",
+			"module.exports",
+			"module.edports",
+			"__dirname",
+			"const",
+			"modelsPath",
+			"path",
+			"modelsPath",
+			"Task",
+			"User",
+			"firstName",
+			"db",
+			"user",
+			"sequelize",
+			"Logger",
+			"var",
+			"winston",
+			"log",
+			"console",
+			"logger",
+			"sequelize",
+			"logger",
+			"Sequelize",
+			"logger",
+			"windows",
+			"_ignored"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "src/database/student.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 251,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								251,
+								251
+							]
+						],
+						"settings":
+						{
+							"SL.16.region_keys":
+							[
+							],
+							"SL.21.region_keys":
+							[
+								"sublime_linter.protected_regions"
+							],
+							"SL.31.region_keys":
+							[
+								"sublime_linter.protected_regions"
+							],
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/database/assignmentCategory.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 343,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								343,
+								343
+							]
+						],
+						"settings":
+						{
+							"SL.58.region_keys":
+							[
+								"sublime_linter.protected_regions"
+							],
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/database/index.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1206,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								480,
+								480
+							]
+						],
+						"settings":
+						{
+							"SL.59.region_keys":
+							[
+								"SL.annotations.Gutter.|region.yellowish markup.warning.sublime_linter|dot",
+								"SL.annotations.Highlights.|259bef27478595b9a6e0c30cbd237f1cbda741f511a73ed28ae86c4151faf8ef|region.yellowish markup.warning.sublime_linter|32",
+								"sublime_linter.protected_regions"
+							],
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/database/user.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 413,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								413,
+								413
+							]
+						],
+						"settings":
+						{
+							"SL.52.region_keys":
+							[
+								"sublime_linter.protected_regions"
+							],
+							"open_with_edit": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 40.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": false,
+	"output.SublimeLinter":
+	{
+		"height": 0.0
+	},
+	"output.exec":
+	{
+		"height": 615.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 109.0
+	},
+	"pinned_build_system": "",
+	"project": "instructor_grading_system.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"win",
+				"src\\config\\winston.js"
+			],
+			[
+				"index",
+				"src\\main\\index.js"
+			],
+			[
+				"student",
+				"src\\database\\student.js"
+			],
+			[
+				"winston",
+				"src\\config\\winston.js"
+			],
+			[
+				"config",
+				"src\\config\\index.js"
+			],
+			[
+				"inde",
+				"src\\database\\index.js"
+			],
+			[
+				"inde.js",
+				"src\\main\\index.js"
+			],
+			[
+				"Student",
+				"src\\database\\student.js"
+			],
+			[
+				"stu",
+				"src\\database\\student.js"
+			],
+			[
+				"in",
+				"src\\main\\index.js"
+			],
+			[
+				"package",
+				"package.json"
+			],
+			[
+				"index.js",
+				"src\\main\\index.js"
+			],
+			[
+				"index.",
+				"src\\index.ejs"
+			],
+			[
+				"gitig",
+				".gitignore"
+			],
+			[
+				"pack",
+				"package.json"
+			],
+			[
+				"In",
+				"index.js"
+			],
+			[
+				"st",
+				"src\\database\\models\\student.js"
+			],
+			[
+				"db",
+				"src\\client\\dbconnection.js"
+			],
+			[
+				"index dev",
+				"src\\main\\index.dev.js"
+			],
+			[
+				"main",
+				"dist\\electron\\main.js"
+			],
+			[
+				"WInston",
+				"src\\config\\winston.js"
+			],
+			[
+				"sublime",
+				"instructor_grading_system.sublime-project"
+			],
+			[
+				".eslint",
+				".eslintrc.json"
+			],
+			[
+				"dbcon",
+				"src\\dbconnection.js"
+			],
+			[
+				"",
+				".eslintrc.json"
+			],
+			[
+				".es",
+				".eslintrc.json"
+			],
+			[
+				".eslin",
+				".eslintrc.json"
+			],
+			[
+				"eslint",
+				"node_modules\\.bin\\eslint"
+			],
+			[
+				"dbconn",
+				"src\\dbconnection.js"
+			],
+			[
+				"project",
+				"instructor_grading_system.sublime-project"
+			],
+			[
+				"Potion",
+				"Game\\5-Systems\\ColorCauldron\\Code\\Potion.cs"
+			],
+			[
+				"Dictionary",
+				"LWG-Code\\Utilities\\SerDictionary.cs"
+			],
+			[
+				"ActorMove",
+				"Game\\5-Systems\\Movement\\ActorMovement.cs"
+			],
+			[
+				"ShadowBase",
+				"CoreRP\\Shadow\\ShadowBase.cs"
+			],
+			[
+				"TextureCache",
+				"CoreRP\\Textures\\TextureCache.cs"
+			],
+			[
+				"Shadow.cs",
+				"CoreRP\\Shadow\\Shadow.cs"
+			],
+			[
+				"TextureCombin",
+				"CoreRP\\Editor\\TextureCombiner\\TextureCombiner.cs"
+			],
+			[
+				"ScreenSpaceSh",
+				"LWRP\\Passes\\ScreenSpaceShadowResolvePass.cs"
+			],
+			[
+				"LocalSha",
+				"LWRP\\Passes\\LocalShadowsPass.cs"
+			],
+			[
+				"DirectionalS",
+				"LWRP\\Passes\\DirectionalShadowsPass.cs"
+			],
+			[
+				"Forward",
+				"LWRP\\Passes\\ForwardLitPass.cs"
+			],
+			[
+				"GameDire",
+				"Game\\5-Systems\\ColorCauldron\\Code\\GameDirectionalLightingData.cs"
+			],
+			[
+				"GameLight",
+				"Game\\5-Systems\\ColorCauldron\\Code\\GameDirectionalLightingData.cs"
+			],
+			[
+				"Forwar",
+				"LWRP\\Passes\\ForwardLitPass.cs"
+			],
+			[
+				"PixelP",
+				"CoreRP\\Camera\\PixelPerfectCamera.cs"
+			],
+			[
+				"PixelPer",
+				"CoreRP\\Camera\\PixelPerfectCamera.cs"
+			],
+			[
+				"PixelPerfec",
+				"CoreRP\\Camera\\PixelPerfectCamera.cs"
+			],
+			[
+				"CameraFollow",
+				"Game\\5-Systems\\Camera\\Code\\CameraFollow2D.cs"
+			],
+			[
+				"LightweightPipelineAss",
+				"LWRP\\Data\\LightweightPipelineAsset.cs"
+			],
+			[
+				"sublimepr",
+				"Project\\mini_clungeons.sublime-project"
+			],
+			[
+				"ForwardL",
+				"LWRP\\Passes\\ForwardLitPass.cs"
+			],
+			[
+				"ForwardPass",
+				"LWRP\\Passes\\ForwardLitPass.cs"
+			],
+			[
+				"LightweightPipelineAs",
+				"LWRP\\Data\\LightweightPipelineAsset.cs"
+			],
+			[
+				"LightweightPipelineAsser",
+				"LWRP\\Editor\\LightweightPipelineAssetEditor.cs"
+			],
+			[
+				"LightweightUt",
+				"LWRP\\LightweightUtils.cs"
+			],
+			[
+				"For",
+				"LWRP\\Passes\\ForwardLitPass.cs"
+			],
+			[
+				"HdPipe",
+				"HDRP\\RenderPipeline\\HDRenderPipeline.cs"
+			],
+			[
+				"Utils",
+				"LWRP\\LightweightShaderUtils.cs"
+			],
+			[
+				"HDRenderPipelne",
+				"HDRP\\RenderPipeline\\HDRenderPipeline.cs"
+			],
+			[
+				"HDRender",
+				"HDRP\\RenderPipeline\\HDRenderPipeline.cs"
+			],
+			[
+				"Sublime projec",
+				"Project\\mini_clungeons.sublime-project"
+			],
+			[
+				"ForW",
+				"LWRP\\Passes\\ForwardLitPass.cs"
+			],
+			[
+				"sublimeproj",
+				"Project\\mini_clungeons.sublime-project"
+			],
+			[
+				"ForwardLit",
+				"LWRP\\Passes\\ForwardLitPass.cs"
+			],
+			[
+				"SriptableRende",
+				"LWRP\\Passes\\ScriptableRenderPass.cs"
+			],
+			[
+				"player",
+				"Game\\2-Actors\\Player\\Code\\PlayerController.cs"
+			],
+			[
+				"SCriptable",
+				"LWRP\\Passes\\ScriptableRenderPass.cs"
+			],
+			[
+				"ForwardLitPas",
+				"LWRP\\Passes\\ForwardLitPass.cs"
+			],
+			[
+				"PlayerCon",
+				"Game\\2-Actors\\Player\\Code\\PlayerController.cs"
+			],
+			[
+				"LightPass.cs",
+				"HDRP\\Lighting\\LightLoop\\GlobalLightLoopSettings.cs"
+			],
+			[
+				"ForwardLitP",
+				"LWRP\\Passes\\ForwardLitPass.cs"
+			],
+			[
+				"ForwardLitPass",
+				"LWRP\\Passes\\ForwardLitPass.cs"
+			],
+			[
+				"Lightweight",
+				"LWRP\\Editor\\ShaderGraph\\LightWeightPBRSubShader.cs"
+			],
+			[
+				"HdRenderPipeline",
+				"HDRP\\RenderPipeline\\HDRenderPipeline.cs"
+			],
+			[
+				"sublime projec",
+				"Project\\mini_clungeons.sublime-project"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"C:\\Users\\clark\\Documents\\Programming\\main_game_lfs\\mini_clungeons.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 251.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

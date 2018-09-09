@@ -1,12 +1,8 @@
-'use strict'
-export default function (sequelize, DataTypes) {
+export default (sequelize, DataTypes) => {
   var Student = sequelize.define('student', {
-    firstName: {
-      type: DataTypes.STRING
-    },
-    lastName: {
-      type: DataTypes.STRING
-    }
+    id: { type: DataTypes.INTEGER, primaryKey: true },
+    firstName: DataTypes.STRING,
+    lastName: DataTypes.STRING
   })
 
   // Force a sync
