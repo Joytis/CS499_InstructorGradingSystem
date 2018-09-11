@@ -2,17 +2,18 @@
 	"folders":
 	[
 		{
-			"path": "."
+			"path": ".",
+            "folder_exclude_patterns": ["node_modules", "doc", "build", "logs"]
 		}
 	],
     "linters": {
         "eslint": {
-            // "selector": "text.html.vue, source.js - meta.attribute-with-value"
+            "selector": "text.html.vue, source.js - meta.attribute-with-value"
         }
     },
 	"settings":
 	{
-		"tab_size": 4,
+		"tab_size": 2,
 		"translate_tabs_to_spaces": true,
 		"detect_indentation": false,
 		"use_tab_stops": true,

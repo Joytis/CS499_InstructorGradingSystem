@@ -1,0 +1,27 @@
+{
+  "sequelize": {
+    "user": "root",
+    "password": "colemancs499",
+    "database": "instructor-grading-system",
+    "host": "142.93.6.47",
+    "dialect": "mysql",
+    "operatorsAliases": false,
+    "pool": {
+      "max": 5,
+      "min": 0,
+      "acquire": 30000,
+      "idle": 10000
+    },
+    "define": {
+      "underscored": false,
+      "freezeTableName": false,
+      "charset": "utf8",
+      "dialectOptions": {
+        "collate": "utf8_general_ci"
+      }
+    },
+    "sync": { 
+      "force": true 
+    }
+  }
+}
