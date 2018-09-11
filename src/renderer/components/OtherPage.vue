@@ -1,6 +1,7 @@
 <template>
   <div id="wrapper">
-    <hero></hero>
+    <!-- <hero></hero> -->
+    <navbar></navbar>
     <main class="main">
       <section class="container">
         <div class="columns">
@@ -18,6 +19,7 @@
 
 <script>
 import Hero from './Hero'
+import Navbar from './Navbar'
 import MenuLeft from './MenuLeft'
 import ContentBodyMock from './ContentBodyMock'
 
@@ -26,7 +28,8 @@ export default {
   components: {
     Hero,
     MenuLeft,
-    ContentBodyMock
+    ContentBodyMock,
+    Navbar
   },
   data () {
     return {}
@@ -36,13 +39,12 @@ export default {
 </script>
 
 <style scoped>
-.main {
-  position: relative;
-  padding-top: 200px;
-  z-index: -1;
-}
 
 menu-left {
   overflow: auto;
+}
+
+main {
+  padding-top: 55px;
 }
 </style>
