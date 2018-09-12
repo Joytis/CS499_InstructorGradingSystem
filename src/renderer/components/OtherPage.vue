@@ -1,6 +1,7 @@
 <template>
   <div id="wrapper">
-    <hero></hero>
+    <!-- <hero></hero> -->
+    <navbar></navbar>
     <main class="main">
       <section class="container">
         <div class="columns">
@@ -17,32 +18,33 @@
 </template>
 
 <script>
-import Hero from './Hero'
-import MenuLeft from './MenuLeft'
-import ContentBodyMock from './ContentBodyMock'
+import Hero from './Hero.vue';
+import Navbar from './Navbar.vue';
+import MenuLeft from './NavMenu/MenuLeft.vue';
+import ContentBodyMock from './ContentBodyMock.vue';
 
 export default {
   name: 'other-page',
   components: {
     Hero,
     MenuLeft,
-    ContentBodyMock
+    ContentBodyMock,
+    Navbar,
   },
-  data () {
-    return {}
+  data() {
+    return {};
   },
-  methods: {}
-}
+  methods: {},
+};
 </script>
 
 <style scoped>
-.main {
-  position: relative;
-  padding-top: 200px;
-  z-index: -1;
-}
 
 menu-left {
   overflow: auto;
+}
+
+main {
+  padding-top: 55px;
 }
 </style>

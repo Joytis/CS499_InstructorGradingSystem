@@ -10,11 +10,13 @@
 export default {
   name: 'ContentBodyMock',
   components: {},
-  data () {
-    return {}
+  data() {
+    return {
+      activeTab: null,
+    };
   },
-  methods: {}
-}
+  methods: {},
+};
 </script>
 
 

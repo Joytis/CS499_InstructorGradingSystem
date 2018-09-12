@@ -6,8 +6,8 @@
 
 <script>
   export default {
-    name: 'instructor_grading_system'
-  }
+    name: 'instructor_grading_system',
+  };
 </script>
 
 <style>
