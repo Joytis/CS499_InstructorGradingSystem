@@ -20,7 +20,7 @@
 <script>
 import Hero from './Hero'
 import Navbar from './Navbar'
-import MenuLeft from './MenuLeft'
+import MenuLeft from './NavMenu/MenuLeft'
 import ContentBodyMock from './ContentBodyMock'
 
 export default {

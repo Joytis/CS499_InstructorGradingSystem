@@ -11,7 +11,9 @@ export default {
   name: 'ContentBodyMock',
   components: {},
   data () {
-    return {}
+    return {
+      activeTab: null
+    }
   },
   methods: {}
 }
