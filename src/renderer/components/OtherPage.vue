@@ -18,10 +18,10 @@
 </template>
 
 <script>
-import Hero from './Hero'
-import Navbar from './Navbar'
-import MenuLeft from './NavMenu/MenuLeft'
-import ContentBodyMock from './ContentBodyMock'
+import Hero from './Hero.vue';
+import Navbar from './Navbar.vue';
+import MenuLeft from './NavMenu/MenuLeft.vue';
+import ContentBodyMock from './ContentBodyMock.vue';
 
 export default {
   name: 'other-page',
@@ -29,13 +29,13 @@ export default {
     Hero,
     MenuLeft,
     ContentBodyMock,
-    Navbar
+    Navbar,
   },
-  data () {
-    return {}
+  data() {
+    return {};
   },
-  methods: {}
-}
+  methods: {},
+};
 </script>
 
 <style scoped>

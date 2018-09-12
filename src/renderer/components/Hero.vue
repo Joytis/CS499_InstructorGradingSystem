@@ -27,13 +27,13 @@
     name: 'Hero',
     components: {
     },
-    data () {
+    data() {
       return {
-      }
+      };
     },
     methods: {
-    }
-  }
+    },
+  };
 </script>
 
 <style scoped>
