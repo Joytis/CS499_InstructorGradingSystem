@@ -41,21 +41,21 @@ const ModalForm = {
                     </footer>
                 </div>
             </form>
-        `
-}
+        `,
+};
 
 export default {
   components: {
-    ModalForm
+    ModalForm,
   },
   props: ['isComponentModalActive'],
-  data () {
+  data() {
     return {
       formProps: {
         email: 'evan@you.com',
-        password: 'testing'
-      }
-    }
-  }
-}
+        password: 'testing',
+      },
+    };
+  },
+};
 </script>

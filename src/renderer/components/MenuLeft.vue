@@ -38,11 +38,11 @@
 export default {
   name: 'MenuLeft',
   components: {},
-  data () {
-    return {}
+  data() {
+    return {};
   },
-  methods: {}
-}
+  methods: {},
+};
 </script>
 
 <style scoped>

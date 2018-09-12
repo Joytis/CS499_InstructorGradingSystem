@@ -17,22 +17,22 @@
 </template>
 
 <script>
-import Hero from './Hero'
-import MenuLeft from './MenuLeft'
-import ContentBodyMock from './ContentBodyMock'
+import Hero from './Hero.vue';
+import MenuLeft from './MenuLeft.vue';
+import ContentBodyMock from './ContentBodyMock.vue';
 
 export default {
   name: 'other-page',
   components: {
     Hero,
     MenuLeft,
-    ContentBodyMock
+    ContentBodyMock,
   },
-  data () {
-    return {}
+  data() {
+    return {};
   },
-  methods: {}
-}
+  methods: {},
+};
 </script>
 
 <style scoped>

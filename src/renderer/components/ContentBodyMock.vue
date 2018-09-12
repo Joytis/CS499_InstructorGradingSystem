@@ -10,11 +10,11 @@
 export default {
   name: 'ContentBodyMock',
   components: {},
-  data () {
-    return {}
+  data() {
+    return {};
   },
-  methods: {}
-}
+  methods: {},
+};
 </script>
 
 
