@@ -1,7 +1,6 @@
 'use strict'
 
 import { app, BrowserWindow } from 'electron'
-import { db } from '../database'
 
 /**
  * Set `__static` path to static files in production
@@ -10,11 +9,6 @@ import { db } from '../database'
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
-
-db.sequelize
-  .authenticate()
-  .then(async () => { await db.sequelize.sync() })
-  .catch(err => { console.log('Unable to connect to the database:', err) })
 
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
