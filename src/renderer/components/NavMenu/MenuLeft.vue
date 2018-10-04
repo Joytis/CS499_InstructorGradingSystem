@@ -12,28 +12,28 @@
 </template>
 
 <script>
-import MenuStruct from './MenuStruct'
+import MenuStruct from './MenuStruct';
 
 export default {
   name: 'MenuLeft',
   components: {},
-  beforeCreate: function () {
-    this.struct = MenuStruct
+  beforeCreate() {
+    this.struct = MenuStruct;
   },
-  data () {
+  data() {
     return {
-      activeComponent: 'Dashboard'
-    }
+      activeComponent: 'Dashboard',
+    };
   },
   methods: {
-    isActive: function (component) {
-      return component === this.activeComponent
+    isActive(component) {
+      return component === this.activeComponent;
     },
-    setActive: function (component) {
-      this.activeComponent = component
-    }
-  }
-}
+    setActive(component) {
+      this.activeComponent = component;
+    },
+  },
+};
 </script>
 
 <style scoped>

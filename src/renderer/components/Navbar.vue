@@ -29,18 +29,18 @@
 <script>
   export default {
     name: 'Navbar',
-    data () {
+    data() {
       return {
-        navIsActive: false
-      }
+        navIsActive: false,
+      };
     },
     methods: {
-      toggleMenu: function () {
-        this.navIsActive = !this.navIsActive
+      toggleMenu() {
+        this.navIsActive = !this.navIsActive;
       },
-      open: function (link) {
-        this.$electron.shell.openExternal(link)
-      }
-    }
-  }
+      open(link) {
+        this.$electron.shell.openExternal(link);
+      },
+    },
+  };
 </script>
