@@ -2,30 +2,57 @@ const menu = [
   {
     title: 'Development',
     menuItems: [
-      'Login',
-      'Server Communication Testing',
+      {
+        itemTitle: 'Login',
+        itemLink: 'develop/login',
+      },
+      {
+        itemTitle: 'Server Communication Testing',
+        itemLink: 'develop/serverTesting',
+      },
     ],
   },
   {
     title: 'General',
     menuItems: [
-      'Dashboard',
-      'Courses',
-      'Documentation',
+      {
+        itemTitle: 'Dashboard',
+        itemLink: 'general/dashboard',
+      },
+      {
+        itemTitle: 'Courses',
+        itemLink: 'general/courses',
+      },
+      {
+        itemTitle: 'Documentation',
+        itemLink: 'general/documentation',
+      },
     ],
   },
   {
     title: 'Administration',
     menuItems: [
-      'Course Settings',
-      'Manage Enrollment',
+      {
+        itemTitle: 'Course Settings',
+        itemLink: 'administration/courses',
+      },
+      {
+        itemTitle: 'Manage Enrollment',
+        itemLink: 'administration/enrollment',
+      },
     ],
   },
   {
     title: 'Settings',
     menuItems: [
-      'Account Settings',
-      'Remote Storage Settings',
+      {
+        itemTitle: 'Account Settings',
+        itemLink: 'settings/account',
+      },
+      {
+        itemTitle: 'Remote Storage Settings',
+        itemLink: 'settings/remote',
+      },
     ],
   },
 ];

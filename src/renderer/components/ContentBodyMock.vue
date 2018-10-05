@@ -1,5 +1,11 @@
 <template>
   <section>
+
+    <div>
+      Email: {{ email }}
+      Password: {{ password }}
+    </div>
+
     <button class="button is-primary is-medium"
       @click="isComponentModalActive = true">
       Sign In
@@ -48,21 +54,21 @@ const ModalForm = {
                     </footer>
                 </div>
             </form>
-        `
-}
+        `,
+};
 
 export default {
   components: {
-    ModalForm
+    ModalForm,
   },
   props: ['isComponentModalActive'],
-  data () {
+  data() {
     return {
       formProps: {
         email: '',
-        password: ''
-      }
-    }
-  }
-}
+        password: '',
+      },
+    };
+  },
+};
 </script>
