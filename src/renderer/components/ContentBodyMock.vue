@@ -1,23 +1,40 @@
 <template>
-  <b-tabs size="is-medium" position="is-centered" v-model="activeTab">
-    <b-tab-item label="Unaswered" icon="google-photos"></b-tab-item>
-    <b-tab-item label="Most Asked" icon="library-music"></b-tab-item>
-    <b-tab-item label="FAQ" icon="video"></b-tab-item>
-  </b-tabs>
-</template>
+  <section>
 
+    <button class="button is-primary is-medium"
+      @click="isComponentModalActive = true">
+      Sign In
+    </button>
+
+    <button class="button is-primary is-medium"
+      @click="isComponentModalActive = true">
+      Sign Up
+    </button>
+
+    <b-modal :active.sync="isComponentModalActive" has-modal-card>
+      <sign-in-form></sign-in-form>
+    </b-modal>
+  </section>
+</template>
+  
 <script>
+import SignInForm from './AuthModal/SignInModal.vue';
+import SignUpForm from './AuthModal/SignUpModal.vue';
+
+
 export default {
   name: 'ContentBodyMock',
-  components: {},
+  components: {
+    SignInForm,
+    SignUpForm,
+  },
   data() {
     return {
-      activeTab: null,
+      isComponentModalActive: false,
     };
   },
   methods: {},
 };
 </script>
 
-
-  
+]
