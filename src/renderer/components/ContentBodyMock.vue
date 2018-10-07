@@ -1,74 +1,40 @@
 <template>
   <section>
 
-    <div>
-      Email: {{ email }}
-      Password: {{ password }}
-    </div>
-
     <button class="button is-primary is-medium"
       @click="isComponentModalActive = true">
       Sign In
     </button>
 
+    <button class="button is-primary is-medium"
+      @click="isComponentModalActive = true">
+      Sign Up
+    </button>
+
     <b-modal :active.sync="isComponentModalActive" has-modal-card>
-      <modal-form v-bind="formProps"></modal-form>
+      <sign-in-form></sign-in-form>
     </b-modal>
   </section>
 </template>
   
 <script>
-const ModalForm = {
-  props: ['email', 'password'],
-  template: `
-            <form action="">
-                <div class="modal-card" style="width: auto">
-                    <header class="modal-card-head">
-                        <p class="modal-card-title">Login</p>
-                    </header>
-                    <section class="modal-card-body">
-                        <b-field label="Email">
-                            <b-input
-                                type="email"
-                                :value="email"
-                                placeholder="Your email"
-                                required>
-                            </b-input>
-                        </b-field>
+import SignInForm from './AuthModal/SignInModal.vue';
+import SignUpForm from './AuthModal/SignUpModal.vue';
 
-                        <b-field label="Password">
-                            <b-input
-                                type="password"
-                                :value="password"
-                                password-reveal
-                                placeholder="Your password"
-                                required>
-                            </b-input>
-                        </b-field>
-
-                        <b-checkbox>Remember me</b-checkbox>
-                    </section>
-                    <footer class="modal-card-foot">
-                        <button class="button" type="button" @click="$parent.close()">Close</button>
-                        <button class="button is-primary">Login</button>
-                    </footer>
-                </div>
-            </form>
-        `,
-};
 
 export default {
+  name: 'ContentBodyMock',
   components: {
-    ModalForm,
+    SignInForm,
+    SignUpForm,
   },
-  props: ['isComponentModalActive'],
   data() {
     return {
-      formProps: {
-        email: '',
-        password: '',
-      },
+      isComponentModalActive: false,
     };
   },
+  methods: {},
 };
 </script>
+
+]
