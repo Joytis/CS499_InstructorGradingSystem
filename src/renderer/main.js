@@ -2,6 +2,8 @@ import Vue from 'vue';
 import axios from 'axios';
 import Buefy from 'buefy';
 import 'buefy/lib/buefy.css';
+import 'vue-material-design-icons/styles.css';
+import Icon from 'vue-material-design-icons/ChevronRight.vue';
 
 import App from './App.vue';
 import router from './router';
@@ -14,7 +16,10 @@ if (!process.env.IS_WEB) Vue.use(require('vue-electron'));
 Vue.http = Vue.prototype.$http = axios;
 Vue.config.productionTip = false;
 
-Vue.use(Buefy);
+Vue.use(Buefy, {
+  defaultIconPack: 'mdi',
+});
+Vue.component('chevron-right-icon', Icon);
 
 /* eslint-disable no-new */
 new Vue({
