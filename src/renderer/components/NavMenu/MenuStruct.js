@@ -3,12 +3,16 @@ const menu = [
     title: 'Development',
     menuItems: [
       {
-        itemTitle: 'Login',
-        itemLink: 'develop/login',
+        itemTitle: 'Sign In',
+        itemLink: '/signin',
+      },
+      {
+        itemTitle: 'Sign Up',
+        itemLink: '/signup',
       },
       {
         itemTitle: 'Server Communication Testing',
-        itemLink: 'develop/serverTesting',
+        itemLink: '/serverTesting',
       },
     ],
   },
@@ -17,15 +21,15 @@ const menu = [
     menuItems: [
       {
         itemTitle: 'Dashboard',
-        itemLink: 'general/dashboard',
+        itemLink: '/dashboard',
       },
       {
         itemTitle: 'Courses',
-        itemLink: 'general/courses',
+        itemLink: '/courses',
       },
       {
         itemTitle: 'Documentation',
-        itemLink: 'general/documentation',
+        itemLink: '/docs',
       },
     ],
   },
@@ -33,12 +37,8 @@ const menu = [
     title: 'Administration',
     menuItems: [
       {
-        itemTitle: 'Course Settings',
-        itemLink: 'administration/courses',
-      },
-      {
         itemTitle: 'Manage Enrollment',
-        itemLink: 'administration/enrollment',
+        itemLink: '/enrollment',
       },
     ],
   },
@@ -47,11 +47,7 @@ const menu = [
     menuItems: [
       {
         itemTitle: 'Account Settings',
-        itemLink: 'settings/account',
-      },
-      {
-        itemTitle: 'Remote Storage Settings',
-        itemLink: 'settings/remote',
+        itemLink: '/account',
       },
     ],
   },

@@ -5,7 +5,8 @@
         {{block.title}}
       </p>
       <ul :key="block.title + '-items'" class="menu-list">
-        <li v-for="menuItem in block.menuItems" :key="menuItem"><a @click="setActive(menuItem)" :class="{'is-active': isActive(menuItem) }">{{ menuItem }}</a></li>
+        <router-link tag="li" v-for="menuItem in block.menuItems" :key="menuItem.itemTitle" :to="menuItem.itemLink"><a @click="setActive(menuItem)" :class="{'is-active': isActive(menuItem) }">{{ menuItem.itemTitle }}</a></router-link>
+        <!--  -->
       </ul>
     </template>
   </aside>
