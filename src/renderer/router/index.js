@@ -8,8 +8,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Courses',
-      component: require('../components/Courses/CourseTable.vue').default,
+      name: 'OtherPage',
+      component: require('../components/OtherPage.vue').default,
     },
     {
       path: '*',

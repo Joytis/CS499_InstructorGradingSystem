@@ -9,7 +9,7 @@
             <menu-left></menu-left>
           </div>
           <div class="column is-three-quarters">
-            <content-body-mock></content-body-mock>
+            <course-table></course-table>
           </div>
         </div>
       </section>
@@ -22,6 +22,7 @@ import Hero from './Hero.vue';
 import Navbar from './Navbar.vue';
 import MenuLeft from './NavMenu/MenuLeft.vue';
 import ContentBodyMock from './ContentBodyMock.vue';
+import CourseTable from './Courses/CourseTable.vue';
 
 export default {
   name: 'other-page',
@@ -30,6 +31,7 @@ export default {
     MenuLeft,
     ContentBodyMock,
     Navbar,
+    CourseTable,
   },
   data() {
     return {};
@@ -39,7 +41,6 @@ export default {
 </script>
 
 <style scoped>
-
 menu-left {
   overflow: auto;
 }

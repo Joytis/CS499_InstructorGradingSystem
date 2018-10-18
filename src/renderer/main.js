@@ -3,7 +3,7 @@ import axios from 'axios';
 import Buefy from 'buefy';
 import 'buefy/lib/buefy.css';
 import 'vue-material-design-icons/styles.css';
-import Icon from 'vue-material-design-icons/ChevronRight.vue';
+import '@mdi/font/css/materialdesignicons.min.css';
 
 import App from './App.vue';
 import router from './router';
@@ -19,7 +19,6 @@ Vue.config.productionTip = false;
 Vue.use(Buefy, {
   defaultIconPack: 'mdi',
 });
-Vue.component('chevron-right-icon', Icon);
 
 /* eslint-disable no-new */
 new Vue({
