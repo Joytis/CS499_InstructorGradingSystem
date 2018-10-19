@@ -3,8 +3,12 @@
 	[
 		{
 			"path": ".",
-            "folder_exclude_patterns": ["node_modules", "doc", "build", "logs"]
-		}
+      "folder_exclude_patterns": ["node_modules", "doc", "build", "logs"]
+		},
+    {
+      "path": "../instructor_server",
+      "folder_exclude_patterns": ["node_modules", "doc", "build", "logs"]
+    }
 	],
     "linters": {
         "eslint": {

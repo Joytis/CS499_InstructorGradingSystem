@@ -4,6 +4,7 @@ dist/web/*
 build/*
 !build/icons
 *.seed
+*.sublime-workspace
 node_modules/
 npm-debug.log
 npm-debug.log.*
