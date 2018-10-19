@@ -33,6 +33,11 @@ export default new Router({
       component: require('../components/OtherPage.vue').default,
     },
     {
+      path: '/auth',
+      name: 'All Sections',
+      component: require('../components/AuthModal/AuthModal.vue').default,
+    },
+    {
       path: '*',
       redirect: '/dashboard',
     },

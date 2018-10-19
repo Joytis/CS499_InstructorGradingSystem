@@ -3,12 +3,8 @@ const menu = [
     title: 'Development',
     menuItems: [
       {
-        itemTitle: 'Sign In',
-        itemLink: '/signin',
-      },
-      {
-        itemTitle: 'Sign Up',
-        itemLink: '/signup',
+        itemTitle: 'Auth Testing',
+        itemLink: '/auth',
       },
       {
         itemTitle: 'Server Communication Testing',

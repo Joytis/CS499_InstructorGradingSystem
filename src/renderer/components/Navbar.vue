@@ -10,7 +10,7 @@
             <span> {{ CurrentSemester }} </span>
             <b-icon icon="menu-down"></b-icon>
           </button>
-          <div v-for="Semester in Terms">
+          <div v-for="Semester in Terms" :key="Semester">
             <b-dropdown-item v-on:click="CurrentSemester=Semester">{{ Semester }}</b-dropdown-item>
           </div>
         </b-dropdown>

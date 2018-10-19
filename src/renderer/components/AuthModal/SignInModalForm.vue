@@ -5,20 +5,6 @@
                         <p class="modal-card-title">Login</p>
                     </header>
                     <section class="modal-card-body">
-                        <b-field label="First Name">
-                            <b-input
-                                :value="FirstName"
-                                placeholder="Jon"
-                                required>
-                            </b-input>
-                        </b-field>
-                        <b-field label="Last Name">
-                            <b-input
-                                :value="LastName"
-                                placeholder="Smith"
-                                required>
-                            </b-input>
-                        </b-field>
                         <b-field label="Email">
                             <b-input
                                 type="email"
@@ -40,7 +26,7 @@
 
                     </section>
                     <footer class="modal-card-foot">
-                        <button class="button" type="button" @click="$parent.close()">Close</button>
+                        <button class="button" type="button" @click="$emit('swap', 'signup')">Toggle</button>
                         <button class="button is-primary" @click="$parent.close()">Login</button>
                     </footer>
                 </div>
@@ -58,8 +44,6 @@ export default {
     return {
       email: '',
       password: '',
-      FirstName: '',
-      LastName: '',
     };
   },
 };
