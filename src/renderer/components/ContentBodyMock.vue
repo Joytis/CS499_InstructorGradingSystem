@@ -2,17 +2,21 @@
   <section>
 
     <button class="button is-primary is-medium"
-      @click="isComponentModalActive = true">
+      @click="isSignInModalActive = true">
       Sign In
     </button>
 
     <button class="button is-primary is-medium"
-      @click="isComponentModalActive = true">
+      @click="isSignUpModalActive = true">
       Sign Up
     </button>
 
-    <b-modal :active.sync="isComponentModalActive" has-modal-card>
+    <b-modal :active.sync="isSignInModalActive" has-modal-card>
       <sign-in-form></sign-in-form>
+    </b-modal>
+
+    <b-modal :active.sync="isSignUpModalActive" has-modal-card>
+      <sign-up-form></sign-up-form>
     </b-modal>
   </section>
 </template>
@@ -30,7 +34,8 @@ export default {
   },
   data() {
     return {
-      isComponentModalActive: false,
+      isSignInModalActive: false,
+      isSignUpModalActive: false,
     };
   },
   methods: {},

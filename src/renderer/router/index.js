@@ -14,7 +14,7 @@ export default new Router({
     {
       path: '/courses',
       name: 'My Courses',
-      component: require('../components/OtherPage.vue').default,
+      component: require('../components/Courses/CourseTable.vue').default,
     },
     {
       path: '/courses/:id/sections',
