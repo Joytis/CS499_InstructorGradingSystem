@@ -5,7 +5,7 @@
         {{block.title}}
       </p>
       <ul :key="block.title + '-items'" class="menu-list">
-        <router-link tag="li" v-for="menuItem in block.menuItems" :key="menuItem.itemTitle" :to="menuItem.itemLink"><a :class="{'is-active': isActive(menuItem.itemTitle) }">{{ menuItem.itemTitle }}</a></router-link>
+        <router-link tag="li" v-for="menuItem in block.menuItems" :key="menuItem.itemTitle" :to="menuItem.itemLink"><a :class="{'is-active': isActive(menuItem.itemLink) }">{{ menuItem.itemTitle }}</a></router-link>
         <!--  -->
       </ul>
     </template>
@@ -26,12 +26,12 @@ export default {
   },
   methods: {
     isActive(component) {
-      return component === this.routeName;
+      return !(this.$route.path.indexOf(component));
     },
   },
   computed: {
     routeName() {
-      return this.$route.name;
+      return this.$route.fullPath;
     },
   },
 };
