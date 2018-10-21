@@ -2,14 +2,9 @@ const request = require('request');
 
 const host = 'https://localhost:3000';
 
-// const data = {
-//   username: 'username',
-//   password: 'password',
-//   confirmPassword: 'password',
-//   firstName: 'firstname',
-//   lastName: 'lastname',
-//   email: 'email@email.com',
-// };
+const data = {
+   postInstructor: 'instructor',
+ };
 
 /* module.exports = async (err) => {
   const accounts = await request.get(`${host}/instructor/accounts`);
@@ -25,67 +20,83 @@ const host = 'https://localhost:3000';
 }; */
 
 async function getInstructor() { // Get request
-  const info = await request.get(`${host}/instructor/accounts/`);
-  if (!info) { // Return error if get request fails
-    throw new Error('Error');
+  try {
+    const info = await request.get(`${host}/instructor/accounts/`);
+    return info;
   }
-  return info;
+  catch (error) {
+    throw error(error);
+  }
 }
 
 async function postInstructor(args) { // Post request
-  args = 'instructor';
-  const info = await request.post(`${host}/auth/instructors`, args);
-  if (!info) { // Return error if post request fails
-    throw new Error('Error');
+  try {
+    const info = await request.post(`${host}/auth/instructors`, args);
+    return info;
   }
-  return info;
+  catch (error) {
+    throw error(error);
+  }
 }
 
-async function getAccount() {
-  const info = await request.get(`${host}/instructors/accounts`);
-  if (!info) {
-    throw new Error('Error');
+async function getAccount() { // Get request
+  try {
+    const info = await request.get(`${host}/instructor/accounts/`);
+    return info;
   }
-  return info;
+  catch (error) {
+    throw error(error);
+  }
 }
 
-async function postAccount(args) {
-  const info = await request.post(`${host}/auth/instructors`, args);
-  if (!info) {
-    throw new Error('Error');
+async function postAccount(args) { // Post request
+  try {
+    const info = await request.post(`${host}/auth/instructors`, args);
+    return info;
   }
-  return info;
-}
-async function getLogin() {
-  const info = await request.get(`${host}/instructors/accounts`);
-  if (!info) {
-    throw new Error('Error');
+  catch (error) {
+    throw error(error);
   }
-  return info;
 }
 
-async function postLogin(args) {
-  const info = await request.post(`${host}/auth/instructors`, args);
-  if (!info) {
-    throw new Error('Error');
+async function getLogin() { // Get request
+  try {
+    const info = await request.get(`${host}/instructor/accounts/`);
+    return info;
   }
-  return info;
+  catch (error) {
+    throw error(error);
+  }
 }
 
-async function getLogout() {
-  const info = await request.get(`${host}/instructors/accounts`);
-  if (!info) {
-    throw new Error('Error');
+async function postLogin(args) { // Post request
+  try {
+    const info = await request.post(`${host}/auth/instructors`, args);
+    return info;
   }
-  return info;
+  catch (error) {
+    throw error(error);
+  }
 }
 
-async function postLogout(args) {
-  const info = await request.post(`${host}/auth/instructors`, args);
-  if (!info) {
-    throw new Error('Error');
+async function getLogout() { // Get request
+  try {
+    const info = await request.get(`${host}/instructor/accounts/`);
+    return info;
   }
-  return info;
+  catch (error) {
+    throw error(error);
+  }
+}
+
+async function postLogout(args) { // Post request
+  try {
+    const info = await request.post(`${host}/auth/instructors`, args);
+    return info;
+  }
+  catch (error) {
+    throw error(error);
+  }
 }
 
 /* Requires courseId argument
