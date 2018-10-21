@@ -18,6 +18,7 @@ module.exports = class SimpleCrud {
       url: this.target,
       json: true,
       jar: true, // enable cached cookies
+      resolveWithFullResponse: true, // Ensure we can get the status code of our response
     };
   }
 
@@ -42,16 +43,15 @@ module.exports = class SimpleCrud {
 
   // Updates the object with the given ID with values in obj
   async put(id, obj) {
-    if (id === undefined) throw Error('No ID provided');
+    if (id === undefined) throw new Error('No ID provided');
     const options = this.copyOptions();
     options.url = appendIdIfExists(options.url, id);
     options.body = obj;
     return request.delete(options);
   }
 
-  // delete an objet with the given ID
+  // For accounts, we sometimes don't want to append the ID. 
   async delete(id) {
-    if (id === undefined) throw Error('No ID provided');
     const options = this.copyOptions();
     options.url = appendIdIfExists(options.url, id);
     return request.delete(options);

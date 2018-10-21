@@ -16,7 +16,6 @@ const host = 'https://localhost:3000';
 
 const AccountCrud = new SimpleCrud(host, '/instructor/account');
 const LoginCrud = new SimpleCrud(host, '/instructor/login');
-const LogoutCrud = new SimpleCrud(host, '/instructor/logout');
 
 async function simpleTest() {
   try {
@@ -29,6 +28,7 @@ async function simpleTest() {
       email: 'coleman@coleman.col',
     });
     logger.info(JSON.stringify(response, null, 2));
+    // logger.info(response.statusCode);
 
     logger.info('Testing account login');
     response = await LoginCrud.post({
@@ -36,10 +36,12 @@ async function simpleTest() {
       password: 'colemancs499',
     });
     logger.info(JSON.stringify(response, null, 2));
+    // logger.info(response.statusCode);
 
-    logger.info('Testing account logout');
-    response = await LogoutCrud.post({});
+    logger.info('Testing account delete');
+    response = await AccountCrud.delete();
     logger.info(JSON.stringify(response, null, 2));
+    // logger.info(response.statusCode);
   } catch (err) {
     logger.error(err);
   }
