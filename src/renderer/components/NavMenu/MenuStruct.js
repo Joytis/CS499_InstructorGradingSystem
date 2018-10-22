@@ -36,6 +36,10 @@ const menu = [
         itemTitle: 'Manage Enrollment',
         itemLink: '/enrollment',
       },
+      {
+        itemTitle: 'Manage Terms',
+        itemLink: '/terms',
+      },
     ],
   },
   {

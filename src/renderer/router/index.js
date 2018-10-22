@@ -34,8 +34,13 @@ export default new Router({
     },
     {
       path: '/auth',
-      name: 'All Sections',
+      name: 'Auth Testing',
       component: require('../components/AuthModal/AuthModal.vue').default,
+    },
+    {
+      path: '/terms',
+      name: 'Terms Testing',
+      component: require('../components/Terms/NewTermTest.vue').default,
     },
     {
       path: '*',

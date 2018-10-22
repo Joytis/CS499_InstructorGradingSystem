@@ -24,7 +24,7 @@ import SignUpForm from './SignUpModalForm.vue';
 
 
 export default {
-  name: 'ContentBodyMock',
+  name: 'AuthModal',
   components: {
     SignInForm,
     SignUpForm,
