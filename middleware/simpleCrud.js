@@ -23,6 +23,7 @@ module.exports = class SimpleCrud {
   }
 
   copyOptions() {
+    // Shallow copy should be just fine. We don't have nested object options.
     return Object.assign({}, this.basicRequestOptions);
   }
 
@@ -35,7 +36,6 @@ module.exports = class SimpleCrud {
 
   // Post a javascript object to our route.
   async post(obj) {
-    // Shallow copy should be just fine.
     const options = this.copyOptions();
     options.body = obj;
     return request.post(options);
@@ -50,7 +50,7 @@ module.exports = class SimpleCrud {
     return request.delete(options);
   }
 
-  // For accounts, we sometimes don't want to append the ID. 
+  // For accounts, we sometimes don't want to append the ID.
   async delete(id) {
     const options = this.copyOptions();
     options.url = appendIdIfExists(options.url, id);
