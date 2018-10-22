@@ -42,7 +42,7 @@
     name: 'Navbar',
     data() {
       return {
-        navIsActive: false,
+        navIsActive: true,
         Terms: ['Fall 18', 'Spring 19', 'Summer 19'],
         CurrentSemester: 'Fall 18',
       };
@@ -50,6 +50,7 @@
     methods: {
       toggleMenu() {
         this.navIsActive = !this.navIsActive;
+        this.$emit('toggleMenu');
       },
       open(link) {
         this.$electron.shell.openExternal(link);
