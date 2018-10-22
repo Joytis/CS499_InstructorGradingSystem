@@ -4,17 +4,17 @@
       <a class="navbar-item" @click="open('https://bulma.io')">
         <img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: a modern CSS framework based on Flexbox" width="112" height="28">
       </a>
-      <section>
-        <b-dropdown>
-          <button class="button is-primary" slot="trigger">
-            <span> {{ CurrentSemester }} </span>
-            <b-icon icon="menu-down"></b-icon>
-          </button>
-          <div v-for="Semester in Terms" :key="Semester">
-            <b-dropdown-item v-on:click="CurrentSemester=Semester">{{ Semester }}</b-dropdown-item>
-          </div>
-        </b-dropdown>
-      </section>
+      <div class="navbar-item">
+          <b-dropdown>
+            <button class="button is-primary" slot="trigger">
+              <span> {{ CurrentSemester }} </span>
+              <b-icon icon="chevron-down"></b-icon>
+            </button>
+            <div v-for="Semester in Terms" :key="Semester">
+              <b-dropdown-item v-on:click="CurrentSemester=Semester">{{ Semester }}</b-dropdown-item>
+            </div>
+          </b-dropdown>
+        </div>
       <div class="navbar-burger burger" @click="toggleMenu" :class="{'is-active': navIsActive}" data-target="mainNav">
         <span></span>
         <span></span>
