@@ -17,6 +17,7 @@
             placeholder="Select a date (mm/dd/yyyy)"
             icon="calendar-today"
             editable
+            inline
             required>
           </b-datepicker>
         </b-field>
@@ -25,6 +26,7 @@
             placeholder="Select a date (mm/dd/yyyy)"
             icon="calendar-today"
             editable
+            inline
             required>
           </b-datepicker>
         </b-field>
