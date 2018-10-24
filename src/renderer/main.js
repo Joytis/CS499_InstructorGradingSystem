@@ -2,7 +2,7 @@ import Vue from 'vue';
 import axios from 'axios';
 import './App.sass';
 import Buefy from 'buefy';
-import 'buefy/lib/buefy.css';
+// import 'buefy/lib/buefy.css';
 import 'vue-material-design-icons/styles.css';
 import '@mdi/font/css/materialdesignicons.min.css';
 
