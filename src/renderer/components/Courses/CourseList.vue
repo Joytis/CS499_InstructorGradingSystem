@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="box" v-for="description in datamock">
+    <div class="box" v-for="description in datamock" :key="description">
       <nav class="level">
         <div class="level-item" :key="description.CourseId">
           {{ description.CourseId }}
