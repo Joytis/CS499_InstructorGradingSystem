@@ -1,9 +1,13 @@
 <template>
-  <nav class="navbar is-primary is-fixed-top ">
+  <nav class="navbar is-primary is-fixed-top" style="-webkit-app-region: drag">
     <div class="navbar-brand">
-      <a class="navbar-item" @click="open('https://bulma.io')">
-        <img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: a modern CSS framework based on Flexbox" width="112" height="28">
+      <a class="navbar-item is-hoverable" @click="toggleMenu">
+        <b-icon icon="menu"></b-icon>
       </a>
+      <div class="navbar-item">
+        <img src="../../../static/gbpp_logo.png" width="auto" height="55">
+        &nbsp; GradeBook++
+      </div>
       <div class="navbar-item">
           <b-dropdown>
             <button class="button is-primary" slot="trigger">
@@ -14,24 +18,19 @@
               <b-dropdown-item v-on:click="CurrentSemester=Semester">{{ Semester }}</b-dropdown-item>
             </div>
           </b-dropdown>
-        </div>
-      <div class="navbar-burger burger" @click="toggleMenu" :class="{'is-active': navIsActive}" data-target="mainNav">
-        <span></span>
-        <span></span>
-        <span></span>
       </div>
     </div>
-
-    <div id="mainNav" class="navbar-menu" :class="{'is-active': navIsActive} + ' is-primary'">
-      <div class="navbar-start">
-        <a class="navbar-item">
-          Home
+    <div v-if="navIsActive" class="navbar-menu is-active">
+      <div class="navbar-end">
+        <a id="min-btn" class="navbar-item is-right" @click="minimize">
+          <b-icon icon="window-minimize" style="justify-content: flex-end"></b-icon>
         </a>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link">
-            Docs
-          </a>
-        </div>
+        <a id="max-btn" class="navbar-item is-right" @click="maximize">
+          <b-icon icon="window-maximize" style="justify-content: flex-end"></b-icon>
+        </a>
+        <a id="close-btn" class="navbar-item is-right" @click="close">
+          <b-icon icon="window-close" style="justify-content: flex-end"></b-icon>
+        </a>
       </div>
     </div>
   </nav>
@@ -55,6 +54,39 @@
       open(link) {
         this.$electron.shell.openExternal(link);
       },
+      minimize() {
+        this.$electron.remote.BrowserWindow.getFocusedWindow().minimize();
+      },
+      maximize() {
+        const window = this.$electron.remote.BrowserWindow.getFocusedWindow();
+        if (window.isMaximized()) {
+          window.unmaximize();
+        } else {
+          window.maximize();
+        }
+      },
+      close() {
+        this.$electron.remote.BrowserWindow.getFocusedWindow().close();
+      },
     },
   };
 </script>
+
+<style>
+.navbar {
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.navbar-item {
+  -webkit-app-region: no-drag;
+  -webkit-user-select:auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
+</style>
