@@ -20,7 +20,7 @@
           </b-dropdown>
       </div>
     </div>
-    <div class="navbar-menu is-active">
+    <div v-if="navIsActive" class="navbar-menu is-active">
       <div class="navbar-end">
         <a id="min-btn" class="navbar-item is-right" @click="minimize">
           <b-icon icon="window-minimize" style="justify-content: flex-end"></b-icon>
@@ -41,7 +41,7 @@
     name: 'Navbar',
     data() {
       return {
-        navIsActive: true,
+        navIsActive: false,
         Terms: ['Fall 18', 'Spring 19', 'Summer 19'],
         CurrentSemester: 'Fall 18',
       };
@@ -73,11 +73,20 @@
 </script>
 
 <style>
-html {
+.navbar {
   -webkit-app-region: drag;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
+
+.navbar-item {
+  -webkit-app-region: no-drag;
+  -webkit-user-select:auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
 </style>
