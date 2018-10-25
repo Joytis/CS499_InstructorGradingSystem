@@ -41,7 +41,7 @@
     name: 'Navbar',
     data() {
       return {
-        navIsActive: false,
+        navIsActive: true,
         Terms: ['Fall 18', 'Spring 19', 'Summer 19'],
         CurrentSemester: 'Fall 18',
       };

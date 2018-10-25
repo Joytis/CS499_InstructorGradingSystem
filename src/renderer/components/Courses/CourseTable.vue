@@ -23,8 +23,10 @@
             {{ props.row.CourseAvg }}
           </b-table-column>
           <b-table-column label="Course Page">
-            <button class="button is-primary is-small">
-              <router-link :to="'courses/' + props.row.CourseId" tag="li" >
+            <button class="button is-warning is-small">
+              <router-link :to="'courses/' + props.row.CourseId">
+                <b-icon type="is-accent" icon="expand-all">
+                </b-icon>
               </router-link>
             </button>
           </b-table-column>
@@ -52,7 +54,7 @@
                 {{ props.row.SectionAvg }}
               </b-table-column>
               <b-table-column label="Section Page">
-                <button class="button is-primary is-small">+</button>
+                <button class="button is-warning is-small">+</button>
               </b-table-column>
             </template>
 

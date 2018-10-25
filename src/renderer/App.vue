@@ -2,7 +2,7 @@
   <div id="wrapper">
     <navbar @toggleMenu="menuActive=!menuActive;"></navbar>
     <multipane class="vertical-panes" layout="vertical">
-      <div class="pane" v-if="menuActive" :style="{ width: '14em', maxWidth: '17em', minWidth: '10em'}">
+      <div id="mainmenu" class="pane" v-if="menuActive" :style="{ width: '14em', maxWidth: '17em', minWidth: '10em'}">
         <menu-left></menu-left>
       </div>
       <multipane-resizer></multipane-resizer>
@@ -45,8 +45,7 @@ menu-left {
 }
 
 .multipane {
-  padding-top: 52px;
-  z-index: -2;
+  padding-top: 51px;
 }
 
 .vertical-panes {
@@ -64,6 +63,10 @@ menu-left {
   border-left: 1px solid #ccc;
 }
 
+#mainmenu {
+  background: #eeeeee
+}
+
 #wrapper {
   overflow: auto;
 }
@@ -77,6 +80,8 @@ menu-left {
   $primary-invert: findColorInvert($primary);
   $twitter: #4099ff;
   $twitter-invert: findColorInvert($twitter);
+  $accent: #666666;
+  $accent-invert: findColorInvert($accent);
   // Setup $colors to use as bulma classes (e.g. 'is-twitter')
   $colors: (
       "white": ($white, $black),
@@ -88,7 +93,8 @@ menu-left {
       "success": ($success, $success-invert),
       "warning": ($warning, $warning-invert),
       "danger": ($danger, $danger-invert),
-      "twitter": ($twitter, $twitter-invert)
+      "twitter": ($twitter, $twitter-invert),
+      "accent": ($accent, $accent-invert)
   );
   // Links
   $link: $primary;
