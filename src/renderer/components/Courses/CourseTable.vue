@@ -1,32 +1,31 @@
 <template>
   <b-table
-      :data="datamock"
+      :data="courses"
       paginated
       per-page="5"
       detailed
-      detail-key="CourseId"
+      detail-key="id"
   >
 
     <template slot-scope="props">
-      <b-table-column field="CourseId" label="Course ID" width="130" sortable>
-        {{ props.row.CourseId }}
+      <b-table-column field="id" label="Course ID" width="130" sortable>
+        {{ props.row.id }}
       </b-table-column>
-      <b-table-column field="CourseName" label="Course Name" sortable>
-        {{ props.row.CourseName }}
-      </b-table-column>
-
-      <b-table-column field="CourseSections" label="Number of Sections" numeric>
-        {{ props.row.CourseSections }}
+      <b-table-column field="title" label="Course Title" sortable>
+        {{ props.row.title }}
       </b-table-column>
 
-      <b-table-column field="CourseAvg" label="Course Average" sortable>
+      <b-table-column field="sections.length" label="Number of Sections" numeric>
+        {{ props.row.sections.length }}
+      </b-table-column>
+
+      <!-- <b-table-column field="CourseAvg" label="Course Average" sortable>
         {{ props.row.CourseAvg }}
-      </b-table-column>
+      </b-table-column> -->
       <b-table-column label="Course Page">
         <button class="button is-warning is-small">
-          <router-link :to="'courses/' + props.row.CourseId">
-            <b-icon type="is-accent" icon="expand-all">
-            </b-icon>
+          <router-link :to="'courses/' + props.row.id">
+            <b-icon type="is-accent" icon="expand-all"/>
           </router-link>
         </button>
       </b-table-column>
@@ -35,24 +34,24 @@
 
     <template slot="detail" slot-scope="props">
       <b-table
-        :data=getSection(props.row.CourseId)
+        :data=props.row.sections
       >
         <template slot-scope="props">
-          <b-table-column field="SectionName" label="Section Name" width="180" sortable>
-            {{ props.row.SectionName }}
+          <b-table-column field="id" label="Section ID" width="180" sortable>
+            {{ props.row.id }}
           </b-table-column>
 
-          <b-table-column field="SectionTime" label="Section Time" sortable>
-            {{ props.row.SectionTime }}
+          <b-table-column field="sectionNumber" label="Section Number" sortable>
+            {{ props.row.sectionNumber }}
           </b-table-column>
 
-          <b-table-column field="NumStudents" label="Number of Students" numeric>
+          <!-- <b-table-column field="NumStudents" label="Number of Students" numeric>
             {{ props.row.NumStudents }}
           </b-table-column>
 
           <b-table-column field="SectionAvg" label="Section Average" sortable>
             {{ props.row.SectionAvg }}
-          </b-table-column>
+          </b-table-column> -->
           <b-table-column label="Section Page">
             <button class="button is-warning is-small">+</button>
           </b-table-column>
@@ -65,6 +64,8 @@
 
 <script>
 /* eslint-disable no-console */
+/* eslint-disable no-param-reassign */
+import urljoin from 'url-join';
 import data from './CourseListDataMock';
 import { config } from '../../../../config';
 import { SimpleCrud } from '../../../../middleware';
@@ -74,7 +75,13 @@ export default {
   name: 'courses',
 
   beforeCreate() {
-    this.datamock = data.coursedata;
+    // this.datamock = data.coursedata;
+    // this.courses = [];
+    this.AccountCrud = new SimpleCrud(config.serverHost, '/instructor/account');
+    this.LoginCrud = new SimpleCrud(config.serverHost, '/instructor/login');
+    this.TermCrud = new SimpleCrud(config.serverHost, '/terms');
+    this.CourseCrud = new SimpleCrud(config.serverHost, '/courses');
+    this.SectionCrud = new SimpleCrud(config.serverHost, '/sections');
   },
 
   created() {
@@ -84,50 +91,44 @@ export default {
 
   data() {
     return {
-      AccountCrud: new SimpleCrud(config.serverHost, '/instructor/account'),
-      LoginCrud: new SimpleCrud(config.serverHost, '/instructor/login'),
-      TermCrud: new SimpleCrud(config.serverHost, '/terms'),
-      CourseCrud: new SimpleCrud(config.serverHost, '/courses'),
-      SectionCrud: new SimpleCrud(config.serverHost, '/sections'),
-      // SimpleCrud,
-      // loading: false,
-      // data: null,
-      // error: null,
+      courses: [],
     };
   },
   methods: {
     getSection(courseid) {
-      return data.coursedata.find(c => c.CourseId === courseid).Section;
+      return data.courses.find(c => c.id === courseid).sections;
     },
 
     async fetchData() {
-      const account = await this.AccountCrud.post({
-        username: 'Coleman',
-        password: 'colemancs499',
-        firstName: 'Professor',
-        lastName: 'Coleman',
-        email: 'coleman@coleman.col',
+      // TESTING AND SETUP CODE.
+      // await this.AccountCrud.post({
+      //   username: 'Coleman',
+      //   password: 'colemancs499',
+      //   firstName: 'Professor',
+      //   lastName: 'Coleman',
+      //   email: 'coleman@coleman.col',
+      // });
+      // await this.LoginCrud.post({
+      //   username: 'Coleman',
+      //   password: 'colemancs499',
+      // });
+      // const term = await this.TermCrud.post({ title: 'TestTerm' });
+      // const course = await this.CourseCrud.post({ title: 'TestCourse', courseNo: 42 });
+      // await this.SectionCrud.post({
+      //   sectionNumber: 0,
+      //   termId: term.data.id,
+      //   courseId: course.data.id,
+      // });
+
+      // ACTUAL USEFUL CODE.
+      // Query the course sections API
+      const newCourses = (await this.CourseCrud.get()).data; // Get all courses
+      const promises = newCourses.map(async (c) => {
+        const courseSectionCrud = this.CourseCrud.fromAppendedRoute(urljoin(String(c.id), '/sections'));
+        c.sections = (await courseSectionCrud.get()).data;
       });
-      console.log(JSON.stringify(account, null, 2));
-
-      const login = await this.LoginCrud.post({
-        username: 'Coleman',
-        password: 'colemancs499',
-      });
-      console.log(JSON.stringify(login, null, 2));
-
-      const term = await this.TermCrud.post({ title: 'TestTerm' });
-      console.log(JSON.stringify(term, null, 2));
-
-      const course = await this.CourseCrud.post({ title: 'TestCourse', courseNo: 42 });
-      console.log(JSON.stringify(course, null, 2));
-
-      const section = await this.SectionCrud.post({
-        sectionNumber: 0,
-        termId: term.data.id,
-        courseId: course.data.id,
-      });
-      console.log(JSON.stringify(section, null, 2));
+      await Promise.all(promises);
+      this.courses = newCourses;
     },
   },
 };

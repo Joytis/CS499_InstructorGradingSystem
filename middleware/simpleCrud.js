@@ -27,6 +27,10 @@ export default class SimpleCrud {
     return Object.assign({}, this.basicRequestOptions);
   }
 
+  fromAppendedRoute(route) {
+    return new SimpleCrud(this.target, route);
+  }
+
   async get(id) {
     // Shallow copy should be just fine.
     const options = this.copyOptions();
