@@ -57,6 +57,7 @@
     "app-root-path": "^2.1.0",
     "axios": "^0.18.0",
     "buefy": "^0.6.6",
+    "epic-spinners": "^1.0.4",
     "express": "4.16.3",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
