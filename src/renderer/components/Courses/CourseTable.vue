@@ -66,7 +66,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
-import data from './CourseListDataMock';
+// import data from './CourseListDataMock';
 import { config } from '../../../../config';
 import { SimpleCrud } from '../../../../middleware';
 
@@ -95,10 +95,6 @@ export default {
     };
   },
   methods: {
-    getSection(courseid) {
-      return data.courses.find(c => c.id === courseid).sections;
-    },
-
     async fetchData() {
       // TESTING AND SETUP CODE.
       // await this.AccountCrud.post({
