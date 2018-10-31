@@ -1,4 +1,5 @@
 <template>
+  <div>
     <b-table
         :data="datamock"
         paginated
@@ -60,13 +61,20 @@
 
           </b-table>
         </template>
-
     </b-table>
+      <button class="button is-primary is-medium"
+        @click="modalForm = 'createcourse'; isModalActive = true">
+        Create Course
+      </button>
+      <b-modal :active.sync="isModalActive" has-modal-card>
+        <create-course-form></create-course-form>
+      </b-modal>
+  </div>
 </template>
 
 <script>
 import data from './CourseListDataMock';
-
+import CreateCourseForm from './CreateCourseModal.vue';
 
 export default {
   name: 'courses',
@@ -76,7 +84,11 @@ export default {
   },
   data() {
     return {
+      isModalActive: false,
     };
+  },
+  components: {
+    CreateCourseForm,
   },
   methods: {
     getSection(courseid) {
