@@ -82,27 +82,15 @@
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
 // import data from './CourseListDataMock';
-import { config } from '../../../../config';
-import { SimpleCrud } from '../../../../middleware';
+import { CourseCrud, TermCrud, SectionCrud } from '../../../../middleware';
 import CreateCourseForm from './CreateCourseModal.vue';
 
 
 export default {
   name: 'courses',
 
-  beforeCreate() {
-    // this.datamock = data.coursedata;
-    // this.courses = [];
-    this.AccountCrud = new SimpleCrud(config.serverHost, '/instructor/account');
-    this.LoginCrud = new SimpleCrud(config.serverHost, '/instructor/login');
-    this.TermCrud = new SimpleCrud(config.serverHost, '/terms');
-    this.CourseCrud = new SimpleCrud(config.serverHost, '/courses');
-    this.SectionCrud = new SimpleCrud(config.serverHost, '/sections');
-  },
-
   created() {
     this.fetchData();
-    // TEST BOILERPLATE FOR THE MODAL.
   },
 
   data() {
@@ -117,30 +105,33 @@ export default {
   methods: {
     async fetchData() {
       // TESTING AND SETUP CODE.
-      // await this.AccountCrud.post({
-      //   username: 'Coleman',
-      //   password: 'colemancs499',
-      //   firstName: 'Professor',
-      //   lastName: 'Coleman',
-      //   email: 'coleman@coleman.col',
-      // });
-      // await this.LoginCrud.post({
-      //   username: 'Coleman',
-      //   password: 'colemancs499',
-      // });
-      // const term = await this.TermCrud.post({ title: 'TestTerm' });
-      // const course = await this.CourseCrud.post({ title: 'TestCourse', courseNo: 42 });
-      // await this.SectionCrud.post({
-      //   sectionNumber: 0,
-      //   termId: term.data.id,
-      //   courseId: course.data.id,
-      // });
+      const term = await TermCrud.post({ title: 'TestTerm' });
+      let course = await CourseCrud.post({ title: 'TestCourse', courseNo: 42 });
+      await SectionCrud.post({
+        sectionNumber: 0,
+        termId: term.data.id,
+        courseId: course.data.id,
+      });
+      await SectionCrud.post({
+        sectionNumber: 1,
+        termId: term.data.id,
+        courseId: course.data.id,
+      });
+      course = await CourseCrud.post({ title: 'TestCourse2', courseNo: 43 });
+      await SectionCrud.post({
+        sectionNumber: 0,
+        termId: term.data.id,
+        courseId: course.data.id,
+      });
+      await SectionCrud.post({
+        sectionNumber: 1,
+        termId: term.data.id,
+        courseId: course.data.id,
+      });
 
-      // ACTUAL USEFUL CODE.
-      // Query the course sections API
-      const newCourses = (await this.CourseCrud.get()).data; // Get all courses
+      const newCourses = (await CourseCrud.get()).data; // Get all courses
       const promises = newCourses.map(async (c) => {
-        const courseSectionCrud = this.CourseCrud.fromAppendedRoute(urljoin(String(c.id), '/sections'));
+        const courseSectionCrud = CourseCrud.fromAppendedRoute(urljoin(String(c.id), '/sections'));
         c.sections = (await courseSectionCrud.get()).data;
       });
       await Promise.all(promises);

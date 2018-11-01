@@ -1,59 +1,102 @@
 <template>
-  <form action="">
-    <div class="modal-card" style="width: auto">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Create New Term</p>
-      </header>
-      <section class="modal-card-body">
+  <div class="modal-card" style="width: auto">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Create New Term</p>
+    </header>
+    <section class="modal-card-body">
+      <div v-if="state === 'loading'">
+        <atom-spinner
+            :animation-duration="1000"
+            :size="200"
+            :color="'#cd5bef'"
+         />
+      </div>
+      <div v-else-if="state === 'error'">
+        <div> {{ error.message }} </div>
+      </div>
+      <div v-else-if="state === 'success'">
+        Success!
+      </div>
+      <div v-else>
         <b-field label="Term Name">
-          <b-input
-            :value="termName"
-            placeholder="Spring '18"
-            required>
-          </b-input>
+          <b-input :value="term.title" placeholder="Spring '18" required> </b-input>
         </b-field>
         <b-field label="Term Start Date">
-          <b-datepicker
-            placeholder="Select a date (mm/dd/yyyy)"
-            icon="calendar-today"
-            editable
-            inline
+          <b-datepicker 
+            v-model="term.startDate" 
+            placeholder="Select a date (mm/dd/yyyy)" 
+            icon="calendar-today" 
+            editable 
             required>
           </b-datepicker>
         </b-field>
         <b-field label="Term End Date">
-          <b-datepicker
-            placeholder="Select a date (mm/dd/yyyy)"
-            icon="calendar-today"
-            editable
-            inline
+          <b-datepicker 
+            v-model="term.endDate" 
+            placeholder="Select a date (mm/dd/yyyy)" 
+            icon="calendar-today" 
+            editable 
             required>
           </b-datepicker>
         </b-field>
-      </section>
-      <footer class="modal-card-foot">
-          <button class="button" type="button" @click="$parent.close()">Close</button>
-          <button class="button is-primary" @click="$parent.close()">Create</button>
-      </footer>
-    </div>
-  </form>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button" type="button" @click="$parent.close()">Close</button>
+      <button class="button is-primary" @click="attemptTermCreate">Create</button>
+    </footer>
+  </div>
 </template>
 
 
 
 <script>
+/* eslint-disable no-console */
+import { AtomSpinner } from 'epic-spinners';
+import { TermCrud } from '../../../../middleware';
+
 export default {
   name: 'CreateTermModalForm',
   components: {
+    AtomSpinner,
   },
   props: [],
   data() {
     return {
-      termName: '',
-      startDate: '',
-      endDate: '',
+      error: undefined,
+      state: 'main',
+      term: {
+        title: '',
+        startDate: '',
+        endDate: '',
+      },
     };
   },
+  methods: {
+    async attemptTermCreate() {
+      try {
+        // Display loading
+        this.state = 'loading';
+        // Wait for term creation
+        // console.log(this.term.startDate);
+        // console.log(this.term.endDate);
+        await TermCrud.post(this.term);
+        // wait for two seconds then close window.
+        this.state = 'success';
+      } catch (err) {
+        console.error(err);
+        this.state = 'error';
+        this.error = err;
+        // DISPLAY ERROR MODAL?
+      }
+    },
+    // computed: {
+    // startDate() {
+    // return Date.parse()
+    // }
+    // },
+  },
+
 };
 </script>
 
