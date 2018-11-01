@@ -28,9 +28,8 @@ export default new Router({
     },
     {
       path: '/courses/:id/:section/',
-      name: 'Section',
-      component: require('../components/OtherPage.vue').default,
-      props: ['id', 'section'],
+      name: 'Section page',
+      component: require('../components/Sections/SectionPage.vue').default,
     },
     {
       path: '/courses/:id/all/',

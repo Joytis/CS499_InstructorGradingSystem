@@ -8,24 +8,24 @@
         detail-key="CourseId"
     >
 
-        <template slot-scope="props">
+        <template slot-scope="Courseprops">
           <b-table-column field="CourseId" label="Course ID" width="130" sortable>
-            {{ props.row.CourseId }}
+            {{ Courseprops.row.CourseId }}
           </b-table-column>
           <b-table-column field="CourseName" label="Course Name" sortable>
-            {{ props.row.CourseName }}
+            {{ Courseprops.row.CourseName }}
           </b-table-column>
 
           <b-table-column field="CourseSections" label="Number of Sections" numeric>
-            {{ props.row.CourseSections }}
+            {{ Courseprops.row.CourseSections }}
           </b-table-column>
 
           <b-table-column field="CourseAvg" label="Course Average" sortable>
-            {{ props.row.CourseAvg }}
+            {{ Courseprops.row.CourseAvg }}
           </b-table-column>
           <b-table-column label="Course Page">
             <button class="button is-warning is-small">
-              <router-link :to="'courses/' + props.row.CourseId">
+              <router-link :to="'courses/' + Courseprops.row.CourseId">
                 <b-icon type="is-accent" icon="expand-all">
                 </b-icon>
               </router-link>
@@ -34,9 +34,9 @@
 
         </template>
 
-        <template slot="detail" slot-scope="props">
+        <template slot="detail" slot-scope="Courseprops">
           <b-table
-            :data=getSection(props.row.CourseId)
+            :data=getSection(Courseprops.row.CourseId)
           >
             <template slot-scope="props">
               <b-table-column field="SectionName" label="Section Name" width="180" sortable>
@@ -54,8 +54,14 @@
               <b-table-column field="SectionAvg" label="Section Average" sortable>
                 {{ props.row.SectionAvg }}
               </b-table-column>
+
               <b-table-column label="Section Page">
-                <button class="button is-warning is-small">+</button>
+                <button class="button is-warning is-small">
+                  <router-link :to="'courses/' + Courseprops.row.CourseId + '/' + props.row.SectionName">
+                    <b-icon type="is-accent" icon="expand-all">
+                    </b-icon>
+                  </router-link>
+                </button>
               </b-table-column>
             </template>
 
