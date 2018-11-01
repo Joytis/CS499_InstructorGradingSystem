@@ -8,16 +8,16 @@
         detail-key="id"
     >
 
-      <template slot-scope="props">
+      <template slot-scope="Courseprops">
         <b-table-column field="id" label="Course ID" width="130" sortable>
-          {{ props.row.id }}
+          {{ Courseprops.row.id }}
         </b-table-column>
         <b-table-column field="title" label="Course Title" sortable>
-          {{ props.row.title }}
+          {{ Courseprops.row.title }}
         </b-table-column>
 
         <b-table-column field="sections.length" label="Number of Sections" numeric>
-          {{ props.row.sections.length }}
+          {{ Courseprops.row.sections.length }}
         </b-table-column>
 
         <!-- <b-table-column field="CourseAvg" label="Course Average" sortable>
@@ -25,7 +25,7 @@
         </b-table-column> -->
         <b-table-column label="Course Page">
           <button class="button is-warning is-small">
-            <router-link :to="'courses/' + props.row.id">
+            <router-link :to="'courses/' + Courseprops.row.id">
               <b-icon type="is-accent" icon="expand-all"/>
             </router-link>
           </button>
@@ -34,9 +34,9 @@
      </b-table>
 
 
-      <template slot="detail" slot-scope="props">
+      <template slot="detail" slot-scope="Courseprops">
         <b-table
-          :data=props.row.sections
+          :data="courses[0].sections"
         >
           <template slot-scope="props">
             <b-table-column field="id" label="Section ID" width="180" sortable>
@@ -57,7 +57,7 @@
 
             <b-table-column label="Section Page">
               <button class="button is-warning is-small">
-                <router-link :to="'courses/' + Courseprops.row.CourseId + '/' + props.row.SectionName">
+                <router-link :to="'courses/' + Courseprops.row.CourseId + '/' + props.row.sectionNumber">
                   <b-icon type="is-accent" icon="expand-all">
                   </b-icon>
                 </router-link>
@@ -68,7 +68,7 @@
         </b-table>
       </template>
         <button class="button is-primary is-medium"
-          @click="modalForm = 'createcourse'; isModalActive = true">
+          @click="Out(); isModalActive = true">
           Create Course
         </button>
         <b-modal :active.sync="isModalActive" has-modal-card>
@@ -101,6 +101,9 @@ export default {
   },
   components: {
     CreateCourseForm,
+  },
+  watchers: {
+
   },
   methods: {
     async fetchData() {
@@ -136,6 +139,14 @@ export default {
       });
       await Promise.all(promises);
       this.courses = newCourses;
+    },
+    Out() {
+      console.log(this.courses);
+    },
+    getSection(courseID) {
+      const section = this.courses.find(s => s.sections.courseId === courseID);
+      console.log(section);
+      return section;
     },
   },
 };
