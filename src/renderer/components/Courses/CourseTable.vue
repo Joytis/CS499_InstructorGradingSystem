@@ -1,71 +1,87 @@
 <template>
-  <b-table
-      :data="datamock"
-      paginated
-      per-page="5"
-      detailed
-      detail-key="CourseId"
-  >
+  <div>
+    <b-table
+        :data="datamock"
+        paginated
+        per-page="5"
+        detailed
+        detail-key="CourseId"
+    >
 
-    <template slot-scope="props">
-      <b-table-column field="CourseId" label="Course ID" width="130" sortable>
-        {{ props.row.CourseId }}
-      </b-table-column>
-      <b-table-column field="CourseName" label="Course Name" sortable>
-        {{ props.row.CourseName }}
-      </b-table-column>
-
-      <b-table-column field="CourseSections" label="Number of Sections" numeric>
-        {{ props.row.CourseSections }}
-      </b-table-column>
-
-      <b-table-column field="CourseAvg" label="Course Average" sortable>
-        {{ props.row.CourseAvg }}
-      </b-table-column>
-      <b-table-column label="Course Page">
-        <button class="button is-warning is-small">
-          <router-link :to="'courses/' + props.row.CourseId">
-            <b-icon type="is-accent" icon="expand-all">
-            </b-icon>
-          </router-link>
-        </button>
-      </b-table-column>
-
-    </template>
-
-    <template slot="detail" slot-scope="props">
-      <b-table
-        :data=getSection(props.row.CourseId)
-      >
-        <template slot-scope="props">
-          <b-table-column field="SectionName" label="Section Name" width="180" sortable>
-            {{ props.row.SectionName }}
+        <template slot-scope="Courseprops">
+          <b-table-column field="CourseId" label="Course ID" width="130" sortable>
+            {{ Courseprops.row.CourseId }}
+          </b-table-column>
+          <b-table-column field="CourseName" label="Course Name" sortable>
+            {{ Courseprops.row.CourseName }}
           </b-table-column>
 
-          <b-table-column field="SectionTime" label="Section Time" sortable>
-            {{ props.row.SectionTime }}
+          <b-table-column field="CourseSections" label="Number of Sections" numeric>
+            {{ Courseprops.row.CourseSections }}
           </b-table-column>
 
-          <b-table-column field="NumStudents" label="Number of Students" numeric>
-            {{ props.row.NumStudents }}
+          <b-table-column field="CourseAvg" label="Course Average" sortable>
+            {{ Courseprops.row.CourseAvg }}
+          </b-table-column>
+          <b-table-column label="Course Page">
+            <button class="button is-warning is-small">
+              <router-link :to="'courses/' + Courseprops.row.CourseId">
+                <b-icon type="is-accent" icon="expand-all">
+                </b-icon>
+              </router-link>
+            </button>
           </b-table-column>
 
-          <b-table-column field="SectionAvg" label="Section Average" sortable>
-            {{ props.row.SectionAvg }}
-          </b-table-column>
-          <b-table-column label="Section Page">
-            <button class="button is-warning is-small">+</button>
-          </b-table-column>
         </template>
 
-      </b-table>
-    </template>
-  </b-table>
+        <template slot="detail" slot-scope="Courseprops">
+          <b-table
+            :data=getSection(Courseprops.row.CourseId)
+          >
+            <template slot-scope="props">
+              <b-table-column field="SectionName" label="Section Name" width="180" sortable>
+                {{ props.row.SectionName }}
+              </b-table-column>
+
+              <b-table-column field="SectionTime" label="Section Time" sortable>
+                {{ props.row.SectionTime }}
+              </b-table-column>
+
+              <b-table-column field="NumStudents" label="Number of Students" numeric>
+                {{ props.row.NumStudents }}
+              </b-table-column>
+
+              <b-table-column field="SectionAvg" label="Section Average" sortable>
+                {{ props.row.SectionAvg }}
+              </b-table-column>
+
+              <b-table-column label="Section Page">
+                <button class="button is-warning is-small">
+                  <router-link :to="'courses/' + Courseprops.row.CourseId + '/' + props.row.SectionName">
+                    <b-icon type="is-accent" icon="expand-all">
+                    </b-icon>
+                  </router-link>
+                </button>
+              </b-table-column>
+            </template>
+
+          </b-table>
+        </template>
+    </b-table>
+      <button class="button is-primary is-medium"
+        @click="modalForm = 'createcourse'; isModalActive = true">
+        Create Course
+      </button>
+      <b-modal :active.sync="isModalActive" has-modal-card>
+        <create-course-form></create-course-form>
+      </b-modal>
+  </div>
 </template>
 
 <script>
 /* eslint-disable no-console */
 import data from './CourseListDataMock';
+import CreateCourseForm from './CreateCourseModal.vue';
 import { config } from '../../../../config';
 import { SimpleCrud } from '../../../../middleware';
 
@@ -84,6 +100,7 @@ export default {
 
   data() {
     return {
+      isModalActive: false,
       AccountCrud: new SimpleCrud(config.serverHost, '/instructor/account'),
       LoginCrud: new SimpleCrud(config.serverHost, '/instructor/login'),
       TermCrud: new SimpleCrud(config.serverHost, '/terms'),
@@ -94,6 +111,9 @@ export default {
       // data: null,
       // error: null,
     };
+  },
+  components: {
+    CreateCourseForm,
   },
   methods: {
     getSection(courseid) {

@@ -6,14 +6,13 @@
           {{ $route.params.id }}
         </div>
         <div class="level-item">
-          {{ getdata($route.params.id).CourseName }}
-        </div>
-        <div class="level-item">
-          Number of sections: {{ getdata($route.params.id).CourseSections }}
+          {{ $route.params.section }}
         </div>
       </nav>
     </div>
-    Sections:
+    <br>
+    Students:
+
     <b-table
         :data="datamock"
         paginated
@@ -36,13 +35,12 @@
   </div>
 </template>
 
-
-
 <script>
-import data from './CourseListDataMock';
+import data from '../Courses/CourseListDataMock';
 
 export default {
-  name: 'CoursePage',
+  name: 'SectionPage',
+
   beforeCreate() {
     this.datamock = data.coursedata;
   },
@@ -51,22 +49,7 @@ export default {
     };
   },
   methods: {
-    getSection(courseid) {
-      for (let i = 0, len = data.coursedata.length; i < len; i += 1) {
-        if (data.coursedata[i].CourseId === courseid) {
-          this.sectiondata = data.coursedata[i].Section;
-        }
-      }
-      return this.sectiondata;
-    },
-    getdata(id) {
-      for (let i = 0, len = data.coursedata.length; i < len; i += 1) {
-        if (data.coursedata[i].CourseId === id) {
-          this.coursedata = (data.coursedata[i]);
-        }
-      }
-      return this.coursedata;
-    },
+
   },
 };
 </script>
