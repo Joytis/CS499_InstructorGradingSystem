@@ -67,7 +67,7 @@
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
 // import data from './CourseListDataMock';
-import { CourseCrud } from '../../../../middleware';
+import { CourseCrud, TermCrud, SectionCrud } from '../../../../middleware';
 
 
 export default {
@@ -84,6 +84,31 @@ export default {
   },
   methods: {
     async fetchData() {
+      // TESTING AND SETUP CODE.
+      const term = await TermCrud.post({ title: 'TestTerm' });
+      let course = await CourseCrud.post({ title: 'TestCourse', courseNo: 42 });
+      await SectionCrud.post({
+        sectionNumber: 0,
+        termId: term.data.id,
+        courseId: course.data.id,
+      });
+      await SectionCrud.post({
+        sectionNumber: 1,
+        termId: term.data.id,
+        courseId: course.data.id,
+      });
+      course = await CourseCrud.post({ title: 'TestCourse2', courseNo: 43 });
+      await SectionCrud.post({
+        sectionNumber: 0,
+        termId: term.data.id,
+        courseId: course.data.id,
+      });
+      await SectionCrud.post({
+        sectionNumber: 1,
+        termId: term.data.id,
+        courseId: course.data.id,
+      });
+
       const newCourses = (await CourseCrud.get()).data; // Get all courses
       const promises = newCourses.map(async (c) => {
         const courseSectionCrud = CourseCrud.fromAppendedRoute(urljoin(String(c.id), '/sections'));
