@@ -1,5 +1,6 @@
 import request from 'request-promise-native';
 import urljoin from 'url-join';
+import { config } from '../config';
 
 function appendIdIfExists(url, id) {
   // If we're passed an ID, staple it to the request.
@@ -10,7 +11,7 @@ function appendIdIfExists(url, id) {
   return url;
 }
 
-export default class SimpleCrud {
+export class SimpleCrud {
   constructor(host, route) {
     this.target = urljoin(host, route);
 
@@ -25,6 +26,10 @@ export default class SimpleCrud {
   copyOptions() {
     // Shallow copy should be just fine. We don't have nested object options.
     return Object.assign({}, this.basicRequestOptions);
+  }
+
+  fromAppendedRoute(route) {
+    return new SimpleCrud(this.target, route);
   }
 
   async get(id) {
@@ -61,3 +66,14 @@ export default class SimpleCrud {
     return response.body;
   }
 }
+
+export const AccountCrud = new SimpleCrud(config.serverHost, '/instructor/account');
+export const LoginCrud = new SimpleCrud(config.serverHost, '/instructor/login');
+export const LogoutCrud = new SimpleCrud(config.serverHost, '/instructor/logout');
+export const CourseCrud = new SimpleCrud(config.serverHost, '/courses');
+export const SectionCrud = new SimpleCrud(config.serverHost, '/sections');
+export const TermCrud = new SimpleCrud(config.serverHost, '/terms');
+export const EnrollmentCrud = new SimpleCrud(config.serverHost, '/enrollment');
+export const StudentCrud = new SimpleCrud(config.serverHost, '/students');
+export const AssignmentCrud = new SimpleCrud(config.serverHost, '/assignments');
+export const AssignmentCategoryCrud = new SimpleCrud(config.serverHost, '/assignmentCategories');

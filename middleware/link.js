@@ -1,114 +1,118 @@
-const request = require('request');
+import request from 'request';
+import winston from 'winston';
 
 const host = 'https://localhost:3000';
 
-const data = {
-   postInstructor: 'instructor',
- };
+const logger = winston.createLogger({
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
+    }),
+  ],
+  exitOnError: false,
+});
 
-/* module.exports = async (err) => {
-  const accounts = await request.get(`${host}/instructor/accounts`);
-  console.log(accounts);
-  if (err) {
-    throw err;
-  }
-}; */
-
-/* module.exports = async (newInstructors) => {
-  const newInstructor = await request.post(`${host}/instructor/accounts`, newInstructors);
-  console.log(newInstructor);
-}; */
-
-async function getInstructor() { // Get request
+async function getInstructor() {
+  // Get request
   try {
     const info = await request.get(`${host}/instructor/accounts/`);
     return info;
-  }
-  catch (error) {
+  } catch (error) {
     throw error(error);
   }
 }
 
-async function postInstructor(args) { // Post request
+async function postInstructor(args) {
+  // Post request
   try {
+    const data = {
+      // Test if variable argument is passed into info and outputted from test file. May be removed
+      Instructor: 'Instructor',
+    };
     const info = await request.post(`${host}/auth/instructors`, args);
+    logger.info(JSON.stringify(data, null, 2));
     return info;
-  }
-  catch (error) {
+  } catch (error) {
     throw error(error);
   }
 }
 
-async function getAccount() { // Get request
+async function getAccount() {
+  // Get request
   try {
     const info = await request.get(`${host}/instructor/accounts/`);
     return info;
-  }
-  catch (error) {
+  } catch (error) {
     throw error(error);
   }
 }
 
-async function postAccount(args) { // Post request
+async function postAccount(args) {
+  // Post request
   try {
+    const data = {
+      // Test if variable argument is passed into info and outputted from test file. May be removed
+      Account: 'Account',
+    };
     const info = await request.post(`${host}/auth/instructors`, args);
+    logger.info(JSON.stringify(data, null, 2));
     return info;
-  }
-  catch (error) {
+  } catch (error) {
     throw error(error);
   }
 }
 
-async function getLogin() { // Get request
+async function getLogin() {
+  // Get request
   try {
     const info = await request.get(`${host}/instructor/accounts/`);
     return info;
-  }
-  catch (error) {
+  } catch (error) {
     throw error(error);
   }
 }
 
-async function postLogin(args) { // Post request
+async function postLogin(args) {
+  // Post request
   try {
+    const data = {
+      // Test if variable argument is passed into info and outputted from test file. May be removed
+      Login: 'Login',
+    };
     const info = await request.post(`${host}/auth/instructors`, args);
+    logger.info(JSON.stringify(data, null, 2));
     return info;
-  }
-  catch (error) {
+  } catch (error) {
     throw error(error);
   }
 }
 
-async function getLogout() { // Get request
+async function getLogout() {
+  // Get request
   try {
     const info = await request.get(`${host}/instructor/accounts/`);
     return info;
-  }
-  catch (error) {
+  } catch (error) {
     throw error(error);
   }
 }
 
-async function postLogout(args) { // Post request
+async function postLogout(args) {
+  // Post request
   try {
+    const data = {
+      // Test if variable argument is passed into info and outputted from test file. May be removed
+      Logout: 'Logout',
+    };
     const info = await request.post(`${host}/auth/instructors`, args);
+    logger.info(JSON.stringify(data, null, 2));
     return info;
-  }
-  catch (error) {
+  } catch (error) {
     throw error(error);
   }
 }
 
-/* Requires courseId argument
-async function getCourse(courseId) { // Get request
-  const info = await request.get(`${host}/course/${courseId}`);
-  if (!info) { // Return error if get post request fails
-    throw new Error('Error');
-  }
-  return info;
-} */
-
-export default {
+module.exports = {
   getInstructor,
   postInstructor,
   getAccount,
