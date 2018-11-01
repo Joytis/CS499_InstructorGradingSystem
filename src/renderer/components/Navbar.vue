@@ -9,15 +9,23 @@
         &nbsp; GradeBook++
       </div>
       <div class="navbar-item">
+        <div v-if="dropdown.state === 'loading'">
+          <atom-spinner :animation-duration="1000" :size="40" :color="'#cd5bef'"/>
+        </div>
+        <div v-else-if="dropdown.state === 'error'">
+          <div> {{ error.message }} </div>
+        </div>
+        <div v-else>
           <b-dropdown>
-            <button class="button is-primary" slot="trigger">
-              <span> {{ CurrentSemester }} </span>
+            <button class="button is-primary" slot="trigger" click="fetchTerms">
+              <span> {{ CurrentTerm }} </span>
               <b-icon icon="chevron-down"></b-icon>
             </button>
-            <div v-for="Semester in Terms" :key="Semester">
-              <b-dropdown-item v-on:click="CurrentSemester=Semester">{{ Semester }}</b-dropdown-item>
+            <div v-for="Term in Terms">
+              <b-dropdown-item v-on:click="CurrentTerm=Term">{{ Term.title }}</b-dropdown-item>
             </div>
           </b-dropdown>
+        </div>
       </div>
     </div>
     <div v-if="navIsActive" class="navbar-menu is-active">
@@ -37,39 +45,73 @@
 </template>
 
 <script>
-  export default {
-    name: 'Navbar',
-    data() {
-      return {
-        navIsActive: true,
-        Terms: ['Fall 18', 'Spring 19', 'Summer 19'],
-        CurrentSemester: 'Fall 18',
-      };
+import { AtomSpinner } from 'epic-spinners';
+import { TermCrud, Timeout } from '../../../middleware';
+
+export default {
+  name: 'Navbar',
+  components: {
+    AtomSpinner,
+  },
+  data() {
+    return {
+      navIsActive: true,
+      Terms: [],
+      CurrentTerm: null,
+      dropdown: {
+        error: '',
+        state: 'main',
+      },
+    };
+  },
+
+  created() {
+    this.fetchTerms();
+    this.asyncQueryTermsFuckIt();
+  },
+
+  methods: {
+    toggleMenu() {
+      this.navIsActive = !this.navIsActive;
+      this.$emit('toggleMenu');
     },
-    methods: {
-      toggleMenu() {
-        this.navIsActive = !this.navIsActive;
-        this.$emit('toggleMenu');
-      },
-      open(link) {
-        this.$electron.shell.openExternal(link);
-      },
-      minimize() {
-        this.$electron.remote.BrowserWindow.getFocusedWindow().minimize();
-      },
-      maximize() {
-        const window = this.$electron.remote.BrowserWindow.getFocusedWindow();
-        if (window.isMaximized()) {
-          window.unmaximize();
-        } else {
-          window.maximize();
+    open(link) {
+      this.$electron.shell.openExternal(link);
+    },
+    minimize() {
+      this.$electron.remote.BrowserWindow.getFocusedWindow().minimize();
+    },
+    maximize() {
+      const window = this.$electron.remote.BrowserWindow.getFocusedWindow();
+      if (window.isMaximized()) {
+        window.unmaximize();
+      } else {
+        window.maximize();
+      }
+    },
+    async fetchTerms() {
+      try {
+        this.dropdown.state = 'loading';
+        this.Terms = await TermCrud.get();
+        this.dropdown.state = 'main';
+      } catch (err) {
+        this.dropdown.state = 'error';
+        this.error = err;
+      }
+    },
+    async fetchTerms() {
+      while (true) {
+        if (dropdown.state === 'error') {
+          await fetchTerms();
         }
-      },
-      close() {
-        this.$electron.remote.BrowserWindow.getFocusedWindow().close();
-      },
+        await Timeout(1000);
+      }
     },
-  };
+    close() {
+      this.$electron.remote.BrowserWindow.getFocusedWindow().close();
+    },
+  },
+};
 </script>
 
 <style>

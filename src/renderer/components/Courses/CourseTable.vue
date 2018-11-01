@@ -13,7 +13,7 @@
           {{ props.row.id }}
         </b-table-column>
         <b-table-column field="title" label="Course Title" sortable>
-          {{ props.row.title }}
+          {{ `${props.row.courseLabel} - ${props.row.title}` }}
         </b-table-column>
 
         <b-table-column field="sections.length" label="Number of Sections" numeric>
@@ -72,7 +72,7 @@
           Create Course
         </button>
         <b-modal :active.sync="isModalActive" has-modal-card>
-          <create-course-form></create-course-form>
+          <create-course-form @update="fetchData"></create-course-form>
         </b-modal>
   </div>
 </template>
@@ -104,31 +104,6 @@ export default {
   },
   methods: {
     async fetchData() {
-      // // TESTING AND SETUP CODE.
-      // const term = await TermCrud.post({ title: 'TestTerm' });
-      // let course = await CourseCrud.post({ title: 'TestCourse', courseNo: 42 });
-      // await SectionCrud.post({
-      //   sectionNumber: 0,
-      //   termId: term.data.id,
-      //   courseId: course.data.id,
-      // });
-      // await SectionCrud.post({
-      //   sectionNumber: 1,
-      //   termId: term.data.id,
-      //   courseId: course.data.id,
-      // });
-      // course = await CourseCrud.post({ title: 'TestCourse2', courseNo: 43 });
-      // await SectionCrud.post({
-      //   sectionNumber: 0,
-      //   termId: term.data.id,
-      //   courseId: course.data.id,
-      // });
-      // await SectionCrud.post({
-      //   sectionNumber: 1,
-      //   termId: term.data.id,
-      //   courseId: course.data.id,
-      // });
-
       const newCourses = (await CourseCrud.get()).data; // Get all courses
       const promises = newCourses.map(async (c) => {
         const courseSectionCrud = CourseCrud.fromAppendedRoute(urljoin(String(c.id), '/sections'));

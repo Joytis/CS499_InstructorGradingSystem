@@ -68,7 +68,6 @@ export default {
     out: console.log,
 
     async fetchData() {
-      console.log('fetchy');
       this.terms = (await TermCrud.get()).data;
     },
   },
