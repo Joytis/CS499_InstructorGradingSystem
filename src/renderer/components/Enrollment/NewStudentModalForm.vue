@@ -1,5 +1,4 @@
 <template>
-<form action="">
     <div class="modal-card" style="width: auto">
         <header class="modal-card-head">
             <p class="modal-card-title">Create Student</p>
@@ -41,7 +40,6 @@
             <button class="button is-primary" @click="$parent.close()">Create</button>
         </footer>
     </div>
-</form>
 </template>
 
 
