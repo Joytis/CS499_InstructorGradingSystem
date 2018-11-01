@@ -19,7 +19,7 @@
       </div>
       <div v-else>
         <b-field label="Term Name">
-          <b-input :value="term.title" placeholder="Spring '18" required> </b-input>
+          <b-input v-model="term.title" placeholder="Spring '18" required> </b-input>
         </b-field>
         <b-field label="Term Start Date">
           <b-datepicker 
@@ -79,10 +79,10 @@ export default {
         this.state = 'loading';
         // Wait for term creation
         // console.log(this.term.startDate);
-        // console.log(this.term.endDate);
         await TermCrud.post(this.term);
         // wait for two seconds then close window.
         this.state = 'success';
+        this.$emit('update');
       } catch (err) {
         console.error(err);
         this.state = 'error';
@@ -90,11 +90,6 @@ export default {
         // DISPLAY ERROR MODAL?
       }
     },
-    // computed: {
-    // startDate() {
-    // return Date.parse()
-    // }
-    // },
   },
 
 };
