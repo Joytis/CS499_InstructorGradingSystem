@@ -1,5 +1,1 @@
-const SimpleCrud = require('./simpleCrud');
-
-module.exports = {
-  SimpleCrud,
-};
+export SimpleCrud from './simpleCrud';

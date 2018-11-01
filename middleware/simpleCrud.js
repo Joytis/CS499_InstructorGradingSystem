@@ -1,5 +1,5 @@
-const request = require('request-promise-native');
-const urljoin = require('url-join');
+import request from 'request-promise-native';
+import urljoin from 'url-join';
 
 function appendIdIfExists(url, id) {
   // If we're passed an ID, staple it to the request.
@@ -10,7 +10,7 @@ function appendIdIfExists(url, id) {
   return url;
 }
 
-module.exports = class SimpleCrud {
+export default class SimpleCrud {
   constructor(host, route) {
     this.target = urljoin(host, route);
 
@@ -31,14 +31,16 @@ module.exports = class SimpleCrud {
     // Shallow copy should be just fine.
     const options = this.copyOptions();
     options.url = appendIdIfExists(options.url, id);
-    return request.get(options);
+    const response = await request.get(options);
+    return response.body;
   }
 
   // Post a javascript object to our route.
   async post(obj) {
     const options = this.copyOptions();
     options.body = obj;
-    return request.post(options);
+    const response = await request.post(options);
+    return response.body;
   }
 
   // Updates the object with the given ID with values in obj
@@ -47,13 +49,15 @@ module.exports = class SimpleCrud {
     const options = this.copyOptions();
     options.url = appendIdIfExists(options.url, id);
     options.body = obj;
-    return request.delete(options);
+    const response = await request.put(options);
+    return response.body;
   }
 
   // For accounts, we sometimes don't want to append the ID.
   async delete(id) {
     const options = this.copyOptions();
     options.url = appendIdIfExists(options.url, id);
-    return request.delete(options);
+    const response = await request.delete(options);
+    return response.body;
   }
-};
+}

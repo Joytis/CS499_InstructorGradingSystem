@@ -3,6 +3,8 @@
 
 import { app, BrowserWindow } from 'electron';
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -27,7 +29,7 @@ function createWindow() {
     useContentSize: true,
     width: 1000,
     minWidth: 750,
-    frame: false,
+    frame: true,
   });
 
   mainWindow.loadURL(winURL);
