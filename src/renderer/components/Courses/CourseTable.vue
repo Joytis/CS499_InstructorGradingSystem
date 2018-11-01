@@ -5,19 +5,19 @@
         paginated
         per-page="5"
         detailed
-        detail-key="id"
+        detail-key="CourseId"
     >
 
       <template slot-scope="props">
-        <b-table-column field="id" label="Course ID" width="130" sortable>
-          {{ props.row.id }}
+        <b-table-column field="courseId" label="Course ID" width="130" sortable>
+          {{ props.row.CourseId }}
         </b-table-column>
-        <b-table-column field="title" label="Course Title" sortable>
-          {{ props.row.title }}
+        <b-table-column field="courseName" label="Course Title" sortable>
+          {{ props.row.CourseName }}
         </b-table-column>
 
-        <b-table-column field="sections.length" label="Number of Sections" numeric>
-          {{ props.row.sections.length }}
+        <b-table-column field="courseSections" label="Number of Sections" numeric>
+          {{ props.row.CourseSections }}
         </b-table-column>
 
         <!-- <b-table-column field="CourseAvg" label="Course Average" sortable>
@@ -25,7 +25,7 @@
         </b-table-column> -->
         <b-table-column label="Course Page">
           <button class="button is-warning is-small">
-            <router-link :to="'courses/' + props.row.id">
+            <router-link :to="'courses/' + props.row.CourseId">
               <b-icon type="is-accent" icon="expand-all"/>
             </router-link>
           </button>
@@ -36,15 +36,15 @@
 
       <template slot="detail" slot-scope="props">
         <b-table
-          :data=props.row.sections
+          :data=getSection(props.row.CourseId)
         >
           <template slot-scope="props">
-            <b-table-column field="id" label="Section ID" width="180" sortable>
-              {{ props.row.id }}
+            <b-table-column field="SectionName" label="Section ID" width="180" sortable>
+              {{ props.row.SectionName }}
             </b-table-column>
 
-            <b-table-column field="sectionNumber" label="Section Number" sortable>
-              {{ props.row.sectionNumber }}
+            <b-table-column field="SectionTime" label="Section Number" sortable>
+              {{ props.row.SectionTime }}
             </b-table-column>
 
             <!-- <b-table-column field="NumStudents" label="Number of Students" numeric>
@@ -81,7 +81,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
-// import data from './CourseListDataMock';
+import data from './CourseListDataMock';
 import { CourseCrud } from '../../../../middleware';
 import CreateCourseForm from './CreateCourseModal.vue';
 
@@ -90,13 +90,16 @@ export default {
   name: 'courses',
 
   created() {
-    this.fetchData();
+    // this.fetchData();
   },
-
+  mounted() {
+    this.courses = data.coursedata;
+  },
   data() {
     return {
       isModalActive: false,
       courses: [],
+
     };
   },
   components: {
@@ -136,6 +139,10 @@ export default {
       });
       await Promise.all(promises);
       this.courses = newCourses;
+    },
+    getSection(courseid) {
+      const section = this.data.find(s => s.CourseId === courseid).Section;
+      return section;
     },
   },
 };
