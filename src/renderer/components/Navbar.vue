@@ -17,8 +17,8 @@
         </div>
         <div v-else>
           <b-dropdown>
-            <button class="button is-primary" slot="trigger" click="fetchTerms">
-              <span> {{ CurrentTerm }} </span>
+            <button class="button is-primary" slot="trigger" click>
+              <span> {{ CurrentTerm.title }} </span>
               <b-icon icon="chevron-down"></b-icon>
             </button>
             <div v-for="Term in Terms">
@@ -26,6 +26,7 @@
             </div>
           </b-dropdown>
         </div>
+        <button class="button" slot="trigger" @click="fetchTerms">Refresh</button>
       </div>
     </div>
     <div v-if="navIsActive" class="navbar-menu is-active">
@@ -46,7 +47,7 @@
 
 <script>
 import { AtomSpinner } from 'epic-spinners';
-import { TermCrud, Timeout } from '../../../middleware';
+import { TermCrud, EventBus } from '../../../middleware';
 
 export default {
   name: 'Navbar',
@@ -57,7 +58,7 @@ export default {
     return {
       navIsActive: true,
       Terms: [],
-      CurrentTerm: null,
+      CurrentTerm: {},
       dropdown: {
         error: '',
         state: 'main',
@@ -67,7 +68,9 @@ export default {
 
   created() {
     this.fetchTerms();
-    this.asyncQueryTermsFuckIt();
+    EventBus.$on('term-added', newTerm => {
+      this.Terms.push(newTerm);
+    });
   },
 
   methods: {
@@ -92,19 +95,12 @@ export default {
     async fetchTerms() {
       try {
         this.dropdown.state = 'loading';
-        this.Terms = await TermCrud.get();
+        this.Terms = (await TermCrud.get()).data;
         this.dropdown.state = 'main';
+        console.log(this.Terms);
       } catch (err) {
         this.dropdown.state = 'error';
         this.error = err;
-      }
-    },
-    async fetchTerms() {
-      while (true) {
-        if (dropdown.state === 'error') {
-          await fetchTerms();
-        }
-        await Timeout(1000);
       }
     },
     close() {

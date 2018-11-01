@@ -53,7 +53,7 @@
 <script>
 /* eslint-disable no-console */
 import { AtomSpinner } from 'epic-spinners';
-import { TermCrud } from '../../../../middleware';
+import { TermCrud, EventBus } from '../../../../middleware';
 
 export default {
   name: 'CreateTermModalForm',
@@ -79,10 +79,10 @@ export default {
         this.state = 'loading';
         // Wait for term creation
         // console.log(this.term.startDate);
-        await TermCrud.post(this.term);
+        const newTerm = (await TermCrud.post(this.term)).data;
         // wait for two seconds then close window.
         this.state = 'success';
-        this.$emit('update');
+        EventBus.$emit('term-added', newTerm);
       } catch (err) {
         console.error(err);
         this.state = 'error';
