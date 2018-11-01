@@ -17,12 +17,17 @@
       Add To Section
     </button>
 
+    <b-input v-model="searchString"
+      placeholder="Filter Results..."
+      style="padding-top: .3em;"
+    ></b-input>
+
     <b-modal :active.sync="isModalActive" :width="640" scroll="keep" has-modal-card>
       <create-term-modal-form></create-term-modal-form>
     </b-modal>
     
       <b-table
-        :data="mockdata"
+        :data="filteredData"
         paginated
         per-page="8"
         checkable=""
@@ -58,8 +63,8 @@ import modalForm from './NewStudentModalForm.vue';
 
 export default {
   name: 'GlobalEnrollment',
-  beforeCreate() {
-    this.mockdata = data;
+  mounted() {
+    this.data = data;
   },
   components: {
     modalForm,
@@ -69,7 +74,7 @@ export default {
       isModalActive: false,
       checkedRows: [],
       data: [],
-      searchString: 'something',
+      searchString: '',
     };
   },
   methods: {
@@ -79,10 +84,11 @@ export default {
   },
   computed: {
     filteredData() {
-      return this.data.filter((student) => (student.email.includes(this.searchString)
-        || student.firstName.includes(this.searchString)
-        || student.lastName.includes(this.searchString)
-        || student.aNumber.toString().includes(this.searchString)));
+      return this.data.filter((student) => (
+        student.email.toLowerCase().includes(this.searchString.toLowerCase())
+        || student.firstName.toLowerCase().includes(this.searchString.toLowerCase())
+        || student.lastName.toLowerCase().includes(this.searchString.toLowerCase())
+        || student.aNumber.toString().includes(this.searchString.toLowerCase())));
     },
   },
 };
