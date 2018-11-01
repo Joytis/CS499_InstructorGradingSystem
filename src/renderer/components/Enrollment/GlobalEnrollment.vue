@@ -2,17 +2,17 @@
   <section>
 
     <button class="button is-primary is-small"
-      @click="out(selected)">
-      Create New Term
+      @click="isModalActive = true">
+      Create New Student
     </button>    
     <button class="button is-warning is-small"
       @click="out(selected)"
       :disabled="checkedRows.length!=1"
       >
-      Edit Term
+      Edit Student
     </button>
     <button class="button is-success is-small"
-      :disabled="checkedRows.length"
+      :disabled="checkedRows.length==0"
     >
       Add To Section
     </button>
@@ -29,17 +29,23 @@
         :checked-rows.sync="checkedRows"
       >
         <template slot-scope="props">
-          <b-table-column field="startDate" label="Start Date" sortable>
-            {{ props.row.startDate }}
+          <b-table-column field="aNumber" label="A-Number" sortable >
+            {{ props.row.aNumber }}
           </b-table-column>
-          <b-table-column field="endDate" label="End Date" numeric>
-            {{ props.row.endDate }}
+          <b-table-column field="firstName" label="First Name" sortable>
+            {{ props.row.firstName }}
           </b-table-column>
-          <b-table-column field="title" label="Term Name" width="180" sortable>
-            {{ props.row.title }}
+          <b-table-column field="lastName" label="Last Name" sortable>
+            {{ props.row.lastName }}
+          </b-table-column>
+          <b-table-column field="email" label="Email" sortable>
+            {{ props.row.email }}
           </b-table-column>
         </template>
       </b-table>
+    <b-modal :active.sync="isModalActive" has-modal-card>
+      <modal-form></modal-form>
+    </b-modal>
   </section>
 </template>
 
@@ -47,6 +53,7 @@
 <script>
 /* eslint-disable no-console */
 import data from './TermListDataMock';
+import modalForm from './NewStudentModalForm.vue';
 
 
 export default {
@@ -54,11 +61,12 @@ export default {
   beforeCreate() {
     this.mockdata = data;
   },
-  components: {},
+  components: {
+    modalForm,
+  },
   data() {
     return {
       isModalActive: false,
-      modalForm: 'signup',
       checkedRows: [],
       data: [],
       searchString: 'something',
