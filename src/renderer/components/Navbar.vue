@@ -68,12 +68,19 @@ export default {
 
   created() {
     this.fetchTerms();
-    EventBus.$on('term-added', newTerm => {
-      this.Terms.push(newTerm);
-    });
+    EventBus.$on('term-added', this.termAdded);
+    EventBus.$on('request-selected-term', this.requestSelectedTerm);
+  },
+
+  beforeDestroy() {
+    EventBus.$off('term-added', this.termAdded);
+    EventBus.$off('request-selected-term', this.requestSelectedTerm);
   },
 
   methods: {
+    termAdded(newTerm) { this.Terms.push(newTerm); },
+    requestSelectedTerm() { EventBus.$emit('response-selected-term', this.CurrentTerm); },
+
     toggleMenu() {
       this.navIsActive = !this.navIsActive;
       this.$emit('toggleMenu');
@@ -97,7 +104,6 @@ export default {
         this.dropdown.state = 'loading';
         this.Terms = (await TermCrud.get()).data;
         this.dropdown.state = 'main';
-        console.log(this.Terms);
       } catch (err) {
         this.dropdown.state = 'error';
         this.error = err;

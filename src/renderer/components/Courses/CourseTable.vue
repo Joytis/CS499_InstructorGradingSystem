@@ -30,11 +30,18 @@
             </router-link>
           </button>
         </b-table-column>
+        <b-table-column label="Create Section">
+          <button class="button is-warning is-small" @click="isSectionModalActive = true">
+            <b-icon type="is-success" icon="account"/>
+          </button>
+          <b-modal :active.sync="isSectionModalActive" :width="640" scroll="keep" has-modal-card>
+            <create-section-form :course-id="props.row.id"></create-section-form>
+          </b-modal>
+        </b-table-column>
       </template>
      </b-table>
 
-
-      <template slot="detail" slot-scope="props">
+     <template slot="detail" slot-scope="props">
         <b-table
           :data=props.row.sections
         >
@@ -46,14 +53,6 @@
             <b-table-column field="sectionNumber" label="Section Number" sortable>
               {{ props.row.sectionNumber }}
             </b-table-column>
-
-            <!-- <b-table-column field="NumStudents" label="Number of Students" numeric>
-              {{ props.row.NumStudents }}
-            </b-table-column>
-
-            <b-table-column field="SectionAvg" label="Section Average" sortable>
-              {{ props.row.SectionAvg }}
-            </b-table-column> -->
 
             <b-table-column label="Section Page">
               <button class="button is-warning is-small">
@@ -68,10 +67,10 @@
         </b-table>
       </template>
         <button class="button is-primary is-medium"
-          @click="modalForm = 'createcourse'; isModalActive = true">
+          @click="isCourseModalActive = true">
           Create Course
         </button>
-        <b-modal :active.sync="isModalActive" has-modal-card>
+        <b-modal :active.sync="isCourseModalActive" has-modal-card>
           <create-course-form></create-course-form>
         </b-modal>
   </div>
@@ -84,6 +83,7 @@ import urljoin from 'url-join';
 // import data from './CourseListDataMock';
 import { CourseCrud, EventBus } from '../../../../middleware';
 import CreateCourseForm from './CreateCourseModal.vue';
+import CreateSectionForm from './CreateSectionModal.vue';
 
 
 export default {
@@ -91,24 +91,29 @@ export default {
 
   created() {
     this.fetchData();
-    EventBus.$on('course-added', course => {
-      this.courses.push(course);
-    });
-    EventBus.$on('course-removed', course => {
-      this.courses = this.courses.filter(c => c.id === course.id);
-    });
+    EventBus.$on('course-added', this.courseAdded);
+    EventBus.$on('course-removed', this.courseRemoved);
+  },
+  beforeDestroy() {
+    EventBus.$off('course-added', this.courseAdded);
+    EventBus.$off('course-removed', this.courseRemoved);
   },
 
   data() {
     return {
-      isModalActive: false,
+      isCourseModalActive: false,
+      isSectionModalActive: false,
       courses: [],
     };
   },
   components: {
     CreateCourseForm,
+    CreateSectionForm,
   },
   methods: {
+    courseAdded(course) { this.courses.push(course); },
+    courseRemoved(course) { this.courses = this.courses.filter(c => c.id === course.id); },
+
     async fetchData() {
       const newCourses = (await CourseCrud.get()).data; // Get all courses
       const promises = newCourses.map(async (c) => {

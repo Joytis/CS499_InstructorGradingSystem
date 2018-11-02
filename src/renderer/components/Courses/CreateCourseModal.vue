@@ -51,7 +51,6 @@ export default {
   components: {
     AtomSpinner,
   },
-  props: [],
   data() {
     return {
       error: undefined,

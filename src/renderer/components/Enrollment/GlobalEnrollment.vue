@@ -84,17 +84,20 @@ export default {
     async fetchData() {
       this.students = (await StudentCrud.get()).data;
     },
+
+    studentAdded(student) { this.students.push(student); },
+    studentRemoved(student) { this.students = this.students.filter(s => s.id === student.id); },
   },
 
   created() {
     this.fetchData();
 
-    EventBus.$on('student-added', newTerm => {
-      this.students.push(newTerm);
-    });
-    EventBus.$on('student-removed', student => {
-      this.students = this.students.filter(s => s.id === student.id);
-    });
+    EventBus.$on('student-added', this.studentAdded);
+    EventBus.$on('student-removed', this.studentRemoved);
+  },
+  beforeDestroy() {
+    EventBus.$off('student-added', this.studentAdded);
+    EventBus.$off('student-removed', this.studentRemoved);
   },
 
   computed: {

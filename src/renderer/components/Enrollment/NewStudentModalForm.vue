@@ -52,7 +52,7 @@
     </section>
     <footer class="modal-card-foot">
       <button class="button" type="button" @click="$parent.close()">Cancel</button>
-      <button class="button is-primary" :disabled="validateStudent" @click="attemptStudentCreate">Create</button>
+      <button class="button is-primary" @click="attemptStudentCreate">Create</button>
     </footer>
   </div>
 </template>
@@ -78,9 +78,6 @@ export default {
         lastName: '',
         email: '',
       },
-      validationMsg: {
-        aNumber: '',
-      },
     };
   },
   methods: {
@@ -95,23 +92,6 @@ export default {
         this.state = 'error';
         this.error = err;
       }
-    },
-
-    validateANumber() {
-      const value = this.student.aNumber;
-      if (value.length !== 9) {
-        this.validationMsg.aNumber = 'ANumber must be an A######## string';
-        return false;
-      }
-      if (value[0] !== 'A') {
-        this.validationMsg.aNumber = 'ANumber must start with A';
-        return false;
-      }
-      if (Number.isInteger(Number(value.substr(1)))) {
-        this.validationMsg.aNumber = 'ANumber must be a number';
-        return false;
-      }
-      return true;
     },
   },
 };

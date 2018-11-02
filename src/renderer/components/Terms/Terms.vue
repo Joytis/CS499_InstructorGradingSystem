@@ -51,12 +51,12 @@ export default {
   created() {
     this.fetchData();
 
-    EventBus.$on('term-added', newTerm => {
-      this.terms.push(newTerm);
-    });
-    EventBus.$on('term-removed', term => {
-      this.terms = this.terms.filter(t => t.id === term.id);
-    });
+    EventBus.$on('term-added', this.termAdded);
+    EventBus.$on('term-removed', this.termRemoved);
+  },
+  beforeDestroy() {
+    EventBus.$off('term-added', this.termAdded);
+    EventBus.$off('term-removed', this.termRemoved);
   },
 
   components: {
@@ -73,6 +73,8 @@ export default {
   },
   methods: {
     out: console.log,
+    termAdded(term) { this.terms.push(term); },
+    termRemoved(term) { this.terms = this.terms.filter(t => t.id === term.id); },
 
     async fetchData() {
       this.terms = (await TermCrud.get()).data;
