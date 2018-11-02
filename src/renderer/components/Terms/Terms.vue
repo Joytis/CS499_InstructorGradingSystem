@@ -13,7 +13,7 @@
     </button>
 
     <b-modal :active.sync="isModalActive" :width="640" scroll="keep" has-modal-card>
-      <create-term-modal-form></create-term-modal-form>
+      <creation-modal-form :inputs="modalInputs"></creation-modal-form>
     </b-modal>
     
     <b-table
@@ -41,7 +41,7 @@
 
 <script>
 /* eslint-disable no-console */
-import CreateTermModalForm from './CreateTermModalForm.vue';
+import CreationModalForm from '../CreationModal.vue';
 import { TermCrud, EventBus } from '../../../../middleware';
 
 
@@ -60,7 +60,7 @@ export default {
   },
 
   components: {
-    CreateTermModalForm,
+    CreationModalForm,
   },
 
   data() {
@@ -68,6 +68,27 @@ export default {
       isModalActive: false,
       modalForm: 'signup',
       selected: null,
+      modalInputs: {
+        crudTarget: TermCrud,
+        postCreate(result) { EventBus.$emit('term-added', result); },
+        templates: {
+          title: {
+            label: 'Term Name',
+            type: 'input',
+            placeholder: 'Spring \'18',
+          },
+          startDate: {
+            label: 'Term Start Date',
+            type: 'datepicker',
+            placeholder: 'Select a date (mm/dd/yyyy)',
+          },
+          endDate: {
+            label: 'Term End Date',
+            type: 'datepicker',
+            placeholder: 'Select a date (mm/dd/yyyy)',
+          },
+        },
+      },
       terms: [],
     };
   },

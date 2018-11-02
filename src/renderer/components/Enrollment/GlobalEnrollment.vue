@@ -21,35 +21,31 @@
       placeholder="Filter Results..."
       style="padding-top: .3em;"
     ></b-input>
-
-    <b-modal :active.sync="isModalActive" :width="640" scroll="keep" has-modal-card>
-      <create-term-modal-form></create-term-modal-form>
-    </b-modal>
     
-      <b-table
-        :data="filteredData"
-        paginated
-        per-page="8"
-        checkable=""
-        :checked-rows.sync="checkedRows"
-      >
-        <template slot-scope="props">
-          <b-table-column field="aNumber" label="A-Number" sortable >
-            {{ props.row.aNumber }}
-          </b-table-column>
-          <b-table-column field="firstName" label="First Name" sortable>
-            {{ props.row.firstName }}
-          </b-table-column>
-          <b-table-column field="lastName" label="Last Name" sortable>
-            {{ props.row.lastName }}
-          </b-table-column>
-          <b-table-column field="email" label="Email" sortable>
-            {{ props.row.email }}
-          </b-table-column>
-        </template>
-      </b-table>
+    <b-table
+      :data="filteredData"
+      paginated
+      per-page="8"
+      checkable=""
+      :checked-rows.sync="checkedRows"
+    >
+      <template slot-scope="props">
+        <b-table-column field="aNumber" label="A-Number" sortable >
+          {{ props.row.aNumber }}
+        </b-table-column>
+        <b-table-column field="firstName" label="First Name" sortable>
+          {{ props.row.firstName }}
+        </b-table-column>
+        <b-table-column field="lastName" label="Last Name" sortable>
+          {{ props.row.lastName }}
+        </b-table-column>
+        <b-table-column field="email" label="Email" sortable>
+          {{ props.row.email }}
+        </b-table-column>
+      </template>
+    </b-table>
     <b-modal :active.sync="isModalActive" has-modal-card>
-      <modal-form></modal-form>
+      <creation-modal-form :inputs="studentModalInputs"></creation-modal-form>
     </b-modal>
   </section>
 </template>
@@ -58,14 +54,14 @@
 <script>
 /* eslint-disable no-console */
 // import data from './TermListDataMock';
-import modalForm from './NewStudentModalForm.vue';
+import CreationModalForm from '../CreationModal.vue';
 import { StudentCrud, EventBus } from '../../../../middleware';
 
 export default {
   name: 'GlobalEnrollment',
 
   components: {
-    modalForm,
+    CreationModalForm,
   },
 
   data() {
@@ -74,6 +70,20 @@ export default {
       checkedRows: [],
       students: [],
       searchString: '',
+      studentModalInputs: {
+        crudTarget: StudentCrud,
+        postCreate(student) { EventBus.$emit('student-added', student); },
+        templates: {
+          aNumber: {
+            label: 'A-Number', type: 'input', subtype: 'number', placeholder: 'A########',
+          },
+          firstName: { label: 'First Name', type: 'input', placeholder: 'First Name' },
+          lastName: { label: 'Last Name', type: 'input', placeholder: 'Last Name' },
+          email: {
+            label: 'Email', type: 'input', subtype: 'email', placeholder: 'UAH Email',
+          },
+        },
+      },
     };
   },
   methods: {
