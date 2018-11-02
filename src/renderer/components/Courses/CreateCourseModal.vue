@@ -4,14 +4,14 @@
           <p class="modal-card-title">Create Course</p>
       </header>
       <section class="modal-card-body">
-          <b-field label="id">
+          <b-field label="Course Number">
               <b-input
                   :value="id"
                   placeholder="CS000"
                   required>
               </b-input>
           </b-field>
-          <b-field label="title">
+          <b-field label="Course Title">
               <b-input
                   :value="title"
                   placeholder="Intro to code"
