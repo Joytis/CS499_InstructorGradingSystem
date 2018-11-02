@@ -12,13 +12,8 @@
         <b-table-column field="courseId" label="Course ID" width="130" sortable>
           {{ props.row.CourseId }}
         </b-table-column>
-<<<<<<< HEAD
-        <b-table-column field="courseName" label="Course Title" sortable>
-          {{ props.row.CourseName }}
-=======
         <b-table-column field="title" label="Course Title" sortable>
           {{ `${props.row.courseLabel} - ${props.row.title}` }}
->>>>>>> origin/lolGetRektNerds
         </b-table-column>
 
         <b-table-column field="courseSections" label="Number of Sections" numeric>
@@ -86,13 +81,8 @@
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
-<<<<<<< HEAD
-import data from './CourseListDataMock';
-import { CourseCrud } from '../../../../middleware';
-=======
 // import data from './CourseListDataMock';
 import { CourseCrud, EventBus } from '../../../../middleware';
->>>>>>> origin/lolGetRektNerds
 import CreateCourseForm from './CreateCourseModal.vue';
 import CreateSectionForm from './CreateSectionModal.vue';
 
@@ -101,12 +91,6 @@ export default {
   name: 'courses',
 
   created() {
-<<<<<<< HEAD
-    // this.fetchData();
-  },
-  mounted() {
-    this.courses = data.coursedata;
-=======
     this.fetchData();
     EventBus.$on('course-added', this.courseAdded);
     EventBus.$on('course-removed', this.courseRemoved);
@@ -118,7 +102,6 @@ export default {
     EventBus.$off('course-removed', this.courseRemoved);
     EventBus.$off('section-added', this.sectionAdded);
     EventBus.$off('section-removed', this.sectionAdded);
->>>>>>> origin/lolGetRektNerds
   },
   data() {
     return {
