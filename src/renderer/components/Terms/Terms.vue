@@ -72,20 +72,12 @@ export default {
         crudTarget: TermCrud,
         postCreate(result) { EventBus.$emit('term-added', result); },
         templates: {
-          title: {
-            label: 'Term Name',
-            type: 'input',
-            placeholder: 'Spring \'18',
-          },
+          title: { label: 'Term Name', type: 'input', placeholder: 'Spring \'18' },
           startDate: {
-            label: 'Term Start Date',
-            type: 'datepicker',
-            placeholder: 'Select a date (mm/dd/yyyy)',
+            label: 'Term Start Date', type: 'datepicker', placeholder: 'Select a date (mm/dd/yyyy)', 
           },
           endDate: {
-            label: 'Term End Date',
-            type: 'datepicker',
-            placeholder: 'Select a date (mm/dd/yyyy)',
+            label: 'Term End Date', type: 'datepicker', placeholder: 'Select a date (mm/dd/yyyy)',
           },
         },
       },

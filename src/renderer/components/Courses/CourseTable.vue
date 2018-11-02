@@ -120,16 +120,8 @@ export default {
         crudTarget: CourseCrud,
         postCreate(result) { EventBus.$emit('course-added', result); },
         templates: {
-          courseLabel: {
-            label: 'Course Label',
-            type: 'input',
-            placeholder: 'CS100',
-          },
-          title: {
-            label: 'Course Title',
-            type: 'input',
-            placeholder: 'Intro to Code',
-          },
+          courseLabel: { label: 'Course Label', type: 'input', placeholder: 'CS100' },
+          title: { label: 'Course Title', type: 'input', placeholder: 'Intro to Code' },
         },
       },
       // Arguments passed into Creation modal for sections
@@ -145,10 +137,7 @@ export default {
         postCreate(result) { EventBus.$emit('section-added', result); },
         templates: {
           sectionNumber: {
-            label: 'Section Number',
-            type: 'input',
-            subtype: 'number',
-            placeholder: '00',
+            label: 'Section Number', type: 'input', subtype: 'number', placeholder: '00',
           },
         },
       },
