@@ -13,7 +13,7 @@
     </button>
 
     <b-modal :active.sync="isModalActive" :width="640" scroll="keep" has-modal-card>
-      <create-term-modal-form @update="fetchData"></create-term-modal-form>
+      <create-term-modal-form></create-term-modal-form>
     </b-modal>
     
     <b-table
@@ -41,8 +41,8 @@
 
 <script>
 /* eslint-disable no-console */
-import { TermCrud } from '../../../../middleware';
 import CreateTermModalForm from './CreateTermModalForm.vue';
+import { TermCrud, EventBus } from '../../../../middleware';
 
 
 export default {
@@ -50,6 +50,13 @@ export default {
 
   created() {
     this.fetchData();
+
+    EventBus.$on('term-added', this.termAdded);
+    EventBus.$on('term-removed', this.termRemoved);
+  },
+  beforeDestroy() {
+    EventBus.$off('term-added', this.termAdded);
+    EventBus.$off('term-removed', this.termRemoved);
   },
 
   components: {
@@ -66,9 +73,10 @@ export default {
   },
   methods: {
     out: console.log,
+    termAdded(term) { this.terms.push(term); },
+    termRemoved(term) { this.terms = this.terms.filter(t => t.id === term.id); },
 
     async fetchData() {
-      console.log('fetchy');
       this.terms = (await TermCrud.get()).data;
     },
   },

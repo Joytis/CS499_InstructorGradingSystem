@@ -1,61 +1,98 @@
 <template>
-    <div class="modal-card" style="width: auto">
-        <header class="modal-card-head">
-            <p class="modal-card-title">Create Student</p>
-        </header>
-        <section class="modal-card-body">
-            <b-field label="A-Number">
-                <b-input
-										type="number"
-                    :value="aNumber"
-                    placeholder="A########"
-                    required>
-                </b-input>
-            </b-field>
-            <b-field label="First Name">
-                <b-input
-                    :value="firstname"
-                    placeholder="First Name"
-                    required>
-                </b-input>
-            </b-field>
-						<b-field label="Last Name">
-                <b-input
-                    :value="lastName"
-                    placeholder="Last Name"
-                    required>
-                </b-input>
-            </b-field>
-						<b-field label="Email">
-                <b-input
-										:type="email"
-                    :value="email"
-                    placeholder="UAH Email"
-                    required>
-                </b-input>
-            </b-field>
-        </section>
-        <footer class="modal-card-foot">
-            <button class="button" type="button" @click="$parent.close()">Cancel</button>
-            <button class="button is-primary" @click="$parent.close()">Create</button>
-        </footer>
-    </div>
+  <div class="modal-card" style="width: auto">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Create Student</p>
+    </header>
+    <section class="modal-card-body">
+      <div v-if="state === 'loading'">
+        <atom-spinner
+          :animation-duration="1000"
+          :size="200"
+          :color="'#cd5bef'"
+         />
+      </div>
+      <div v-else-if="state === 'error'">
+        <div> {{ error.message }} </div>
+      </div>
+      <div v-else-if="state === 'success'">
+        Success!
+      </div>
+      <div v-else>
+        <b-field label="A-Number">
+          <b-input
+            type="number"
+            v-model="student.aNumber"
+            placeholder="A########"
+            required>
+          </b-input>
+        </b-field>
+        <b-field label="First Name">
+          <b-input
+            v-model="student.firstName"
+            placeholder="First Name"
+            required>
+          </b-input>
+        </b-field>
+				<b-field label="Last Name">
+          <b-input
+            v-model="student.lastName"
+            placeholder="Last Name"
+            required>
+          </b-input>
+        </b-field>
+				<b-field label="Email">
+          <b-input
+						type="email"
+            v-model="student.email"
+            placeholder="UAH Email"
+            required>
+          </b-input>
+        </b-field>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button" type="button" @click="$parent.close()">Cancel</button>
+      <button class="button is-primary" @click="attemptStudentCreate">Create</button>
+    </footer>
+  </div>
 </template>
 
-
-
 <script>
+/* eslint-disable no-console */
+import { AtomSpinner } from 'epic-spinners';
+import { StudentCrud, EventBus } from '../../../../middleware';
+
 export default {
+  name: 'CreateCourseModal',
   components: {
+    AtomSpinner,
   },
   props: [],
   data() {
     return {
-      aNumber: '',
-      firstName: '',
-      lastName: '',
-      email: '',
+      error: undefined,
+      state: 'main',
+      student: {
+        aNumber: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+      },
     };
+  },
+  methods: {
+    async attemptStudentCreate() {
+      try {
+        this.state = 'loading';
+        const student = (await StudentCrud.post(this.student)).data;
+        this.state = 'success';
+        EventBus.$emit('student-added', student);
+      } catch (err) {
+        console.error(err);
+        this.state = 'error';
+        this.error = err;
+      }
+    },
   },
 };
 </script>

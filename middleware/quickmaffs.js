@@ -35,12 +35,14 @@ function Mode(id, values) {
       mode = number;
     }
   });
+  // NOTE: Make sure if two numbers have max that the mode is NAN
   return +mode;
 }
 
 function StandardDeviation(id, values, mean) {
   if (!Array.IsArray(values)) throw new Error('Values are not an array!');
   const SDprep = values.reduce((acc, value) => acc + ((parseFloat(value) - mean) ** 2));
+  // NOTE: INCORRECT fix implementation.
   return Math.sqrt(SDprep / values.length);
 }
 

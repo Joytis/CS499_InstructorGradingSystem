@@ -57,23 +57,22 @@
 
 <script>
 /* eslint-disable no-console */
-import data from './TermListDataMock';
+// import data from './TermListDataMock';
 import modalForm from './NewStudentModalForm.vue';
-
+import { StudentCrud, EventBus } from '../../../../middleware';
 
 export default {
   name: 'GlobalEnrollment',
-  mounted() {
-    this.data = data;
-  },
+
   components: {
     modalForm,
   },
+
   data() {
     return {
       isModalActive: false,
       checkedRows: [],
-      data: [],
+      students: [],
       searchString: '',
     };
   },
@@ -81,10 +80,29 @@ export default {
     out(args) {
       console.log(args);
     },
+
+    async fetchData() {
+      this.students = (await StudentCrud.get()).data;
+    },
+
+    studentAdded(student) { this.students.push(student); },
+    studentRemoved(student) { this.students = this.students.filter(s => s.id === student.id); },
   },
+
+  created() {
+    this.fetchData();
+
+    EventBus.$on('student-added', this.studentAdded);
+    EventBus.$on('student-removed', this.studentRemoved);
+  },
+  beforeDestroy() {
+    EventBus.$off('student-added', this.studentAdded);
+    EventBus.$off('student-removed', this.studentRemoved);
+  },
+
   computed: {
     filteredData() {
-      return this.data.filter((student) => (
+      return this.students.filter((student) => (
         student.email.toLowerCase().includes(this.searchString.toLowerCase())
         || student.firstName.toLowerCase().includes(this.searchString.toLowerCase())
         || student.lastName.toLowerCase().includes(this.searchString.toLowerCase())

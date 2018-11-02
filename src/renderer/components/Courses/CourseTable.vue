@@ -12,8 +12,13 @@
         <b-table-column field="courseId" label="Course ID" width="130" sortable>
           {{ props.row.CourseId }}
         </b-table-column>
+<<<<<<< HEAD
         <b-table-column field="courseName" label="Course Title" sortable>
           {{ props.row.CourseName }}
+=======
+        <b-table-column field="title" label="Course Title" sortable>
+          {{ `${props.row.courseLabel} - ${props.row.title}` }}
+>>>>>>> origin/lolGetRektNerds
         </b-table-column>
 
         <b-table-column field="courseSections" label="Number of Sections" numeric>
@@ -30,14 +35,20 @@
             </router-link>
           </button>
         </b-table-column>
+        <b-table-column label="Create Section">
+          <button 
+              class="button is-warning is-small" 
+              @click="isSectionModalActive = true; selectedCourseId = props.row.id"
+          >
+            <b-icon type="is-success" icon="account"/>
+          </button>
+          <b-modal :active.sync="isSectionModalActive" :width="640" scroll="keep" has-modal-card>
+            <create-section-form :course-id="selectedCourseId"></create-section-form>
+          </b-modal>
+        </b-table-column>
       </template>
-     </b-table>
-
-
       <template slot="detail" slot-scope="props">
-        <b-table
-          :data=getSection(props.row.CourseId)
-        >
+        <b-table :data=props.row.sections>
           <template slot-scope="props">
             <b-table-column field="SectionName" label="Section ID" width="180" sortable>
               {{ props.row.SectionName }}
@@ -47,17 +58,9 @@
               {{ props.row.SectionTime }}
             </b-table-column>
 
-            <!-- <b-table-column field="NumStudents" label="Number of Students" numeric>
-              {{ props.row.NumStudents }}
-            </b-table-column>
-
-            <b-table-column field="SectionAvg" label="Section Average" sortable>
-              {{ props.row.SectionAvg }}
-            </b-table-column> -->
-
             <b-table-column label="Section Page">
               <button class="button is-warning is-small">
-                <router-link :to="'courses/' + Courseprops.row.CourseId + '/' + props.row.SectionName">
+                <router-link :to="'courses/' + props.row.CourseId + '/' + props.row.SectionName">
                   <b-icon type="is-accent" icon="expand-all">
                   </b-icon>
                 </router-link>
@@ -67,13 +70,15 @@
 
         </b-table>
       </template>
-        <button class="button is-primary is-medium"
-          @click="modalForm = 'createcourse'; isModalActive = true">
-          Create Course
-        </button>
-        <b-modal :active.sync="isModalActive" has-modal-card>
-          <create-course-form></create-course-form>
-        </b-modal>
+    </b-table>
+
+    <button class="button is-primary is-medium"
+      @click="isCourseModalActive = true">
+      Create Course
+    </button>
+    <b-modal :active.sync="isCourseModalActive" has-modal-card>
+      <create-course-form></create-course-form>
+    </b-modal>
   </div>
 </template>
 
@@ -81,57 +86,66 @@
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
+<<<<<<< HEAD
 import data from './CourseListDataMock';
 import { CourseCrud } from '../../../../middleware';
+=======
+// import data from './CourseListDataMock';
+import { CourseCrud, EventBus } from '../../../../middleware';
+>>>>>>> origin/lolGetRektNerds
 import CreateCourseForm from './CreateCourseModal.vue';
+import CreateSectionForm from './CreateSectionModal.vue';
 
 
 export default {
   name: 'courses',
 
   created() {
+<<<<<<< HEAD
     // this.fetchData();
   },
   mounted() {
     this.courses = data.coursedata;
+=======
+    this.fetchData();
+    EventBus.$on('course-added', this.courseAdded);
+    EventBus.$on('course-removed', this.courseRemoved);
+    EventBus.$on('section-added', this.sectionAdded);
+    EventBus.$on('section-removed', this.sectionAdded);
+  },
+  beforeDestroy() {
+    EventBus.$off('course-added', this.courseAdded);
+    EventBus.$off('course-removed', this.courseRemoved);
+    EventBus.$off('section-added', this.sectionAdded);
+    EventBus.$off('section-removed', this.sectionAdded);
+>>>>>>> origin/lolGetRektNerds
   },
   data() {
     return {
-      isModalActive: false,
+      selectedCourseId: null,
+      isCourseModalActive: false,
+      isSectionModalActive: false,
       courses: [],
 
     };
   },
   components: {
     CreateCourseForm,
+    CreateSectionForm,
   },
   methods: {
-    async fetchData() {
-      // // TESTING AND SETUP CODE.
-      // const term = await TermCrud.post({ title: 'TestTerm' });
-      // let course = await CourseCrud.post({ title: 'TestCourse', courseNo: 42 });
-      // await SectionCrud.post({
-      //   sectionNumber: 0,
-      //   termId: term.data.id,
-      //   courseId: course.data.id,
-      // });
-      // await SectionCrud.post({
-      //   sectionNumber: 1,
-      //   termId: term.data.id,
-      //   courseId: course.data.id,
-      // });
-      // course = await CourseCrud.post({ title: 'TestCourse2', courseNo: 43 });
-      // await SectionCrud.post({
-      //   sectionNumber: 0,
-      //   termId: term.data.id,
-      //   courseId: course.data.id,
-      // });
-      // await SectionCrud.post({
-      //   sectionNumber: 1,
-      //   termId: term.data.id,
-      //   courseId: course.data.id,
-      // });
+    courseAdded(course) { this.courses.push(course); },
+    courseRemoved(course) { this.courses = this.courses.filter(c => c.id === course.id); },
+    sectionAdded(section) {
+      const course = this.courses.find(c => c.id === section.courseId);
+      course.sections.push(section);
+    },
+    sectionRemoved(section) {
+      const course = this.courses.find(c => c.id === section.courseId);
+      course.sections.filter(s => s.id === section.id);
+    },
 
+    async fetchData() {
       const newCourses = (await CourseCrud.get()).data; // Get all courses
       const promises = newCourses.map(async (c) => {
         const courseSectionCrud = CourseCrud.fromAppendedRoute(urljoin(String(c.id), '/sections'));
