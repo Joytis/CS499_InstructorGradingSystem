@@ -29,7 +29,7 @@
 <script>
 /* eslint-disable no-console */
 import { AtomSpinner } from 'epic-spinners';
-import { SectionCrud, EventBus } from '../../../../middleware';
+import { SectionCrud, EventBus, RaceTimer } from '../../../../middleware';
 
 export default {
   name: 'CreateSectionModal',
@@ -55,16 +55,39 @@ export default {
   methods: {
 
     async attemptFindSelectedTerm() {
-      // const findPromise = new Promise((resolve, reject) => {
-      //   'response-selected-term'
-      // })
+      let term = null;
+      let res;
+      const resolver = (t) => {
+        term = t;
+        res();
+      };
+      // Listen the response, then resolve our object.
+      EventBus.$on('response-selected-term', resolver);
+      const findPromise = new Promise((resolve) => {
+        // Set the resolver for our functor.
+        res = resolve;
+        // request our term.
+        EventBus.$emit('request-selected-term');
+      });
+
+      // Dawg if we don't find that in 20 ms then it's not there lol.
+      const timer = RaceTimer(20, findPromise).catch(err => {
+        this.error = err;
+        this.state = 'error';
+        throw new Error('Couldnt find an active term');
+      });
+      await timer;
+      // Don't listen for the response anymore.
+      EventBus.$off('response-selected-term', resolver);
+      return term;
     },
 
     async attemptCreateSection() {
       try {
         // Copy props
         this.section.courseId = this.courseId;
-        this.section.termId = this.termId;
+        this.section.termId = (await this.attemptFindSelectedTerm()).id;
+        console.log(this.section.termId);
         // Send to Db.
         this.state = 'loading';
         const section = (await SectionCrud.post(this.section)).data;

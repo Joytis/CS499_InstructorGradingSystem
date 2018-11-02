@@ -39,8 +39,6 @@
           </b-modal>
         </b-table-column>
       </template>
-     </b-table>
-
      <template slot="detail" slot-scope="props">
         <b-table
           :data=props.row.sections
@@ -56,7 +54,7 @@
 
             <b-table-column label="Section Page">
               <button class="button is-warning is-small">
-                <router-link :to="'courses/' + Courseprops.row.CourseId + '/' + props.row.SectionName">
+                <router-link :to="'courses/' + props.row.CourseId + '/' + props.row.SectionName">
                   <b-icon type="is-accent" icon="expand-all">
                   </b-icon>
                 </router-link>
@@ -66,13 +64,15 @@
 
         </b-table>
       </template>
-        <button class="button is-primary is-medium"
-          @click="isCourseModalActive = true">
-          Create Course
-        </button>
-        <b-modal :active.sync="isCourseModalActive" has-modal-card>
-          <create-course-form></create-course-form>
-        </b-modal>
+    </b-table>
+
+    <button class="button is-primary is-medium"
+      @click="isCourseModalActive = true">
+      Create Course
+    </button>
+    <b-modal :active.sync="isCourseModalActive" has-modal-card>
+      <create-course-form></create-course-form>
+    </b-modal>
   </div>
 </template>
 
@@ -121,6 +121,7 @@ export default {
         c.sections = (await courseSectionCrud.get()).data;
       });
       await Promise.all(promises);
+      console.log(newCourses);
       this.courses = newCourses;
     },
   },
