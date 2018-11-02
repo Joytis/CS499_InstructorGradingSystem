@@ -87,6 +87,7 @@ export default {
         // Copy props
         this.section.courseId = this.courseId;
         this.section.termId = (await this.attemptFindSelectedTerm()).id;
+        console.log(this.section.courseId);
         console.log(this.section.termId);
         // Send to Db.
         this.state = 'loading';

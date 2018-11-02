@@ -31,18 +31,19 @@
           </button>
         </b-table-column>
         <b-table-column label="Create Section">
-          <button class="button is-warning is-small" @click="isSectionModalActive = true">
+          <button 
+              class="button is-warning is-small" 
+              @click="isSectionModalActive = true; selectedCourseId = props.row.id"
+          >
             <b-icon type="is-success" icon="account"/>
           </button>
           <b-modal :active.sync="isSectionModalActive" :width="640" scroll="keep" has-modal-card>
-            <create-section-form :course-id="props.row.id"></create-section-form>
+            <create-section-form :course-id="selectedCourseId"></create-section-form>
           </b-modal>
         </b-table-column>
       </template>
-     <template slot="detail" slot-scope="props">
-        <b-table
-          :data=props.row.sections
-        >
+      <template slot="detail" slot-scope="props">
+        <b-table :data=props.row.sections>
           <template slot-scope="props">
             <b-table-column field="id" label="Section ID" width="180" sortable>
               {{ props.row.id }}
@@ -93,14 +94,19 @@ export default {
     this.fetchData();
     EventBus.$on('course-added', this.courseAdded);
     EventBus.$on('course-removed', this.courseRemoved);
+    EventBus.$on('section-added', this.sectionAdded);
+    EventBus.$on('section-removed', this.sectionAdded);
   },
   beforeDestroy() {
     EventBus.$off('course-added', this.courseAdded);
     EventBus.$off('course-removed', this.courseRemoved);
+    EventBus.$off('section-added', this.sectionAdded);
+    EventBus.$off('section-removed', this.sectionAdded);
   },
 
   data() {
     return {
+      selectedCourseId: null,
       isCourseModalActive: false,
       isSectionModalActive: false,
       courses: [],
@@ -113,6 +119,14 @@ export default {
   methods: {
     courseAdded(course) { this.courses.push(course); },
     courseRemoved(course) { this.courses = this.courses.filter(c => c.id === course.id); },
+    sectionAdded(section) {
+      const course = this.courses.find(c => c.id === section.courseId);
+      course.sections.push(section);
+    },
+    sectionRemoved(section) {
+      const course = this.courses.find(c => c.id === section.courseId);
+      course.sections.filter(s => s.id === section.id);
+    },
 
     async fetchData() {
       const newCourses = (await CourseCrud.get()).data; // Get all courses
@@ -121,7 +135,6 @@ export default {
         c.sections = (await courseSectionCrud.get()).data;
       });
       await Promise.all(promises);
-      console.log(newCourses);
       this.courses = newCourses;
     },
   },
