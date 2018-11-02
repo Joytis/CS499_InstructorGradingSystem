@@ -1,21 +1,24 @@
 <template>
   <section>
 
-    <button class="button is-primary is-small"
-      @click="isModalActive = true">
+    <button class="button is-primary is-small" @click="isModalActive = true"> 
       Create New Student
     </button>    
-    <button class="button is-warning is-small"
-      @click="out(selected)"
-      :disabled="checkedRows.length!=1"
-      >
+    <button class="button is-warning is-small" 
+      @click="isEditThingsModalActive = true" 
+      :disabled="checkedRows.length != 1">
       Edit Student
     </button>
-    <button class="button is-success is-small"
-      :disabled="checkedRows.length==0"
-    >
+    <button class="button is-success is-small" :disabled="checkedRows.length==0">
       Add To Section
     </button>
+
+    <b-modal :active.sync="isCreationModalActive" :width="640" scroll="keep" has-modal-card>
+      <creation-modal-form :inputs="studentModalInputs"></creation-modal-form>
+    </b-modal>
+    <b-modal :active.sync="isEditThingsModalActive" :width="640" scroll="keep" has-modal-card>
+      <edit-things-modal-form :inputs="studentModalInputs" :target="checkedRows[0]"></edit-things-modal-form>
+    </b-modal>
 
     <b-input v-model="searchString"
       placeholder="Filter Results..."
@@ -44,9 +47,6 @@
         </b-table-column>
       </template>
     </b-table>
-    <b-modal :active.sync="isModalActive" has-modal-card>
-      <creation-modal-form :inputs="studentModalInputs"></creation-modal-form>
-    </b-modal>
   </section>
 </template>
 
@@ -55,6 +55,7 @@
 /* eslint-disable no-console */
 // import data from './TermListDataMock';
 import CreationModalForm from '../CreationModal.vue';
+import EditThingsModalForm from '../EditThingsModal.vue';
 import { StudentCrud, EventBus } from '../../../../middleware';
 
 export default {
@@ -62,11 +63,13 @@ export default {
 
   components: {
     CreationModalForm,
+    EditThingsModalForm,
   },
 
   data() {
     return {
-      isModalActive: false,
+      isCreationModalActive: false,
+      isEditThingsModalActive: false,
       checkedRows: [],
       students: [],
       searchString: '',
@@ -97,6 +100,9 @@ export default {
 
     studentAdded(student) { this.students.push(student); },
     studentRemoved(student) { this.students = this.students.filter(s => s.id === student.id); },
+    studentUpdated(student) {
+      this.students[this.students.findIndex(s => s.id === student.id)] = student;
+    },
   },
 
   created() {
@@ -104,10 +110,12 @@ export default {
 
     EventBus.$on('student-added', this.studentAdded);
     EventBus.$on('student-removed', this.studentRemoved);
+    EventBus.$on('student-updated', this.studentUpdated);
   },
   beforeDestroy() {
     EventBus.$off('student-added', this.studentAdded);
     EventBus.$off('student-removed', this.studentRemoved);
+    EventBus.$off('student-updated', this.studentUpdated);
   },
 
   computed: {

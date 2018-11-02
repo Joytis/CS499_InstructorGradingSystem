@@ -1,11 +1,25 @@
 <template>
   <div>
+    <button class="button is-primary is-small"@click="isCreationModalActive = true"> 
+      Create New Term 
+    </button>
+    <button class="button is-warning is-small" @click="isEditThingsModalActive = true" :disabled="!selectedCourse">
+      Edit Term
+    </button>
+    <b-modal :active.sync="isCreationModalActive" :width="640" scroll="keep" has-modal-card>
+      <creation-modal-form :inputs="courseModalInputs"></creation-modal-form>
+    </b-modal>
+    <b-modal :active.sync="isEditThingsModalActive" :width="640" scroll="keep" has-modal-card>
+      <edit-things-modal-form :inputs="courseModalInputs" :target="selectedCourse"></edit-things-modal-form>
+    </b-modal>
+
     <b-table
         :data="courses"
         paginated
         per-page="5"
         detailed
         detail-key="id"
+        :selected.sync="selectedCourse"
     >
 
       <template slot-scope="props">
@@ -62,18 +76,9 @@
               </button>
             </b-table-column>
           </template>
-
         </b-table>
       </template>
     </b-table>
-
-    <button class="button is-primary is-medium"
-      @click="isCourseModalActive = true">
-      Create Course
-    </button>
-    <b-modal :active.sync="isCourseModalActive" has-modal-card>
-      <creation-modal-form :inputs="courseModalInputs"></creation-modal-form>
-    </b-modal>
   </div>
 </template>
 
@@ -82,6 +87,7 @@
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
 import CreationModalForm from '../CreationModal.vue';
+import EditThingsModalForm from '../EditThingsModal.vue';
 import {
   CourseCrud, SectionCrud, EventBus, Finders,
 } from '../../../../middleware';
@@ -91,12 +97,14 @@ export default {
 
   components: {
     CreationModalForm,
+    EditThingsModalForm,
   },
 
   created() {
     this.fetchData();
     EventBus.$on('course-added', this.courseAdded);
     EventBus.$on('course-removed', this.courseRemoved);
+    EventBus.$on('course-updated', this.courseUpdated);
     EventBus.$on('section-added', this.sectionAdded);
     EventBus.$on('section-removed', this.sectionAdded);
     EventBus.$on('request-selected-course', this.requestSelectedCourse);
@@ -104,6 +112,7 @@ export default {
   beforeDestroy() {
     EventBus.$off('course-added', this.courseAdded);
     EventBus.$off('course-removed', this.courseRemoved);
+    EventBus.$off('course-updated', this.courseUpdated);
     EventBus.$off('section-added', this.sectionAdded);
     EventBus.$off('section-removed', this.sectionAdded);
     EventBus.$off('request-selected-course', this.requestSelectedCourse);
@@ -112,13 +121,16 @@ export default {
   data() {
     return {
       selectedCourse: null,
-      isCourseModalActive: false,
+      isCreationModalActive: false,
+      isEditThingsModalActive: false,
       isSectionModalActive: false,
+
       courses: [],
       // Arguments passed into the creation modal for courses.
       courseModalInputs: {
         crudTarget: CourseCrud,
         postCreate(result) { EventBus.$emit('course-added', result); },
+        postUpdate(result) { EventBus.$emit('course-updated', result); },
         templates: {
           courseLabel: { label: 'Course Label', type: 'input', placeholder: 'CS100' },
           title: { label: 'Course Title', type: 'input', placeholder: 'Intro to Code' },
@@ -152,6 +164,9 @@ export default {
       this.courses.push(custom);
     },
     courseRemoved(course) { this.courses = this.courses.filter(c => c.id === course.id); },
+    courseUpdated(course) {
+      this.courses[this.courses.findIndex(c => c.id === course.id)] = course;
+    },
     sectionAdded(section) {
       const course = this.courses.find(c => c.id === section.courseId);
       course.sections.push(section);
@@ -170,7 +185,6 @@ export default {
       });
       await Promise.all(promises);
       this.courses = newCourses;
-      console.log(this.courses);
     },
   },
 };
