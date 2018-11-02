@@ -72,7 +72,7 @@
           Create Course
         </button>
         <b-modal :active.sync="isModalActive" has-modal-card>
-          <create-course-form @update="fetchData"></create-course-form>
+          <create-course-form></create-course-form>
         </b-modal>
   </div>
 </template>
@@ -82,7 +82,7 @@
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
 // import data from './CourseListDataMock';
-import { CourseCrud } from '../../../../middleware';
+import { CourseCrud, EventBus } from '../../../../middleware';
 import CreateCourseForm from './CreateCourseModal.vue';
 
 
@@ -91,6 +91,12 @@ export default {
 
   created() {
     this.fetchData();
+    EventBus.$on('course-added', course => {
+      this.courses.push(course);
+    });
+    EventBus.$on('course-removed', course => {
+      this.courses = this.courses.filter(c => c.id === course.id);
+    });
   },
 
   data() {

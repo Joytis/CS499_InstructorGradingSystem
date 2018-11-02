@@ -44,7 +44,7 @@
 <script>
 /* eslint-disable no-console */
 import { AtomSpinner } from 'epic-spinners';
-import { CourseCrud } from '../../../../middleware';
+import { CourseCrud, EventBus } from '../../../../middleware';
 
 export default {
   name: 'CreateCourseModal',
@@ -66,9 +66,9 @@ export default {
     async attemptCourseCreate() {
       try {
         this.state = 'loading';
-        await CourseCrud.post(this.course);
+        const course = (await CourseCrud.post(this.course)).data;
         this.state = 'success';
-        this.$emit('update');
+        EventBus.$emit('course-added', course);
       } catch (err) {
         console.error(err);
         this.state = 'error';

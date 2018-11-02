@@ -52,8 +52,10 @@ export default {
     this.fetchData();
 
     EventBus.$on('term-added', newTerm => {
-      console.log(`newTerm: ${newTerm}`);
       this.terms.push(newTerm);
+    });
+    EventBus.$on('term-removed', term => {
+      this.terms = this.terms.filter(t => t.id === term.id);
     });
   },
 

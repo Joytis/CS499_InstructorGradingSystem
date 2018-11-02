@@ -57,23 +57,22 @@
 
 <script>
 /* eslint-disable no-console */
-import data from './TermListDataMock';
+// import data from './TermListDataMock';
 import modalForm from './NewStudentModalForm.vue';
-
+import { StudentCrud, EventBus } from '../../../../middleware';
 
 export default {
   name: 'GlobalEnrollment',
-  mounted() {
-    this.data = data;
-  },
+
   components: {
     modalForm,
   },
+
   data() {
     return {
       isModalActive: false,
       checkedRows: [],
-      data: [],
+      students: [],
       searchString: '',
     };
   },
@@ -81,10 +80,26 @@ export default {
     out(args) {
       console.log(args);
     },
+
+    async fetchData() {
+      this.students = (await StudentCrud.get()).data;
+    },
   },
+
+  created() {
+    this.fetchData();
+
+    EventBus.$on('student-added', newTerm => {
+      this.students.push(newTerm);
+    });
+    EventBus.$on('student-removed', student => {
+      this.students = this.students.filter(s => s.id === student.id);
+    });
+  },
+
   computed: {
     filteredData() {
-      return this.data.filter((student) => (
+      return this.students.filter((student) => (
         student.email.toLowerCase().includes(this.searchString.toLowerCase())
         || student.firstName.toLowerCase().includes(this.searchString.toLowerCase())
         || student.lastName.toLowerCase().includes(this.searchString.toLowerCase())
