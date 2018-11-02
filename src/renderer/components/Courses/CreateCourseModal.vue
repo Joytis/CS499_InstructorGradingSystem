@@ -1,31 +1,5 @@
 <template>
   <div class="modal-card" style="width: auto">
-<<<<<<< HEAD
-      <header class="modal-card-head">
-          <p class="modal-card-title">Create Course</p>
-      </header>
-      <section class="modal-card-body">
-          <b-field label="Course Number">
-              <b-input
-                  :value="id"
-                  placeholder="CS000"
-                  required>
-              </b-input>
-          </b-field>
-          <b-field label="Course Title">
-              <b-input
-                  :value="title"
-                  placeholder="Intro to code"
-                  required>
-              </b-input>
-          </b-field>
-
-      </section>
-      <footer class="modal-card-foot">
-          <button class="button" type="button" @click="$parent.close()">Close</button>
-          <button class="button is-primary" @click="$parent.close()">Create</button>
-      </footer>
-=======
     <header class="modal-card-head">
       <p class="modal-card-title">Create Course</p>
     </header>
@@ -64,7 +38,6 @@
       <button class="button" type="button" @click="$parent.close()">Close</button>
       <button class="button is-primary" @click="attemptCourseCreate">Create</button>
     </footer>
->>>>>>> origin/lolGetRektNerds
   </div>
 </template>
 
