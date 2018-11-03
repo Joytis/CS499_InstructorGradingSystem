@@ -1,10 +1,10 @@
 <template>
   <div>
     <button class="button is-primary is-small"@click="isCreationModalActive = true"> 
-      Create New Term 
+      Create New Course
     </button>
     <button class="button is-warning is-small" @click="isEditThingsModalActive = true" :disabled="!selectedCourse">
-      Edit Term
+      Edit Course
     </button>
     <b-modal :active.sync="isCreationModalActive" :width="640" scroll="keep" has-modal-card>
       <creation-modal-form :inputs="courseModalInputs"></creation-modal-form>
