@@ -1,18 +1,12 @@
 <template>
   <section>
-
-    <button class="button is-primary is-small"@click="isCreationModalActive = true"> 
-      Create New Term 
-    </button>
-    <button class="button is-warning is-small" @click="isEditThingsModalActive = true" :disabled="!selected">
-      Edit Term
-    </button>
-    <b-modal :active.sync="isCreationModalActive" :width="640" scroll="keep" has-modal-card>
-      <creation-modal-form :inputs="modalInputs"></creation-modal-form>
-    </b-modal>
-    <b-modal :active.sync="isEditThingsModalActive" :width="640" scroll="keep" has-modal-card>
-      <edit-things-modal-form :inputs="modalInputs" :target="selected"></edit-things-modal-form>
-    </b-modal>
+    <crud-modal-bar
+      createTitle="Create Term"
+      editTitle="Edit Term"
+      deleteTitle="Delete Term"
+      :target="selected"
+      :inputs="modalInputs"
+    />
     
     <b-table
       :data="terms"
@@ -40,8 +34,7 @@
 <script>
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
-import CreationModalForm from '../CreationModal.vue';
-import EditThingsModalForm from '../EditThingsModal.vue';
+import CrudModalBar from '../CrudModalBar.vue';
 import { TermCrud, EventBus } from '../../../../middleware';
 
 
@@ -62,8 +55,7 @@ export default {
   },
 
   components: {
-    CreationModalForm,
-    EditThingsModalForm,
+    CrudModalBar,
   },
 
   data() {

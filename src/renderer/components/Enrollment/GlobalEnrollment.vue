@@ -1,24 +1,16 @@
 <template>
   <section>
-
-    <button class="button is-primary is-small" @click="isModalActive = true"> 
-      Create New Student
-    </button>    
-    <button class="button is-warning is-small" 
-      @click="isEditThingsModalActive = true" 
-      :disabled="checkedRows.length != 1">
-      Edit Student
-    </button>
+    <crud-modal-bar
+      createTitle="Create Student"
+      editTitle="Edit Student"
+      deleteTitle="Delete Student"
+      :target="(checkedRows.length == 1) ? checkedRows[0] : null"
+      :inputs="studentModalInputs"
+    />
     <button class="button is-success is-small" :disabled="checkedRows.length==0">
       Add To Section
     </button>
 
-    <b-modal :active.sync="isCreationModalActive" :width="640" scroll="keep" has-modal-card>
-      <creation-modal-form :inputs="studentModalInputs"></creation-modal-form>
-    </b-modal>
-    <b-modal :active.sync="isEditThingsModalActive" :width="640" scroll="keep" has-modal-card>
-      <edit-things-modal-form :inputs="studentModalInputs" :target="checkedRows[0]"></edit-things-modal-form>
-    </b-modal>
 
     <b-input v-model="searchString"
       placeholder="Filter Results..."

@@ -1,18 +1,12 @@
 <template>
   <div>
-    <button class="button is-primary is-small"@click="isCreationModalActive = true"> 
-      Create New Course
-    </button>
-    <button class="button is-warning is-small" @click="isEditThingsModalActive = true" :disabled="!selectedCourse">
-      Edit Course
-    </button>
-    <b-modal :active.sync="isCreationModalActive" :width="640" scroll="keep" has-modal-card>
-      <creation-modal-form :inputs="courseModalInputs"></creation-modal-form>
-    </b-modal>
-    <b-modal :active.sync="isEditThingsModalActive" :width="640" scroll="keep" has-modal-card>
-      <edit-things-modal-form :inputs="courseModalInputs" :target="selectedCourse"></edit-things-modal-form>
-    </b-modal>
-
+    <crud-modal-bar
+      createTitle="Create Course"
+      editTitle="Edit Course"
+      deleteTitle="Delete Course"
+      :target="selectedCourse"
+      :inputs="courseModalInputs"
+    />
     <b-table
         :data="courses"
         paginated
@@ -86,8 +80,8 @@
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
+import CrudModalBar from '../CrudModalBar.vue';
 import CreationModalForm from '../CreationModal.vue';
-import EditThingsModalForm from '../EditThingsModal.vue';
 import {
   CourseCrud, SectionCrud, EventBus, Finders,
 } from '../../../../middleware';
@@ -96,8 +90,8 @@ export default {
   name: 'courses',
 
   components: {
+    CrudModalBar,
     CreationModalForm,
-    EditThingsModalForm,
   },
 
   created() {
