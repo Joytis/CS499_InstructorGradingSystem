@@ -122,6 +122,23 @@ menu-left {
 html {
   overflow-y: auto;
 }
+
+html,
+body,
+#app,
+#app > div,
+.animation-content,
+.animation-content > div,
+.modal-card,
+.modal-card-body {
+  overflow: auto;
+}
+
+.modal-card {
+  width: auto !important;
+  padding-top: 51px;
+}
+
 </style>
 
 

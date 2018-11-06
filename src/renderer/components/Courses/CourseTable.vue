@@ -1,11 +1,19 @@
 <template>
   <div>
+    <crud-modal-bar
+      createTitle="Create Course"
+      editTitle="Edit Course"
+      deleteTitle="Delete Course"
+      :target="selectedCourse"
+      :inputs="courseModalInputs"
+    />
     <b-table
         :data="courses"
         paginated
         per-page="5"
         detailed
         detail-key="id"
+        :selected.sync="selectedCourse"
     >
 
       <template slot-scope="Courseprops">
@@ -13,7 +21,7 @@
           {{ Courseprops.row.id }}
         </b-table-column>
         <b-table-column field="title" label="Course Title" sortable>
-          {{ Courseprops.row.title }}
+          {{ `${props.row.courseLabel} - ${props.row.title}` }}
         </b-table-column>
 
         <b-table-column field="sections.length" label="Number of Sections" numeric>
@@ -30,14 +38,20 @@
             </router-link>
           </button>
         </b-table-column>
+        <b-table-column label="Create Section">
+          <button 
+              class="button is-warning is-small" 
+              @click="selectedCourse = props.row; isSectionModalActive = true"
+          >
+            <b-icon type="is-success" icon="account"/>
+          </button>
+          <b-modal :active.sync="isSectionModalActive" :width="640" scroll="keep" has-modal-card>
+            <creation-modal-form :inputs="sectionModalInputs"></creation-modal-form>
+          </b-modal>
+        </b-table-column>
       </template>
-     </b-table>
-
-
-      <template slot="detail" slot-scope="Courseprops">
-        <b-table
-          :data="courses[0].sections"
-        >
+      <template slot="detail" slot-scope="props">
+        <b-table :data=props.row.sections>
           <template slot-scope="props">
             <b-table-column field="id" label="Section ID" width="180" sortable>
               {{ props.row.id }}
@@ -47,33 +61,18 @@
               {{ props.row.sectionNumber }}
             </b-table-column>
 
-            <!-- <b-table-column field="NumStudents" label="Number of Students" numeric>
-              {{ props.row.NumStudents }}
-            </b-table-column>
-
-            <b-table-column field="SectionAvg" label="Section Average" sortable>
-              {{ props.row.SectionAvg }}
-            </b-table-column> -->
-
             <b-table-column label="Section Page">
               <button class="button is-warning is-small">
-                <router-link :to="'courses/' + Courseprops.row.CourseId + '/' + props.row.sectionNumber">
+                <router-link :to="'courses/' + props.row.courseId + '/' + props.row.id">
                   <b-icon type="is-accent" icon="expand-all">
                   </b-icon>
                 </router-link>
               </button>
             </b-table-column>
           </template>
-
         </b-table>
       </template>
-        <button class="button is-primary is-medium"
-          @click="Out(); isModalActive = true">
-          Create Course
-        </button>
-        <b-modal :active.sync="isModalActive" has-modal-card>
-          <create-course-form></create-course-form>
-        </b-modal>
+    </b-table>
   </div>
 </template>
 
@@ -81,57 +80,97 @@
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
-// import data from './CourseListDataMock';
-import { CourseCrud, TermCrud, SectionCrud } from '../../../../middleware';
-import CreateCourseForm from './CreateCourseModal.vue';
-
+import CrudModalBar from '../CrudModalBar.vue';
+import CreationModalForm from '../CreationModal.vue';
+import {
+  CourseCrud, SectionCrud, EventBus, Finders,
+} from '../../../../middleware';
 
 export default {
   name: 'courses',
 
+  components: {
+    CrudModalBar,
+    CreationModalForm,
+  },
+
   created() {
     this.fetchData();
+    EventBus.$on('course-added', this.courseAdded);
+    EventBus.$on('course-removed', this.courseRemoved);
+    EventBus.$on('course-updated', this.courseUpdated);
+    EventBus.$on('section-added', this.sectionAdded);
+    EventBus.$on('section-removed', this.sectionAdded);
+    EventBus.$on('request-selected-course', this.requestSelectedCourse);
+  },
+  beforeDestroy() {
+    EventBus.$off('course-added', this.courseAdded);
+    EventBus.$off('course-removed', this.courseRemoved);
+    EventBus.$off('course-updated', this.courseUpdated);
+    EventBus.$off('section-added', this.sectionAdded);
+    EventBus.$off('section-removed', this.sectionAdded);
+    EventBus.$off('request-selected-course', this.requestSelectedCourse);
   },
 
   data() {
     return {
-      isModalActive: false,
+      selectedCourse: null,
+      isCreationModalActive: false,
+      isEditThingsModalActive: false,
+      isSectionModalActive: false,
+
       courses: [],
+      // Arguments passed into the creation modal for courses.
+      courseModalInputs: {
+        crudTarget: CourseCrud,
+        postCreate(result) { EventBus.$emit('course-added', result); },
+        postUpdate(result) { EventBus.$emit('course-updated', result); },
+        templates: {
+          courseLabel: { label: 'Course Label', type: 'input', placeholder: 'CS100' },
+          title: { label: 'Course Title', type: 'input', placeholder: 'Intro to Code' },
+        },
+      },
+      // Arguments passed into Creation modal for sections
+      sectionModalInputs: {
+        crudTarget: SectionCrud,
+        async preCreate(staged) {
+          // Retrieve the desired course and term ID
+          // Querying events here because we don't have access to other members in data asection.
+          const courseId = (await Finders.SelectedCourse()).id;
+          const termId = (await Finders.SelectedTerm()).id;
+          return Object.assign({ courseId, termId }, staged);
+        },
+        postCreate(result) { EventBus.$emit('section-added', result); },
+        templates: {
+          sectionNumber: {
+            label: 'Section Number', type: 'input', subtype: 'number', placeholder: '00',
+          },
+        },
+      },
     };
   },
-  components: {
-    CreateCourseForm,
-  },
-  watchers: {
-
-  },
   methods: {
-    async fetchData() {
-      // TESTING AND SETUP CODE.
-      const term = await TermCrud.post({ title: 'TestTerm' });
-      let course = await CourseCrud.post({ title: 'TestCourse', courseNo: 42 });
-      await SectionCrud.post({
-        sectionNumber: 0,
-        termId: term.data.id,
-        courseId: course.data.id,
-      });
-      await SectionCrud.post({
-        sectionNumber: 1,
-        termId: term.data.id,
-        courseId: course.data.id,
-      });
-      course = await CourseCrud.post({ title: 'TestCourse2', courseNo: 43 });
-      await SectionCrud.post({
-        sectionNumber: 0,
-        termId: term.data.id,
-        courseId: course.data.id,
-      });
-      await SectionCrud.post({
-        sectionNumber: 1,
-        termId: term.data.id,
-        courseId: course.data.id,
-      });
+    async courseAdded(course) {
+      const custom = Object.assign({ sections: [] }, course);
+      const courseSectionCrud = CourseCrud.fromAppendedRoute(urljoin(String(custom.id), '/sections'));
+      custom.sections = (await courseSectionCrud.get()).data;
+      this.courses.push(custom);
+    },
+    courseRemoved(course) { this.courses = this.courses.filter(c => c.id !== course.id); },
+    courseUpdated(course) {
+      this.courses[this.courses.findIndex(c => c.id === course.id)] = course;
+    },
+    sectionAdded(section) {
+      const course = this.courses.find(c => c.id === section.courseId);
+      course.sections.push(section);
+    },
+    sectionRemoved(section) {
+      const course = this.courses.find(c => c.id === section.courseId);
+      course.sections.filter(s => s.id !== section.id);
+    },
 
+    requestSelectedCourse() { EventBus.$emit('response-selected-course', this.selectedCourse); },
+    async fetchData() {
       const newCourses = (await CourseCrud.get()).data; // Get all courses
       const promises = newCourses.map(async (c) => {
         const courseSectionCrud = CourseCrud.fromAppendedRoute(urljoin(String(c.id), '/sections'));

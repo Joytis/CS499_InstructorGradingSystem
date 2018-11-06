@@ -10,27 +10,50 @@
     </button>
 
     <b-modal :active.sync="isModalActive" has-modal-card>
-      <sign-in-form v-if="modalForm === 'signin'" @modalSwap="modalForm=$event"></sign-in-form>
-      <sign-up-form v-else-if="modalForm === 'signup'" @modalSwap="modalForm=$event"></sign-up-form>
+      <creation-modal-form v-if="modalForm === 'signin'" :inputs="signInModalInputs"/>
+      <creation-modal-form v-else-if="modalForm === 'signup'" :inputs="signUpModalInputs"/>
     </b-modal>
   </section>
 </template>
   
 <script>
-import SignInForm from './SignInModalForm.vue';
-import SignUpForm from './SignUpModalForm.vue';
+/* eslint-disable no-alert */
+import CreationModalForm from '../CreationModal.vue';
+import { AccountCrud, LoginCrud } from '../../../../middleware';
 
 
 export default {
   name: 'AuthModal',
   components: {
-    SignInForm,
-    SignUpForm,
+    CreationModalForm,
   },
   data() {
     return {
       isModalActive: false,
       modalForm: 'signup',
+      signUpModalInputs: {
+        crudTarget: AccountCrud,
+        templates: {
+          username: { label: 'Username', type: 'input', placeholder: '' },
+          firstName: { label: 'First Name', type: 'input', placeholder: 'Jon' },
+          lastName: { label: 'Last Name', type: 'input', placeholder: 'Smith' },
+          email: {
+            label: 'Last Name',
+            type: 'input',
+            subtype: 'email',
+            placeholder: 'email@uah.edu',
+          },
+          password: { label: 'Password', type: 'password', placeholder: 'password' },
+        },
+      },
+      signInModalInputs: {
+        crudTarget: LoginCrud,
+        primaryText: 'Sign In',
+        templates: {
+          username: { label: 'Username', type: 'input', placeholder: '' },
+          password: { label: 'Password', type: 'password', placeholder: 'password' },
+        },
+      },
     };
   },
   methods: {},

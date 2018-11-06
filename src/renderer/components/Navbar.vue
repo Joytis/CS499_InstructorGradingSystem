@@ -9,15 +9,24 @@
         &nbsp; GradeBook++
       </div>
       <div class="navbar-item">
+        <div v-if="dropdown.state === 'loading'">
+          <atom-spinner :animation-duration="1000" :size="40" :color="'#cd5bef'"/>
+        </div>
+        <div v-else-if="dropdown.state === 'error'">
+          <div> {{ error.message }} </div>
+        </div>
+        <div v-else>
           <b-dropdown>
-            <button class="button is-primary" slot="trigger">
-              <span> {{ CurrentSemester }} </span>
+            <button class="button is-primary" slot="trigger" click>
+              <span> {{ CurrentTerm.title }} </span>
               <b-icon icon="chevron-down"></b-icon>
             </button>
-            <div v-for="Semester in Terms" :key="Semester">
-              <b-dropdown-item v-on:click="CurrentSemester=Semester">{{ Semester }}</b-dropdown-item>
+            <div v-for="Term in Terms">
+              <b-dropdown-item v-on:click="CurrentTerm=Term">{{ Term.title }}</b-dropdown-item>
             </div>
           </b-dropdown>
+        </div>
+        <button class="button" slot="trigger" @click="fetchTerms">Refresh</button>
       </div>
     </div>
     <div v-if="navIsActive" class="navbar-menu is-active">
@@ -37,39 +46,74 @@
 </template>
 
 <script>
-  export default {
-    name: 'Navbar',
-    data() {
-      return {
-        navIsActive: true,
-        Terms: ['Fall 18', 'Spring 19', 'Summer 19'],
-        CurrentSemester: 'Fall 18',
-      };
+import { AtomSpinner } from 'epic-spinners';
+import { TermCrud, EventBus } from '../../../middleware';
+
+export default {
+  name: 'Navbar',
+  components: {
+    AtomSpinner,
+  },
+  data() {
+    return {
+      navIsActive: true,
+      Terms: [],
+      CurrentTerm: {},
+      dropdown: {
+        error: '',
+        state: 'main',
+      },
+    };
+  },
+
+  created() {
+    this.fetchTerms();
+    EventBus.$on('term-added', this.termAdded);
+    EventBus.$on('request-selected-term', this.requestSelectedTerm);
+  },
+
+  beforeDestroy() {
+    EventBus.$off('term-added', this.termAdded);
+    EventBus.$off('request-selected-term', this.requestSelectedTerm);
+  },
+
+  methods: {
+    termAdded(newTerm) { this.Terms.push(newTerm); },
+    requestSelectedTerm() { EventBus.$emit('response-selected-term', this.CurrentTerm); },
+
+    toggleMenu() {
+      this.navIsActive = !this.navIsActive;
+      this.$emit('toggleMenu');
     },
-    methods: {
-      toggleMenu() {
-        this.navIsActive = !this.navIsActive;
-        this.$emit('toggleMenu');
-      },
-      open(link) {
-        this.$electron.shell.openExternal(link);
-      },
-      minimize() {
-        this.$electron.remote.BrowserWindow.getFocusedWindow().minimize();
-      },
-      maximize() {
-        const window = this.$electron.remote.BrowserWindow.getFocusedWindow();
-        if (window.isMaximized()) {
-          window.unmaximize();
-        } else {
-          window.maximize();
-        }
-      },
-      close() {
-        this.$electron.remote.BrowserWindow.getFocusedWindow().close();
-      },
+    open(link) {
+      this.$electron.shell.openExternal(link);
     },
-  };
+    minimize() {
+      this.$electron.remote.BrowserWindow.getFocusedWindow().minimize();
+    },
+    maximize() {
+      const window = this.$electron.remote.BrowserWindow.getFocusedWindow();
+      if (window.isMaximized()) {
+        window.unmaximize();
+      } else {
+        window.maximize();
+      }
+    },
+    async fetchTerms() {
+      try {
+        this.dropdown.state = 'loading';
+        this.Terms = (await TermCrud.get()).data;
+        this.dropdown.state = 'main';
+      } catch (err) {
+        this.dropdown.state = 'error';
+        this.error = err;
+      }
+    },
+    close() {
+      this.$electron.remote.BrowserWindow.getFocusedWindow().close();
+    },
+  },
+};
 </script>
 
 <style>
