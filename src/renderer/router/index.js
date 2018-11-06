@@ -27,7 +27,7 @@ export default new Router({
       component: require('../components/OtherPage.vue').default,
     },
     {
-      path: '/courses/:id/:section',
+      path: '/courses/:courseId/:sectionId',
       name: 'Section page',
       component: require('../components/Sections/SectionPage.vue').default,
     },
