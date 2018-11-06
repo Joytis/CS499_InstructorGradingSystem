@@ -69,7 +69,7 @@
 
             <b-table-column label="Section Page">
               <button class="button is-warning is-small">
-                <router-link :to="'courses/' + props.row.CourseId + '/' + props.row.SectionName">
+                <router-link :to="'courses/' + props.row.courseId + '/' + props.row.id">
                   <b-icon type="is-accent" icon="expand-all">
                   </b-icon>
                 </router-link>
@@ -163,7 +163,7 @@ export default {
       custom.sections = (await courseSectionCrud.get()).data;
       this.courses.push(custom);
     },
-    courseRemoved(course) { this.courses = this.courses.filter(c => c.id === course.id); },
+    courseRemoved(course) { this.courses = this.courses.filter(c => c.id !== course.id); },
     courseUpdated(course) {
       this.courses[this.courses.findIndex(c => c.id === course.id)] = course;
     },
@@ -173,7 +173,7 @@ export default {
     },
     sectionRemoved(section) {
       const course = this.courses.find(c => c.id === section.courseId);
-      course.sections.filter(s => s.id === section.id);
+      course.sections.filter(s => s.id !== section.id);
     },
 
     requestSelectedCourse() { EventBus.$emit('response-selected-course', this.selectedCourse); },

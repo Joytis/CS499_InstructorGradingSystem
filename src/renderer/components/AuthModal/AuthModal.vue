@@ -9,12 +9,6 @@
       Sign Up
     </button>
 
-
-    <button class="button is-primary is-Small" @click="testMean"> 1 </button>
-    <button class="button is-primary is-Small" @click="testMedian"> 2 </button>
-    <button class="button is-primary is-Small" @click="testMode"> 3 </button>
-    <button class="button is-primary is-Small" @click="testSD"> 4 </button>
-
     <b-modal :active.sync="isModalActive" has-modal-card>
       <creation-modal-form v-if="modalForm === 'signin'" :inputs="signInModalInputs"/>
       <creation-modal-form v-else-if="modalForm === 'signup'" :inputs="signUpModalInputs"/>
@@ -25,7 +19,7 @@
 <script>
 /* eslint-disable no-alert */
 import CreationModalForm from '../CreationModal.vue';
-import { AccountCrud, LoginCrud, QuickMaffs } from '../../../../middleware';
+import { AccountCrud, LoginCrud } from '../../../../middleware';
 
 
 export default {
@@ -62,13 +56,7 @@ export default {
       },
     };
   },
-  methods: {
-    testMean() { alert(QuickMaffs.Mean([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])); },
-    testMedian() { alert(QuickMaffs.Median([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])); },
-    testMode() { alert(QuickMaffs.Mode([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])); },
-    testSD() { alert(QuickMaffs.StandardDeviation([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])); },
-
-  },
+  methods: {},
 };
 </script>
 

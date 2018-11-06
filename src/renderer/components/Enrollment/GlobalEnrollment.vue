@@ -99,7 +99,7 @@ export default {
     },
 
     studentAdded(student) { this.students.push(student); },
-    studentRemoved(student) { this.students = this.students.filter(s => s.id === student.id); },
+    studentRemoved(student) { this.students = this.students.filter(s => s.id !== student.id); },
     studentUpdated(student) {
       this.students[this.students.findIndex(s => s.id === student.id)] = student;
     },

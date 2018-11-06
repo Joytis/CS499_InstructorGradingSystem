@@ -91,7 +91,7 @@ export default {
   methods: {
     out: console.log,
     termAdded(term) { this.terms.push(term); },
-    termRemoved(term) { this.terms = this.terms.filter(t => t.id === term.id); },
+    termRemoved(term) { this.terms = this.terms.filter(t => t.id !== term.id); },
     termUpdated(term) { this.terms[this.terms.findIndex(t => t.id === term.id)] = term; },
 
     async fetchData() {
