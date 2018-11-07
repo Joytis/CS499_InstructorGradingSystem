@@ -158,7 +158,6 @@ export default {
       },
     };
   },
-
   methods: {
     async courseAdded(course) {
       const custom = Object.assign({ sections: [] }, course);
@@ -188,6 +187,14 @@ export default {
       });
       await Promise.all(promises);
       this.courses = newCourses;
+    },
+    Out() {
+      console.log(this.courses);
+    },
+    getSection(courseID) {
+      const section = this.courses.find(s => s.sections.courseId === courseID);
+      console.log(section);
+      return section;
     },
   },
 };
