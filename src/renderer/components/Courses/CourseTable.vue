@@ -16,16 +16,16 @@
         :selected.sync="selectedCourse"
     >
 
-      <template slot-scope="Courseprops">
+      <template slot-scope="props">
         <b-table-column field="id" label="Course ID" width="130" sortable>
-          {{ Courseprops.row.id }}
+          {{ props.row.id }}
         </b-table-column>
         <b-table-column field="title" label="Course Title" sortable>
           {{ `${props.row.courseLabel} - ${props.row.title}` }}
         </b-table-column>
 
         <b-table-column field="sections.length" label="Number of Sections" numeric>
-          {{ Courseprops.row.sections.length }}
+          {{ props.row.sections.length }}
         </b-table-column>
 
         <!-- <b-table-column field="CourseAvg" label="Course Average" sortable>
@@ -33,7 +33,7 @@
         </b-table-column> -->
         <b-table-column label="Course Page">
           <button class="button is-warning is-small">
-            <router-link :to="'courses/' + Courseprops.row.id">
+            <router-link :to="'courses/' + props.row.id">
               <b-icon type="is-accent" icon="expand-all"/>
             </router-link>
           </button>
