@@ -19,7 +19,7 @@
             </template>
         </b-table>
       </b-tab-item>
-      <b-tab-item label="AssignmentCategories">
+      <b-tab-item label="Assignments">
         <!-- Assignment Category Modals -->
         <crud-modal-bar
           createTitle="Create Assignment Category"
@@ -30,7 +30,14 @@
         />
 
         <!-- Assignment Category Tables -->
-        <b-table :data="assCats" paginated per-page="5" :selected.sync="selectedAssignmentCategory">
+        <b-table 
+            :data="assCats" 
+            paginated 
+            per-page="5" 
+            detailed
+            detail-key="id"
+            :selected.sync="selectedAssignmentCategory"
+        >
           <template slot-scope="props">
             <b-table-column field="Name" label="Name" width="300" sortable>
               {{ props.row.name }}
@@ -41,6 +48,47 @@
             <b-table-column field="Lowest Grades Dropped" label="Lowest Grades Dropped" sortable>
               {{ props.row.lowestGradesDropped }}
             </b-table-column>
+
+            <b-table-column label="Create Assignment">
+              <crud-modal-bar
+                @click="selectedAssignmentCategory = props.row"
+                createTitle="Create Assignment"
+                :inputs="assignmentInputs"
+                :removed="['edit', 'delete']"
+              />
+            </b-table-column>
+          </template>
+          <template slot="detail" slot-scope="props">
+            <b-table :data=props.row.assignments>
+              <template slot-scope="props">
+                <b-table-column field="id" label="Assignment ID" width="180" sortable>
+                  {{ props.row.id }}
+                </b-table-column>
+                <b-table-column field="name" label="Name" sortable>
+                  {{ props.row.name }}
+                </b-table-column>
+                <b-table-column field="totalPoints" label="Total Points" sortable>
+                  {{ props.row.totalPoints }}
+                </b-table-column>
+                <b-table-column field="dateCreated" label="Date Created" sortable>
+                  {{ new Date(props.row.dateCreated).toLocaleDateString() }}
+                </b-table-column>
+                <b-table-column field="dueDate" label="Due Date" sortable>
+                  {{ new Date(props.row.dueDate).toLocaleDateString() }}
+                </b-table-column>
+
+                <b-table-column label="Modify">
+                  <crud-modal-bar
+                    @click="selectedAssignment = props.row"
+                    editTitle="Edit"
+                    deleteTitle="Delete"
+                    :inputs="assignmentInputs"
+                    :target="props.row"
+                    :removed="['create']"
+                  />
+                </b-table-column>
+              </template>
+            </b-table>
           </template>
         </b-table>
       </b-tab-item>
@@ -55,7 +103,7 @@ import urljoin from 'url-join';
 import SectionEnrollmentModalForm from './SectionEnrollmentModal.vue';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
-  SectionCrud, StudentCrud, EventBus, AssignmentCategoryCrud, Finders,
+  SectionCrud, StudentCrud, EventBus, AssignmentCategoryCrud, Finders, AssignmentCrud,
 } from '../../../../middleware';
 
 export default {
@@ -79,9 +127,13 @@ export default {
     EventBus.$on('asscat-added', this.asscatAdded);
     EventBus.$on('asscat-updated', this.asscatUpdated);
     EventBus.$on('asscat-removed', this.asscatRemoved);
+    EventBus.$on('assignment-added', this.assignmentAdded);
+    EventBus.$on('assignment-updated', this.assignmentUpdated);
+    EventBus.$on('assignment-removed', this.assignmentRemoved);
     EventBus.$on('enrolled-in-this-section', this.enrolledInThisSection);
     EventBus.$on('unenrolled-in-this-section', this.unenrolledInThisSection);
     EventBus.$on('request-selected-section', this.sectionRequested);
+    EventBus.$on('request-selected-asscat', this.asscatRequested);
   },
 
   beforeDestroy() {
@@ -92,6 +144,7 @@ export default {
     EventBus.$off('enrolled-in-this-section', this.enrolledInThisSection);
     EventBus.$off('unenrolled-in-this-section', this.unenrolledInThisSection);
     EventBus.$off('request-selected-section', this.sectionRequested);
+    EventBus.$off('request-selected-asscat', this.asscatRequested);
   },
 
   data() {
@@ -99,14 +152,13 @@ export default {
       activeTab: 0,
       section: null,
       students: [],
+      assCats: [],
       selectedStudent: null,
+      selectedAssignmentCategory: null,
+      selectedAssignment: null,
       isEnrollmentModalActive: false,
 
-      assCats: [],
-      selectedAssignmentCategory: null,
-      isAssignmentCategoryCreationActive: false,
-      isAssignmentCategoryEditActive: false,
-
+      // Modal input details.
       assignmentCategoryInputs: {
         crudTarget: AssignmentCategoryCrud,
         async preCreate(staged) {
@@ -116,6 +168,7 @@ export default {
         },
         postCreate(result) { EventBus.$emit('asscat-added', result); },
         postUpdate(result) { EventBus.$emit('asscat-updated', result); },
+        postDelete(result) { EventBus.$emit('asscat-removed', result); },
         templates: {
           name: { label: 'Name', type: 'input', placeholder: 'Category Name' },
           weight: {
@@ -123,6 +176,29 @@ export default {
           },
           lowestGradesDropped: {
             label: 'Lowest Grades Dropped', type: 'input', subtype: 'number', placeholder: 0,
+          },
+        },
+      },
+
+      assignmentInputs: {
+        crudTarget: AssignmentCrud,
+        async preCreate(staged) {
+          // Retrieve the desired course and term ID
+          const assignmentCategoryId = (await Finders.SelectedAssignmentCategory()).id;
+          return Object.assign({ assignmentCategoryId }, staged);
+        },
+        postCreate(result) { EventBus.$emit('assignment-added', result); },
+        postUpdate(result) { EventBus.$emit('assignment-updated', result); },
+        postDelete(result) { EventBus.$emit('assignment-removed', result); },
+        templates: {
+          name: {
+            label: 'Name', type: 'input', placeholder: 'Assignment name',
+          },
+          totalPoints: {
+            label: 'Total Points', type: 'input', subtype: 'number', placeholder: 100,
+          },
+          dueDate: {
+            label: 'Due Date', type: 'datepicker', placeholder: 'Select a date (mm/dd/yyyy)',
           },
         },
       },
@@ -136,14 +212,33 @@ export default {
     unenrolledInThisSection(student) {
       this.students = this.students.filter(s => s.id !== student.id);
     },
+    // Responders.
     sectionRequested() { EventBus.$emit('response-selected-section', this.section); },
+    asscatRequested() { EventBus.$emit('response-selected-asscat', this.selectedAssignmentCategory); },
 
-    asscatAdded(assCat) { this.assCats.push(assCat); },
+    // Assignment category stuff
+    async asscatAdded(assCat) {
+      const custom = Object.assign({ assignments: [] }, assCat);
+      const newUrl = urljoin(String(custom.id), '/assignments');
+      const asscatAssCrud = AssignmentCategoryCrud.fromAppendedRoute(newUrl);
+      custom.assignments = (await asscatAssCrud.get()).data;
+      this.assCats.push(custom);
+    },
     asscatUpdated(assCat) {
       this.assCats[this.assCats.findIndex(a => a.id === assCat.id)] = assCat;
     },
     asscatRemoved(assCat) {
       this.assCats = this.assCats.filter(a => a.id !== assCat.id);
+    },
+
+    // assignment stuff
+    assignmentAdded(assignment) {
+      const asscat = this.assCats.find(a => a.id === assignment.assignmentCategoryId);
+      asscat.assignments.push(assignment);
+    },
+    assignmentRemoved(assignment) {
+      const asscat = this.assCats.find(a => a.id === assignment.assignmentCategoryId);
+      asscat.assignments = asscat.assignments.filter(s => s.id !== assignment.id);
     },
 
     async fetchData() {
@@ -162,7 +257,17 @@ export default {
       await Promise.all(promises);
 
       // Get assignment category information.
-      this.assCats = (await this.assignmentCategoryCrud.get()).data;
+      const rawAssCats = (await this.assignmentCategoryCrud.get()).data;
+      rawAssCats.forEach(ac => { ac.assignments = []; });
+      this.assCats = rawAssCats;
+
+      // Get assignments from said categories.
+      const assPromises = rawAssCats.map(async (ac) => {
+        const newUrl = urljoin(String(ac.id), '/assignments');
+        const asscatAssCrud = AssignmentCategoryCrud.fromAppendedRoute(newUrl);
+        ac.assignments = (await asscatAssCrud.get()).data;
+      });
+      await Promise.all(assPromises);
     },
 
   },

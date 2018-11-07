@@ -7,15 +7,13 @@
       :target="(checkedRows.length == 1) ? checkedRows[0] : null"
       :inputs="studentModalInputs"
     />
-    <button class="button is-success is-small" :disabled="checkedRows.length==0">
-      Add To Section
-    </button>
-
-
     <b-input v-model="searchString"
       placeholder="Filter Results..."
       style="padding-top: .3em;"
     ></b-input>
+    <button class="button is-success is-small" :disabled="checkedRows.length==0">
+      Add All To Section
+    </button>
     
     <b-table
       :data="filteredData"
@@ -46,16 +44,14 @@
 <script>
 /* eslint-disable no-console */
 // import data from './TermListDataMock';
-import CreationModalForm from '../CreationModal.vue';
-import EditThingsModalForm from '../EditThingsModal.vue';
+import CrudModalBar from '../CrudModalBar.vue';
 import { StudentCrud, EventBus } from '../../../../middleware';
 
 export default {
   name: 'GlobalEnrollment',
 
   components: {
-    CreationModalForm,
-    EditThingsModalForm,
+    CrudModalBar,
   },
 
   data() {

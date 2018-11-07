@@ -17,10 +17,10 @@
     >
       <template slot-scope="props">
         <b-table-column field="startDate" label="Start Date" sortable>
-          {{ props.row.startDate.toString() }}
+          {{ new Date(props.row.startDate).toLocaleDateString() }}
         </b-table-column>
         <b-table-column field="endDate" label="End Date" numeric>
-          {{ props.row.endDate.toString() }}
+          {{ new Date(props.row.endDate).toLocaleDateString() }}
         </b-table-column>
         <b-table-column field="title" label="Term Name" width="180" sortable>
           {{ props.row.title }}

@@ -4,6 +4,7 @@
       createTitle="Create Course"
       editTitle="Edit Course"
       deleteTitle="Delete Course"
+      deleteMessage="Are you sure? This will delete: ALL SECTIONS"
       :target="selectedCourse"
       :inputs="courseModalInputs"
     />
@@ -28,9 +29,6 @@
           {{ props.row.CourseSections }}
         </b-table-column>
 
-        <!-- <b-table-column field="CourseAvg" label="Course Average" sortable>
-          {{ props.row.CourseAvg }}
-        </b-table-column> -->
         <b-table-column label="Course Page">
           <button class="button is-warning is-small">
             <router-link :to="'courses/' + props.row.CourseId">
@@ -39,15 +37,12 @@
           </button>
         </b-table-column>
         <b-table-column label="Create Section">
-          <button 
-              class="button is-warning is-small" 
-              @click="selectedCourse = props.row; isSectionModalActive = true"
-          >
-            <b-icon type="is-success" icon="account"/>
-          </button>
-          <b-modal :active.sync="isSectionModalActive" :width="640" scroll="keep" has-modal-card>
-            <creation-modal-form :inputs="sectionModalInputs"></creation-modal-form>
-          </b-modal>
+          <crud-modal-bar
+            @click="selectedCourse = props.row"
+            createTitle="Create Section"
+            :inputs="sectionModalInputs"
+            :removed="['edit', 'delete']"
+          />
         </b-table-column>
       </template>
       <template slot="detail" slot-scope="props">
@@ -68,6 +63,15 @@
                   </b-icon>
                 </router-link>
               </button>
+            </b-table-column>
+            <b-table-column label="Modify">
+              <crud-modal-bar
+                editTitle="Edit"
+                deleteTitle="Delete"
+                :inputs="sectionModalInputs"
+                :target="props.row"
+                :removed="['create']"
+              />
             </b-table-column>
           </template>
         </b-table>
@@ -100,7 +104,7 @@ export default {
     EventBus.$on('course-removed', this.courseRemoved);
     EventBus.$on('course-updated', this.courseUpdated);
     EventBus.$on('section-added', this.sectionAdded);
-    EventBus.$on('section-removed', this.sectionAdded);
+    EventBus.$on('section-removed', this.sectionRemoved);
     EventBus.$on('request-selected-course', this.requestSelectedCourse);
   },
   beforeDestroy() {
@@ -108,7 +112,7 @@ export default {
     EventBus.$off('course-removed', this.courseRemoved);
     EventBus.$off('course-updated', this.courseUpdated);
     EventBus.$off('section-added', this.sectionAdded);
-    EventBus.$off('section-removed', this.sectionAdded);
+    EventBus.$off('section-removed', this.sectionRemoved);
     EventBus.$off('request-selected-course', this.requestSelectedCourse);
   },
   data() {
@@ -124,6 +128,7 @@ export default {
         crudTarget: CourseCrud,
         postCreate(result) { EventBus.$emit('course-added', result); },
         postUpdate(result) { EventBus.$emit('course-updated', result); },
+        postDelete(result) { EventBus.$emit('course-removed', result); },
         templates: {
           courseLabel: { label: 'Course Label', type: 'input', placeholder: 'CS100' },
           title: { label: 'Course Title', type: 'input', placeholder: 'Intro to Code' },
@@ -140,6 +145,7 @@ export default {
           return Object.assign({ courseId, termId }, staged);
         },
         postCreate(result) { EventBus.$emit('section-added', result); },
+        postDelete(result) { EventBus.$emit('section-removed', result); },
         templates: {
           sectionNumber: {
             label: 'Section Number', type: 'input', subtype: 'number', placeholder: '00',
@@ -148,7 +154,6 @@ export default {
       },
     };
   },
-
   methods: {
     async courseAdded(course) {
       const custom = Object.assign({ sections: [] }, course);
@@ -160,13 +165,15 @@ export default {
     courseUpdated(course) {
       this.courses[this.courses.findIndex(c => c.id === course.id)] = course;
     },
+
+    // Section stuff.
     sectionAdded(section) {
       const course = this.courses.find(c => c.id === section.courseId);
       course.sections.push(section);
     },
     sectionRemoved(section) {
       const course = this.courses.find(c => c.id === section.courseId);
-      course.sections.filter(s => s.id !== section.id);
+      course.sections = course.sections.filter(s => s.id !== section.id);
     },
 
     requestSelectedCourse() { EventBus.$emit('response-selected-course', this.selectedCourse); },
@@ -179,8 +186,12 @@ export default {
       await Promise.all(promises);
       this.courses = newCourses;
     },
-    getSection(courseid) {
-      const section = this.data.find(s => s.CourseId === courseid).Section;
+    Out() {
+      console.log(this.courses);
+    },
+    getSection(courseID) {
+      const section = this.courses.find(s => s.sections.courseId === courseID);
+      console.log(section);
       return section;
     },
   },

@@ -7,33 +7,14 @@
       <div v-if="state === 'loading'">
         <atom-spinner :animation-duration="1000" :size="200" :color="'#cd5bef'"/>
       </div>
-      <div v-else-if="state === 'error'">
-        <div> {{ error.message }} </div>
-      </div>
-      <div v-else-if="state === 'success'">
-        Success!
-      </div>
-      <div v-else v-for="(field, key) in inputs.templates">
-        <b-field :label="field.label">
-          <div v-if="field.type === 'input'">
-            <b-input v-model="staged[key]" :type="field.subtype" required/>
-          </div>
-          <div v-else-if="field.type === 'datepicker'">
-            <b-datepicker v-model="staged[key]" icon="calendar-today" editable required />
-          </div>
-          <div v-else-if="field.type === 'password'">
-            <b-input type="password" v-model="staged[key]" password-reveal required/>
-          </div>
-          <div v-else>
-            NO VALID TYPE GIVEN
-          </div>
-        </b-field>
-      </div>
+      <div v-else-if="state === 'error'"> {{ error.message }} </div>
+      <div v-else-if="state === 'success'"> Success! </div>
+      <div v-else> {{ deletionString() }} </div>
     </section>
     <footer class="modal-card-foot">
       <div v-if="state === 'main'">
         <button class="button" type="button" @click="$parent.close()">Close</button>
-        <button class="button is-primary"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
+        <button class="button is-primary" @click="attemptDatabaseDelete">Delete</button>
       </div>
     </footer>
   </div>
@@ -46,11 +27,12 @@
 import { AtomSpinner } from 'epic-spinners';
 
 export default {
-  name: 'CreationModalForm',
+  name: 'DeletionModalForm',
   components: {
     AtomSpinner,
   },
   props: {
+    deletionMessage: String,
     title: String,
     target: Object,
     inputs: Object,
@@ -69,27 +51,23 @@ export default {
   },
 
   methods: {
-    primaryButtonText() {
-      return ((this.inputs.primaryText !== undefined) ? this.inputs.primaryText : 'Update');
+    deletionString() {
+      return (this.deletionMessage !== undefined)
+        ? this.deletionMessage
+        : 'Are you sure you wish to delete this entry?';
     },
-
-    async attemptDatabaseCreate() {
+    async attemptDatabaseDelete() {
       try {
-        // If we have a preUpdate defined, mutate staged with its staged.
-        if (this.inputs.preUpdate !== undefined) {
-          this.staged = await this.inputs.preUpdate(this.staged);
-        }
-
         // Display loading
         this.state = 'loading';
         // Wait for term creation
-        await this.inputs.crudTarget.put(this.target.id, { data: this.staged });
+        await this.inputs.crudTarget.delete(this.target.id);
         // wait for two seconds then close window.
         this.state = 'success';
 
         // if we want to do something afterwards, do it here!
-        if (this.inputs.postUpdate !== undefined) {
-          await this.inputs.postUpdate(this.staged);
+        if (this.inputs.postDelete !== undefined) {
+          await this.inputs.postDelete(this.target);
         }
       } catch (err) {
         this.state = 'error';

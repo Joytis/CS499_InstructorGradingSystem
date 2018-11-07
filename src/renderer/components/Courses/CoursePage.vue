@@ -1,35 +1,24 @@
 <template>
   <div>
-    <div class="box">
+    <back-button></back-button>
       <nav class="level">
         <div class="level-item">
-          {{ $route.params.id }}
-        </div>
-        <div class="level-item">
-          {{ getdata($route.params.id).CourseName }}
-        </div>
-        <div class="level-item">
-          Number of sections: {{ getdata($route.params.id).CourseSections }}
+          <strong>{{ course.title }}</strong>
         </div>
       </nav>
-    </div>
     Sections:
     <b-table
-        :data="datamock"
+        :data="course.sections"
         paginated
         per-page="10"
     >
 
         <template slot-scope="props">
-          <b-table-column field="CourseId" label="Student" width="300" sortable>
-            {{ props.row.CourseId }}
+          <b-table-column field="Id" label="Section ID" width="300" sortable>
+            {{ props.row.id }}
           </b-table-column>
-          <b-table-column field="CourseName" label="Section" sortable>
-            {{ props.row.CourseName }}
-          </b-table-column>
-
-          <b-table-column field="CourseSections" label="Grade" sortable>
-            {{ props.row.CourseSections }}
+          <b-table-column field="sectionNumber" label="Section Number" sortable>
+            {{ props.row.sectionNumber }}
           </b-table-column>
         </template>
     </b-table>
@@ -39,33 +28,37 @@
 
 
 <script>
-import data from './CourseListDataMock';
+import urljoin from 'url-join';
+// import CrudModalBar from '../CrudModalBar.vue';
+import {
+  CourseCrud,
+} from '../../../../middleware';
+import BackButton from '../BackButton.vue';
 
 export default {
   name: 'CoursePage',
+  components: {
+    BackButton,
+  },
   beforeCreate() {
-    this.datamock = data.coursedata;
+    // this.datamock = data.coursedata;
+  },
+
+  created() {
+    // Create cruds
+    this.fetchData();
   },
   data() {
     return {
+      course: [],
     };
   },
   methods: {
-    getSection(courseid) {
-      for (let i = 0, len = data.coursedata.length; i < len; i += 1) {
-        if (data.coursedata[i].CourseId === courseid) {
-          this.sectiondata = data.coursedata[i].Section;
-        }
-      }
-      return this.sectiondata;
-    },
-    getdata(id) {
-      for (let i = 0, len = data.coursedata.length; i < len; i += 1) {
-        if (data.coursedata[i].CourseId === id) {
-          this.coursedata = (data.coursedata[i]);
-        }
-      }
-      return this.coursedata;
+    async fetchData() {
+      const newCourse = (await CourseCrud.get(this.$route.params.id)).data; // get course data
+      const courseSectionCrud = CourseCrud.fromAppendedRoute(urljoin(String(this.$route.params.id), '/sections'));
+      newCourse.sections = (await courseSectionCrud.get()).data;
+      this.course = newCourse;
     },
   },
 };
