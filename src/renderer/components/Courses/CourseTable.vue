@@ -29,9 +29,6 @@
           {{ props.row.sections.length }}
         </b-table-column>
 
-        <!-- <b-table-column field="CourseAvg" label="Course Average" sortable>
-          {{ props.row.CourseAvg }}
-        </b-table-column> -->
         <b-table-column label="Course Page">
           <button class="button is-warning is-small">
             <router-link :to="'courses/' + props.row.id">
@@ -169,6 +166,8 @@ export default {
     courseUpdated(course) {
       this.courses[this.courses.findIndex(c => c.id === course.id)] = course;
     },
+
+    // Section stuff.
     sectionAdded(section) {
       const course = this.courses.find(c => c.id === section.courseId);
       course.sections.push(section);
