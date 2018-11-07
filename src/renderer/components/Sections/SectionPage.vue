@@ -116,6 +116,7 @@ export default {
         },
         postCreate(result) { EventBus.$emit('asscat-added', result); },
         postUpdate(result) { EventBus.$emit('asscat-updated', result); },
+        postDelete(result) { EventBus.$emit('asscat-removed', result); },
         templates: {
           name: { label: 'Name', type: 'input', placeholder: 'Category Name' },
           weight: {

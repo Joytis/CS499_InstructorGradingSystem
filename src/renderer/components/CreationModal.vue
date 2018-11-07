@@ -41,8 +41,10 @@
       </div>
     </section>
     <footer class="modal-card-foot">
-      <button class="button" type="button" @click="$parent.close()">Close</button>
-      <button class="button is-primary"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
+      <div v-if="state === 'main'">
+        <button class="button" type="button" @click="$parent.close()">Close</button>
+        <button class="button is-primary"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
+      </div>
     </footer>
   </div>
 </template>
@@ -85,14 +87,12 @@ export default {
         if (this.inputs.preCreate !== undefined) {
           this.staged = await this.inputs.preCreate(this.staged);
         }
-
         // Display loading
         this.state = 'loading';
         // Wait for term creation
         const result = (await this.inputs.crudTarget.post(this.staged)).data;
         // wait for two seconds then close window.
         this.state = 'success';
-
         // if we want to do something afterwards, do it here!
         if (this.inputs.postCreate !== undefined) {
           await this.inputs.postCreate(result);

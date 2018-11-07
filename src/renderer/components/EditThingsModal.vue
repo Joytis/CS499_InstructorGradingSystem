@@ -31,8 +31,10 @@
       </div>
     </section>
     <footer class="modal-card-foot">
-      <button class="button" type="button" @click="$parent.close()">Close</button>
-      <button class="button is-primary"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
+      <div v-if="state === 'main'">
+        <button class="button" type="button" @click="$parent.close()">Close</button>
+        <button class="button is-primary"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
+      </div>
     </footer>
   </div>
 </template>

@@ -7,19 +7,15 @@
       <div v-if="state === 'loading'">
         <atom-spinner :animation-duration="1000" :size="200" :color="'#cd5bef'"/>
       </div>
-      <div v-else-if="state === 'error'">
-        <div> {{ error.message }} </div>
-      </div>
-      <div v-else-if="state === 'success'">
-        Success!
-      </div>
-      <div v-else>
-        Are you sure you wish to delete this entry?
-      </div>
+      <div v-else-if="state === 'error'"> {{ error.message }} </div>
+      <div v-else-if="state === 'success'"> Success! </div>
+      <div v-else> {{ deletionString() }} </div>
     </section>
     <footer class="modal-card-foot">
-      <button class="button" type="button" @click="$parent.close()">Close</button>
-      <button class="button is-primary" @click="attemptDatabaseDelete">Delete</button>
+      <div v-if="state === 'main'">
+        <button class="button" type="button" @click="$parent.close()">Close</button>
+        <button class="button is-primary" @click="attemptDatabaseDelete">Delete</button>
+      </div>
     </footer>
   </div>
 </template>
@@ -36,6 +32,7 @@ export default {
     AtomSpinner,
   },
   props: {
+    deletionMessage: String,
     title: String,
     target: Object,
     inputs: Object,
@@ -54,13 +51,13 @@ export default {
   },
 
   methods: {
+    deletionString() {
+      return (this.deletionMessage !== undefined)
+        ? this.deletionMessage
+        : 'Are you sure you wish to delete this entry?';
+    },
     async attemptDatabaseDelete() {
       try {
-        // If we have a preUpdate defined, mutate staged with its staged.
-        if (this.inputs.preDelete !== undefined) {
-          this.staged = await this.inputs.preDelete(this.staged);
-        }
-
         // Display loading
         this.state = 'loading';
         // Wait for term creation
@@ -69,8 +66,8 @@ export default {
         this.state = 'success';
 
         // if we want to do something afterwards, do it here!
-        if (this.inputs.postDelet !== undefined) {
-          await this.inputs.postDelet(this.staged);
+        if (this.inputs.postDelete !== undefined) {
+          await this.inputs.postDelete(this.target);
         }
       } catch (err) {
         this.state = 'error';
