@@ -32,6 +32,7 @@ const SelectedTerm = async () => findValueThrough('request-selected-term', 'resp
 const SelectedCourse = async () => findValueThrough('request-selected-course', 'response-selected-course');
 const SelectedSection = async () => findValueThrough('request-selected-section', 'response-selected-section');
 const SelectedAssignmentCategory = async () => findValueThrough('request-selected-asscat', 'response-selected-asscat');
+const GemmieAssCats = async () => findValueThrough('request-all-asscat', 'response-all-asscat');
 
 function LoggedInInstructor() {
   return {};
@@ -43,4 +44,5 @@ export default {
   SelectedSection,
   LoggedInInstructor,
   SelectedAssignmentCategory,
+  GemmieAssCats,
 };
