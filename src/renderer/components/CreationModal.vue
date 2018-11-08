@@ -16,7 +16,7 @@
       <div v-else v-for="(field, key) in inputs.templates">
         <b-field :label="field.label">
           <div v-if="field.type === 'input'">
-            <b-input v-model="staged[key]" :type="field.subtype" :placeholder="field.placeholder" required/>
+            <b-input v-model="staged[key]" :type="field.subtype" :step="field.step || 1" :min="field.min || 0" :placeholder="field.placeholder" required/>
           </div>
           <div v-else-if="field.type === 'datepicker'">
             <b-datepicker

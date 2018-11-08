@@ -172,7 +172,7 @@ export default {
         templates: {
           name: { label: 'Name', type: 'input', placeholder: 'Category Name' },
           weight: {
-            label: 'Weight', type: 'input', subtype: 'number', placeholder: 0.0,
+            label: 'Weight', type: 'input', subtype: 'number', placeholder: 0.0, step: 0.01,
           },
           lowestGradesDropped: {
             label: 'Lowest Grades Dropped', type: 'input', subtype: 'number', placeholder: 0,
