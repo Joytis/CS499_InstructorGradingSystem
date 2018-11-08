@@ -45,12 +45,16 @@
 /* eslint-disable no-console */
 // import data from './TermListDataMock';
 import CrudModalBar from '../CrudModalBar.vue';
+import CreationModalForm from '../CreationModal.vue';
+import EditThingsModalForm from '../EditThingsModal.vue';
 import { StudentCrud, EventBus } from '../../../../middleware';
 
 export default {
   name: 'GlobalEnrollment',
 
   components: {
+    CreationModalForm,
+    EditThingsModalForm,
     CrudModalBar,
   },
 
