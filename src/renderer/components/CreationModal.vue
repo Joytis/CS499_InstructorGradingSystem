@@ -34,6 +34,13 @@
               :placeholder="field.placeholder" 
               required/>
           </div>
+          <div v-else-if="field.type === 'b-dropdown'">
+            <b-select placeholder="Select a name">
+              <option v-for="option in field.data" :value="option.Name">
+                {{ option.Name }}
+              </option>
+          </b-select>
+          </div>
           <div v-else>
             NO VALID TYPE GIVEN
           </div>
