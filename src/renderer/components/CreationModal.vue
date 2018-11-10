@@ -35,9 +35,12 @@
               required/>
           </div>
           <div v-else-if="field.type === 'b-dropdown'">
-            <b-select placeholder="Select a name">
-              <option v-for="option in field.data" :value="option.Name">
-                {{ option.Name }}
+            <b-select v-model="staged[key]" placeholder="Select a name" required>
+              <option v-for="option in field.getData()"
+                      :value="option[field.value]"
+                      :key="option[field.key]"
+              >
+                {{ option.name }}
               </option>
           </b-select>
           </div>

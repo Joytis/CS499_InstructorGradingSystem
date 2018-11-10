@@ -113,7 +113,7 @@ import urljoin from 'url-join';
 import SectionEnrollmentModalForm from './SectionEnrollmentModal.vue';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
-  SectionCrud, StudentCrud, EventBus, AssignmentCategoryCrud, Finders, AssignmentCrud,
+  SectionCrud, StudentCrud, EventBus, AssignmentCategoryCrud, AssignmentCrud,
 } from '../../../../middleware';
 import BackButton from '../BackButton.vue';
 
@@ -144,9 +144,6 @@ export default {
     EventBus.$on('assignment-removed', this.assignmentRemoved);
     EventBus.$on('enrolled-in-this-section', this.enrolledInThisSection);
     EventBus.$on('unenrolled-in-this-section', this.unenrolledInThisSection);
-    EventBus.$on('request-selected-section', this.sectionRequested);
-    EventBus.$on('request-selected-asscat', this.asscatRequested);
-    EventBus.$on('request-all-asscat', this.getAllassCats);
   },
 
   beforeDestroy() {
@@ -156,13 +153,13 @@ export default {
     EventBus.$off('asscat-removed', this.asscatRemoved);
     EventBus.$off('enrolled-in-this-section', this.enrolledInThisSection);
     EventBus.$off('unenrolled-in-this-section', this.unenrolledInThisSection);
-    EventBus.$off('request-selected-section', this.sectionRequested);
-    EventBus.$off('request-selected-asscat', this.asscatRequested);
-    EventBus.$off('request-all-asscat', this.getAllassCats);
   },
 
   data() {
-    return {
+    // Javascript doesn't allow us to reference other objects in our object, so
+    //  we create a self-initializing object to manually assign the references after
+    //  creation.
+    const data = {
       activeTab: 0,
       section: null,
       students: [],
@@ -175,11 +172,7 @@ export default {
       // Modal input details.
       assignmentCategoryInputs: {
         crudTarget: AssignmentCategoryCrud,
-        async preCreate(staged) {
-          // Retrieve the desired course and term ID
-          const sectionId = (await Finders.SelectedSection()).id;
-          return Object.assign({ sectionId }, staged);
-        },
+        preCreate: null,
         postCreate(result) { EventBus.$emit('asscat-added', result); },
         postUpdate(result) { EventBus.$emit('asscat-updated', result); },
         postDelete(result) { EventBus.$emit('asscat-removed', result); },
@@ -196,17 +189,16 @@ export default {
 
       assignmentInputs: {
         crudTarget: AssignmentCrud,
-        async preCreate(staged) {
-          // Retrieve the desired course and term ID
-          const assignmentCategoryId = (await Finders.SelectedAssignmentCategory()).id;
-          return Object.assign({ assignmentCategoryId }, staged);
-        },
         postCreate(result) { EventBus.$emit('assignment-added', result); },
         postUpdate(result) { EventBus.$emit('assignment-updated', result); },
         postDelete(result) { EventBus.$emit('assignment-removed', result); },
         templates: {
-          assignmentCategory: {
-            label: 'Assignment Category', type: 'b-dropdown', data: (result) => { EventBus.$emit('response-all-asscats', result); },
+          assignmentCategoryId: {
+            label: 'Assignment Category',
+            type: 'b-dropdown',
+            getData: null,
+            value: 'id',
+            key: 'id,',
           },
           name: {
             label: 'Name', type: 'input', placeholder: 'Assignment name',
@@ -219,7 +211,20 @@ export default {
           },
         },
       },
+      init() {
+        // Javascript doesn't allow us to reference other objects in our object, so
+        //  we create a self-initializing object to manually assign the references after
+        //  creation.
+        this.assignmentInputs.templates.assignmentCategoryId.getData = () => this.assCats;
+        this.assignmentCategoryInputs.preCreate = (staged) => {
+          // Retrieve the desired course and term ID
+          const sectionId = this.section.id;
+          return Object.assign({ sectionId }, staged);
+        };
+      },
     };
+    data.init();
+    return data;
   },
   methods: {
     async enrolledInThisSection(studentId) {
@@ -229,10 +234,6 @@ export default {
     unenrolledInThisSection(student) {
       this.students = this.students.filter(s => s.id !== student.id);
     },
-    // Responders.
-    sectionRequested() { EventBus.$emit('response-selected-section', this.section); },
-    asscatRequested() { EventBus.$emit('response-selected-asscat', this.selectedAssignmentCategory); },
-    getAllassCats() { EventBus.$emit('response-all-asscats', this.assCats); },
 
     // Assignment category stuff
     async asscatAdded(assCat) {
