@@ -1,6 +1,6 @@
 <template>
-    <button class="button is-danger is-small" @click="goBack()">
-        &nbsp <b-icon icon="arrow-left-bold"/> &nbsp
+    <button class="button is-navbutton is-small" @click="goBack()">
+        &nbsp <b-icon icon="arrow-left-bold-outline"/> &nbsp
     </button>
 </template>
 

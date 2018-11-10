@@ -64,7 +64,7 @@ menu-left {
 }
 
 #mainmenu {
-  background: #eeeeee
+  background: #eeeeee;
 }
 
 #wrapper {
@@ -74,48 +74,86 @@ menu-left {
 /* ::-webkit-scrollbar { display: none; } */
 </style>
 <style lang="scss">
-  @import "~bulma/sass/utilities/_all";
-  // Set your colors
-  $primary: #7957D5;
-  $primary-invert: findColorInvert($primary);
-  $twitter: #4099ff;
-  $twitter-invert: findColorInvert($twitter);
-  $accent: #666666;
-  $accent-invert: findColorInvert($accent);
-  // Setup $colors to use as bulma classes (e.g. 'is-twitter')
-  $colors: (
-      "white": ($white, $black),
-      "black": ($black, $white),
-      "light": ($light, $light-invert),
-      "dark": ($dark, $dark-invert),
-      "primary": ($primary, $primary-invert),
-      "info": ($info, $info-invert),
-      "success": ($success, $success-invert),
-      "warning": ($warning, $warning-invert),
-      "danger": ($danger, $danger-invert),
-      "twitter": ($twitter, $twitter-invert),
-      "accent": ($accent, $accent-invert)
-  );
-  // Links
-  $link: $primary;
-  $link-invert: $primary-invert;
-  $link-focus-border: $primary;
-
-  $gap: 64px;
-  // 960, 1152, and 1344 have been chosen because they are divisible by both 12 and 16
-  $tablet: 200px;
-  // 960px container + 4rem
-  $desktop: 300px + (2 * $gap);
-  // 1152px container + 4rem
-  $widescreen: 1152px + (2 * $gap);
-  $widescreen-enabled: true;
-  // 1344px container + 4rem
-  $fullhd: 1344px + (2 * $gap);
-  $fullhd-enabled: true;
-  $navbar-breakpoint: 300px;
-  // Import Bulma and Buefy styles;
-  @import "~bulma";
-  @import "~buefy/src/scss/buefy";
+@import "~bulma/sass/utilities/_all";
+// Set your colors
+$primary: #7957d5;
+$primary-invert: findColorInvert($primary);
+$twitter: #4099ff;
+$twitter-invert: findColorInvert($twitter);
+$accent: #666666;
+$accent-invert: findColorInvert($accent);
+$navbutton: #cccccc;
+$navbutton-invert: findColorInvert($navbutton);
+// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+$colors: (
+  "white": (
+    $white,
+    $black
+  ),
+  "black": (
+    $black,
+    $white
+  ),
+  "light": (
+    $light,
+    $light-invert
+  ),
+  "dark": (
+    $dark,
+    $dark-invert
+  ),
+  "primary": (
+    $primary,
+    $primary-invert
+  ),
+  "info": (
+    $info,
+    $info-invert
+  ),
+  "success": (
+    $success,
+    $success-invert
+  ),
+  "warning": (
+    $warning,
+    $warning-invert
+  ),
+  "danger": (
+    $danger,
+    $danger-invert
+  ),
+  "twitter": (
+    $twitter,
+    $twitter-invert
+  ),
+  "accent": (
+    $accent,
+    $accent-invert
+  ),
+  "navbutton": (
+    $navbutton,
+    $navbutton-invert
+  )
+);
+// Links
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
+$gap: 64px;
+// 960, 1152, and 1344 have been chosen because they are divisible by both 12 and 16
+$tablet: 200px;
+// 960px container + 4rem
+$desktop: 300px + (2 * $gap);
+// 1152px container + 4rem
+$widescreen: 1152px + (2 * $gap);
+$widescreen-enabled: true;
+// 1344px container + 4rem
+$fullhd: 1344px + (2 * $gap);
+$fullhd-enabled: true;
+$navbar-breakpoint: 300px;
+// Import Bulma and Buefy styles;
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
 </style>
 
 <style>
@@ -138,7 +176,6 @@ body,
   width: auto !important;
   padding-top: 51px;
 }
-
 </style>
 
 
