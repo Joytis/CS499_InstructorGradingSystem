@@ -19,14 +19,14 @@
 
       <template slot-scope="props">
         <b-table-column field="courseId" label="Course ID" width="130" sortable>
-          {{ props.row.CourseId }}
+          {{ props.row.id }}
         </b-table-column>
         <b-table-column field="title" label="Course Title" sortable>
           {{ `${props.row.courseLabel} - ${props.row.title}` }}
         </b-table-column>
 
         <b-table-column field="courseSections" label="Number of Sections" numeric>
-          {{ props.row.CourseSections }}
+          {{ props.row.sections.length }}
         </b-table-column>
 
         <b-table-column label="Course Page">
@@ -48,12 +48,13 @@
       <template slot="detail" slot-scope="props">
         <b-table :data=props.row.sections>
           <template slot-scope="props">
-            <b-table-column field="SectionName" label="Section ID" width="180" sortable>
-              {{ props.row.SectionName }}
+            <b-table-column field="SectionName" label="Section Name" width="180" sortable>
+              {{ props.row.sectionNumber }}
             </b-table-column>
 
+            <!-- TODO: Add times to sections. -->
             <b-table-column field="SectionTime" label="Section Number" sortable>
-              {{ props.row.SectionTime }}
+              {{ props.row.sectionTime }}
             </b-table-column>
 
             <b-table-column label="Section Page">
@@ -105,7 +106,6 @@ export default {
     EventBus.$on('course-updated', this.courseUpdated);
     EventBus.$on('section-added', this.sectionAdded);
     EventBus.$on('section-removed', this.sectionRemoved);
-    EventBus.$on('request-selected-course', this.requestSelectedCourse);
   },
   beforeDestroy() {
     EventBus.$off('course-added', this.courseAdded);
@@ -113,10 +113,9 @@ export default {
     EventBus.$off('course-updated', this.courseUpdated);
     EventBus.$off('section-added', this.sectionAdded);
     EventBus.$off('section-removed', this.sectionRemoved);
-    EventBus.$off('request-selected-course', this.requestSelectedCourse);
   },
   data() {
-    return {
+    const data = {
       selectedCourse: null,
       isCreationModalActive: false,
       isEditThingsModalActive: false,
@@ -137,13 +136,7 @@ export default {
       // Arguments passed into Creation modal for sections
       sectionModalInputs: {
         crudTarget: SectionCrud,
-        async preCreate(staged) {
-          // Retrieve the desired course and term ID
-          // Querying events here because we don't have access to other members in data asection.
-          const courseId = (await Finders.SelectedCourse()).id;
-          const termId = (await Finders.SelectedTerm()).id;
-          return Object.assign({ courseId, termId }, staged);
-        },
+        preCreate: null,
         postCreate(result) { EventBus.$emit('section-added', result); },
         postDelete(result) { EventBus.$emit('section-removed', result); },
         templates: {
@@ -152,7 +145,18 @@ export default {
           },
         },
       },
+      init() {
+        this.sectionModalInputs.preCreate = async (staged) => {
+          // Retrieve the desired course and term ID
+          // Querying events here because we don't have access to other members in data asection.
+          const courseId = this.selectedCourse.id;
+          const termId = (await Finders.SelectedTerm()).id;
+          return Object.assign({ courseId, termId }, staged);
+        };
+      },
     };
+    data.init();
+    return data;
   },
   methods: {
     async courseAdded(course) {
@@ -176,7 +180,6 @@ export default {
       course.sections = course.sections.filter(s => s.id !== section.id);
     },
 
-    requestSelectedCourse() { EventBus.$emit('response-selected-course', this.selectedCourse); },
     async fetchData() {
       const newCourses = (await CourseCrud.get()).data; // Get all courses
       const promises = newCourses.map(async (c) => {

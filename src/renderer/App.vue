@@ -1,5 +1,5 @@
 <template>
-  <div id="wrapper">
+  <div v-if="loggedIn" id="wrapper">
     <navbar @toggleMenu="menuActive=!menuActive;"></navbar>
     <multipane class="vertical-panes" layout="vertical">
       <div id="mainmenu" class="pane" v-if="menuActive" :style="{ width: '14em', maxWidth: '17em', minWidth: '10em'}">
@@ -11,10 +11,15 @@
       </div>
     </multipane>
   </div>
+  <div v-else>
+    <auth-modal/>
+  </div>
 </template>
 
 <script>
 import { Multipane, MultipaneResizer } from 'vue-multipane';
+import { EventBus } from '../../middleware';
+import AuthModal from './components/AuthModal/AuthModal.vue';
 import Navbar from './components/Navbar.vue';
 import MenuLeft from './components/NavMenu/MenuLeft.vue';
 import 'buefy/lib/buefy.css';
@@ -29,13 +34,28 @@ export default {
     Navbar,
     Multipane,
     MultipaneResizer,
+    AuthModal,
   },
+  created() {
+    EventBus.$on('login', this.login);
+    EventBus.$on('logout', this.logout);
+  },
+  beforeDestroy() {
+    EventBus.$off('login', this.login);
+    EventBus.$off('logout', this.logout);
+  },
+
   data() {
     return {
       menuActive: true,
+      loggedIn: false,
     };
   },
-  methods: {},
+  methods: {
+    // Let's have this run constantly
+    login() { this.loggedIn = true; },
+    logout() { this.loggedIn = false; },
+  },
 };
 </script>
 

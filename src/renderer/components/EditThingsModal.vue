@@ -56,7 +56,7 @@
 import { AtomSpinner } from 'epic-spinners';
 
 export default {
-  name: 'CreationModalForm',
+  name: 'EditThingsModalForm',
   components: {
     AtomSpinner,
   },

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import request from 'request-promise-native';
 import urljoin from 'url-join';
 import { config } from '../config';
@@ -11,6 +12,8 @@ function appendIdIfExists(url, id) {
   return url;
 }
 
+const cookieJar = request.jar();
+
 export class SimpleCrud {
   constructor(host, route) {
     this.target = urljoin(host, route);
@@ -18,7 +21,7 @@ export class SimpleCrud {
     this.basicRequestOptions = {
       url: this.target,
       json: true,
-      jar: true, // enable cached cookies
+      jar: cookieJar, // enable cached cookies
       resolveWithFullResponse: true, // Ensure we can get the status code of our response
     };
   }

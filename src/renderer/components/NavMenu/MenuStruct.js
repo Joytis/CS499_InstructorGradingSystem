@@ -1,17 +1,17 @@
 const menu = [
-  {
-    title: 'Development',
-    menuItems: [
-      {
-        itemTitle: 'Auth Testing',
-        itemLink: '/auth',
-      },
-      {
-        itemTitle: 'Server Communication Testing',
-        itemLink: '/serverTesting',
-      },
-    ],
-  },
+  // {
+  //   title: 'Development',
+  //   menuItems: [
+  //     {
+  //       itemTitle: 'Auth Testing',
+  //       itemLink: '/auth',
+  //     },
+  //     {
+  //       itemTitle: 'Server Communication Testing',
+  //       itemLink: '/serverTesting',
+  //     },
+  //   ],
+  // },
   {
     title: 'General',
     menuItems: [
