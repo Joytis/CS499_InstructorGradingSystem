@@ -31,17 +31,17 @@
           <!-- Assignments table-->
             <template>
               <b-table 
-                :data="assCats.assignments"
+                :data="assignments"
                 paginated 
-                per-page="5"
+                per-page="10"
                 :selected.sync="selectedAssignment"
                 >
                 <template slot-scope="props">
-                  <b-table-column field="id" label="Assignment ID" width="180" sortable>
-                    {{ props.row.id }}
-                  </b-table-column>
                   <b-table-column field="name" label="Name" sortable>
                     {{ props.row.name }}
+                  </b-table-column>
+                  <b-table-column field="category" label="Assignment Category" width="180" sortable>
+                    {{ props.row.assignmentCategory.name }}
                   </b-table-column>
                   <b-table-column field="totalPoints" label="Total Points" sortable>
                     {{ props.row.totalPoints }}
@@ -164,6 +164,7 @@ export default {
       section: null,
       students: [],
       assCats: [],
+      assignments: [],
       selectedStudent: null,
       selectedAssignmentCategory: null,
       selectedAssignment: null,
@@ -195,7 +196,7 @@ export default {
         templates: {
           assignmentCategoryId: {
             label: 'Assignment Category',
-            type: 'b-dropdown',
+            type: 'dropdown',
             getData: null,
             value: 'id',
             key: 'id,',
@@ -254,10 +255,17 @@ export default {
     assignmentAdded(assignment) {
       const asscat = this.assCats.find(a => a.id === assignment.assignmentCategoryId);
       asscat.assignments.push(assignment);
+      // Add an assignment category to the object, because we lazy up in here.
+      assignment.assignmentCategory = asscat;
+      this.assignments.push(assignment);
     },
     assignmentRemoved(assignment) {
       const asscat = this.assCats.find(a => a.id === assignment.assignmentCategoryId);
       asscat.assignments = asscat.assignments.filter(s => s.id !== assignment.id);
+      this.assignments = this.assignments.filter(s => s.id !== assignment.id);
+    },
+    assignmentUpdated(assignment) {
+      this.assignments[this.assignment.findIndex(a => a.id === assignment.id)] = assignment;
     },
 
     async fetchData() {
@@ -287,6 +295,16 @@ export default {
         ac.assignments = (await asscatAssCrud.get()).data;
       });
       await Promise.all(assPromises);
+
+      // load all assignments
+      const assignments = (await AssignmentCrud.get()).data;
+      assignments.forEach(a => {
+        // Find and link the associated assignment caterogy. We've awaited this info already,
+        //    so just link it together.
+        a.dueDate = new Date(Date.parse(a.dueDate));
+        a.assignmentCategory = this.assCats.find(ac => ac.id === a.assignmentCategoryId);
+      });
+      this.assignments = assignments;
     },
 
   },

@@ -34,15 +34,15 @@
               :placeholder="field.placeholder" 
               required/>
           </div>
-          <div v-else-if="field.type === 'b-dropdown'">
-            <b-select v-model="staged[key]" placeholder="Select a name" required>
+          <div v-else-if="field.type === 'dropdown'">
+            <b-select v-model="staged[key]" placeholder="Select an option" required>
               <option v-for="option in field.getData()"
                       :value="option[field.value]"
                       :key="option[field.key]"
               >
                 {{ option.name }}
               </option>
-          </b-select>
+            </b-select>
           </div>
           <div v-else>
             NO VALID TYPE GIVEN
