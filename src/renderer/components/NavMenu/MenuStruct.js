@@ -42,15 +42,6 @@ const menu = [
       },
     ],
   },
-  {
-    title: 'Settings',
-    menuItems: [
-      {
-        itemTitle: 'Account Settings',
-        itemLink: '/account',
-      },
-    ],
-  },
 ];
 
 export default {
