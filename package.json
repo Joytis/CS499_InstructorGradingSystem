@@ -56,6 +56,7 @@
     "@mdi/font": "^2.8.94",
     "app-root-path": "^2.1.0",
     "axios": "^0.18.0",
+    "bootstrap-vue": "^2.0.0-rc.11",
     "buefy": "^0.6.6",
     "epic-spinners": "^1.0.4",
     "express": "4.16.3",

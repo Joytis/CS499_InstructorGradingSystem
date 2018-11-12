@@ -19,7 +19,7 @@
             <b-input v-model="staged[key]" :type="field.subtype" required/>
           </div>
           <div v-else-if="field.type === 'datepicker'">
-            <b-datepicker v-model="staged[key]" icon="calendar-today" editable required />
+            <b-datepicker v-model="staged[key]" icon="calendar-today" editable inline required/>
           </div>
           <div v-else-if="field.type === 'password'">
             <b-input type="password" v-model="staged[key]" password-reveal required/>

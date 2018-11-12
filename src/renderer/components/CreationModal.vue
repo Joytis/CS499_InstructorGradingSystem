@@ -24,6 +24,7 @@
               :placeholder="field.placeholder"
               icon="calendar-today" 
               editable 
+              inline
               required />
           </div>
           <div v-else-if="field.type === 'password'">
