@@ -83,8 +83,8 @@
         <ag-grid-vue style="width: 100%; height: 70vh;"
           class="ag-theme-balham"
           :columnDefs="assignmentColumns"
-          :rowData="rowData"
-          :cellValueChanged="out"/>
+          :rowData="studentGradeRows"
+          :cellValueChanged="trySubmitOrUpdateGrade"/>
       </b-tab-item>
       <b-tab-item label="Section Settings">
         <!-- Assignment Category Modals -->
@@ -123,13 +123,14 @@
 <script>
 // import data from '../Courses/CourseListDataMock';
 /* eslint-disable no-param-reassign */
+/* eslint-disable no-console */
 import urljoin from 'url-join';
 import { AgGridVue } from 'ag-grid-vue';
 import SectionEnrollmentModalForm from './SectionEnrollmentModal.vue';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
   SectionCrud, StudentCrud, EventBus, AssignmentCategoryCrud, AssignmentCrud,
-  EnrollmentCrud,
+  EnrollmentCrud, GradeCrud,
 } from '../../../../middleware';
 import BackButton from '../BackButton.vue';
 import CopySectionModal from './CopySectionModal.vue';
@@ -152,50 +153,7 @@ export default {
     this.sectionStudentCrud = SectionCrud.fromAppendedRoute(studentSectionRoute);
     const assCatRoute = urljoin(this.$route.params.sectionId, '/assignmentCategories');
     this.assignmentCategoryCrud = SectionCrud.fromAppendedRoute(assCatRoute);
-    this.rowData = [{
-      'a-num': 25222222,
-      name: 'Chris',
-      Ass2: 100,
-      Ass3: 100,
-      Ass4: 100,
-      Ass5: 100,
-      Ass6: 100,
-      Ass7: 100,
-      Ass8: 100,
-    },
-    {
-      'a-num': 25222223,
-      name: 'Clark',
-      Ass2: 100,
-      Ass3: 100,
-      Ass4: 100,
-      Ass5: 100,
-      Ass6: 100,
-      Ass7: 100,
-      Ass8: 100,
-    },
-    {
-      'a-num': 25222224,
-      name: 'Matt',
-      Ass2: 100,
-      Ass3: 100,
-      Ass4: 100,
-      Ass5: 100,
-      Ass6: 100,
-      Ass7: 100,
-      Ass8: 100,
-    },
-    {
-      'a-num': 25222225,
-      name: 'Sam',
-      Ass2: 100,
-      Ass3: 100,
-      Ass4: 100,
-      Ass5: 100,
-      Ass6: 100,
-      Ass7: 100,
-      Ass8: 100,
-    }];
+
     // Fetch data
     this.fetchData();
 
@@ -342,8 +300,43 @@ export default {
     return data;
   },
   methods: {
+    // Do grade stuff
+    async trySubmitOrUpdateGrade(submission) {
+      if (submission.newValue !== submission.oldValue) {
+        const gradeArgs = {
+          studentId: submission.data.studentId,
+          assignmentId: submission.colDef.assignmentId,
+          isSubmitted: true,
+          score: Number(submission.newValue),
+          submissionDate: Date.now(),
+        };
+        try {
+          const linkedGrade = submission.data[`${submission.colDef.field}Link`];
+          if (submission.data[`${submission.colDef.field}Link`] === undefined) {
+            await GradeCrud.post(gradeArgs);
+          } else {
+            await GradeCrud.put(linkedGrade.id, { data: gradeArgs });
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    },
+
+    async getFilteredGrades(student) {
+      const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(student.id), '/grades'));
+      const rawStudentGrades = (await studentGradeCrud.get()).data;
+      const filter = g => this.assignments.findIndex(a => g.assignmentId === a.id) !== -1;
+      student.grades = rawStudentGrades.filter(filter);
+
+      // Add linked assignment to grade
+      student.grades.forEach(g => {
+        g.assignment = this.assignments.find(a => g.assignmentId === a.id);
+      });
+    },
     async enrolledInThisSection(studentId) {
       const student = (await StudentCrud.get(studentId)).data;
+      await this.getFilteredGrades(student);
       this.students.push(student);
     },
     unenrolledInThisSection(student) {
@@ -385,10 +378,6 @@ export default {
       this.assignments[this.assignment.findIndex(a => a.id === assignment.id)] = assignment;
     },
 
-    out(args) {
-      console.log(args);
-    },
-
     async fetchData() {
       // Get Section:
       this.section = (await SectionCrud.get(this.$route.params.sectionId)).data;
@@ -397,12 +386,6 @@ export default {
       rawStudents.forEach(stud => { stud.grades = []; });
       this.students = rawStudents;
 
-      // Get grade info from said student.
-      const promises = rawStudents.map(async (s) => {
-        const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(s.id), '/grades'));
-        s.grades = (await studentGradeCrud.get()).data;
-      });
-      await Promise.all(promises);
 
       // Get assignment category information.
       const rawAssCats = (await this.assignmentCategoryCrud.get()).data;
@@ -423,6 +406,13 @@ export default {
       });
       await Promise.all(assPromises);
 
+      // Get grade info from said student.
+      const promises = this.students.map(async (s) => {
+        await this.getFilteredGrades(s);
+      });
+
+      await Promise.all(promises);
+
       this.allStudents = (await StudentCrud.get()).data;
     },
 
@@ -432,13 +422,13 @@ export default {
       return [
         {
           headerName: 'Student ID',
-          field: 'a-num',
+          field: 'studentId',
           pinned: 'left',
           hide: true,
         },
         {
           headerName: 'Student',
-          field: 'name',
+          field: 'studentName',
           pinned: 'left',
           editable: false,
         }].concat(
@@ -446,8 +436,26 @@ export default {
           headerName: a.name,
           field: `Ass${a.id}`,
           editable: true,
+          assignmentId: a.id,
         })),
       );
+    },
+
+    studentGradeRows() {
+      const rows = this.students.map(student => {
+        const data = {
+          studentId: student.id,
+          studentName: `${student.lastName}, ${student.firstName}`,
+        };
+        this.assignments.forEach(ass => {
+          const assString = `Ass${ass.id}`;
+          const grade = student.grades.find(g => g.assignmentId === ass.id);
+          data[assString] = (grade) ? grade.score : 'Unsubmitted';
+          data[`${assString}Link`] = grade;
+        });
+        return data;
+      });
+      return rows;
     },
   },
 };

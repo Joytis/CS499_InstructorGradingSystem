@@ -87,5 +87,6 @@ export const SectionCrud = new SimpleCrud(config.serverHost, '/sections');
 export const TermCrud = new SimpleCrud(config.serverHost, '/terms');
 export const EnrollmentCrud = new SimpleCrud(config.serverHost, '/enrollment');
 export const StudentCrud = new SimpleCrud(config.serverHost, '/students');
+export const GradeCrud = new SimpleCrud(config.serverHost, '/grades');
 export const AssignmentCrud = new SimpleCrud(config.serverHost, '/assignments');
 export const AssignmentCategoryCrud = new SimpleCrud(config.serverHost, '/assignmentCategories');
