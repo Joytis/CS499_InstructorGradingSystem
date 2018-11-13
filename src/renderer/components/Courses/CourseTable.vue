@@ -101,6 +101,7 @@ export default {
 
   created() {
     this.fetchData();
+    EventBus.$on('term-swapped', this.fetchData); // Just reinitialize.
     EventBus.$on('course-added', this.courseAdded);
     EventBus.$on('course-removed', this.courseRemoved);
     EventBus.$on('course-updated', this.courseUpdated);
@@ -108,6 +109,7 @@ export default {
     EventBus.$on('section-removed', this.sectionRemoved);
   },
   beforeDestroy() {
+    EventBus.$off('term-swapped', this.fetchData);
     EventBus.$off('course-added', this.courseAdded);
     EventBus.$off('course-removed', this.courseRemoved);
     EventBus.$off('course-updated', this.courseUpdated);
@@ -151,7 +153,8 @@ export default {
           // Querying events here because we don't have access to other members in data asection.
           const courseId = this.selectedCourse.id;
           const termId = (await Finders.SelectedTerm()).id;
-          return Object.assign({ courseId, termId }, staged);
+          const instructorId = (await Finders.CurrentInstructor()).id;
+          return Object.assign({ courseId, termId, instructorId }, staged);
         };
       },
     };
@@ -184,7 +187,11 @@ export default {
       const newCourses = (await CourseCrud.get()).data; // Get all courses
       const promises = newCourses.map(async (c) => {
         const courseSectionCrud = CourseCrud.fromAppendedRoute(urljoin(String(c.id), '/sections'));
-        c.sections = (await courseSectionCrud.get()).data;
+        const sections = (await courseSectionCrud.get()).data;
+        const instructor = await Finders.CurrentInstructor();
+        const term = await Finders.SelectedTerm();
+        const filter = sec => (sec.instructorId === instructor.id) && (sec.termId === term.id);
+        c.sections = sections.filter(filter);
       });
       await Promise.all(promises);
       this.courses = newCourses;

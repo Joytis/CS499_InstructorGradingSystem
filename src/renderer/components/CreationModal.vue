@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-card" style="width: auto">
+  <div class="modal-card crud-modal" style="width: auto">
     <header class="modal-card-head">
       <p class="modal-card-title"> {{ this.title }} </p>
     </header>
@@ -8,7 +8,7 @@
         <atom-spinner :animation-duration="1000" :size="200" :color="'#cd5bef'"/>
       </div>
       <div v-else-if="state === 'error'">
-        <div> {{ error.message }} </div>
+        <div> {{ error }} </div>
       </div>
       <div v-else-if="state === 'success'">
         Success!
@@ -65,6 +65,7 @@
 <script>
 /* eslint-disable no-console */
 import { AtomSpinner } from 'epic-spinners';
+import { ParseError } from '../../../middleware';
 
 export default {
   name: 'CreationModalForm',
@@ -110,7 +111,8 @@ export default {
         }
       } catch (err) {
         this.state = 'error';
-        this.error = err;
+        this.error = ParseError(err);
+        console.log(err);
         // DISPLAY ERROR MODAL?
       }
     },
@@ -120,6 +122,10 @@ export default {
 </script>
 
 <style>
+.crud-modal {
+  color: black;
+}
+
 .modal .animation-content .modal-card {
   overflow: visible !important;
 }

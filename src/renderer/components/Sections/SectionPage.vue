@@ -1,108 +1,116 @@
 <template>
   <div>
     <back-button></back-button>
-    <keep-alive>
-      <b-tabs v-model="activeTab">
-        <b-tab-item label="Enrollment">
-          <button class="button is-primary is-small" @click="isEnrollmentModalActive = true"> 
-            Enroll new Student
-          </button>
-          <b-modal :active.sync="isEnrollmentModalActive" :width="640" scroll="keep" has-modal-card>
-            <section-enrollment-modal-form :sectionId="Number($route.params.sectionId)"></section-enrollment-modal-form>
-          </b-modal>
-          <b-table :data="students" paginated per-page="10" :selected.sync="selectedStudent">
-              <template slot-scope="props">
-                <b-table-column field="Name" label="Name" width="300" sortable>
-                  {{ `${props.row.firstName} ${props.row.lastName}` }}
-                </b-table-column>
-                <b-table-column field="Email" label="Email" sortable>
-                  {{ props.row.email }}
-                </b-table-column>
-              </template>
-          </b-table>
-        </b-tab-item>
-        <b-tab-item label="Assignments">
-          <!-- Assignment modal-->
-            <crud-modal-bar
-              createTitle="Create Assignment"
-              :inputs="assignmentInputs"
-              :removed="['edit', 'delete']"
-            />
-          <!-- Assignments table-->
-            <template>
-              <b-table 
-                :data="assignments"
-                paginated 
-                per-page="10"
-                :selected.sync="selectedAssignment"
-                >
-                <template slot-scope="props">
-                  <b-table-column field="name" label="Name" sortable>
-                    {{ props.row.name }}
-                  </b-table-column>
-                  <b-table-column field="category" label="Assignment Category" width="180" sortable>
-                    {{ props.row.assignmentCategory.name }}
-                  </b-table-column>
-                  <b-table-column field="totalPoints" label="Total Points" sortable>
-                    {{ props.row.totalPoints }}
-                  </b-table-column>
-                  <b-table-column field="dateCreated" label="Date Created" sortable>
-                    {{ new Date(props.row.dateCreated).toLocaleDateString() }}
-                  </b-table-column>
-                  <b-table-column field="dueDate" label="Due Date" sortable>
-                    {{ new Date(props.row.dueDate).toLocaleDateString() }}
-                  </b-table-column>
-
-                  <b-table-column label="Modify">
-                    <crud-modal-bar
-                      @click="selectedAssignment = props.row"
-                      editTitle="Edit"
-                      deleteTitle="Delete"
-                      :inputs="assignmentInputs"
-                      :target="props.row"
-                      :removed="['create']"
-                    />
-                  </b-table-column>
-                </template>
-              </b-table>
-            </template>
-          </b-table-column>
-        </b-tab-item>
-        <b-tab-item label="Grades">
-
-        </b-tab-item>
-        <b-tab-item label="Section Settings">
-          <!-- Assignment Category Modals -->
-          <crud-modal-bar
-            createTitle="Create Assignment Category"
-            editTitle="Edit Assignment Category"
-            deleteTitle="Delete Assignment Category"
-            :target="selectedAssignmentCategory"
-            :inputs="assignmentCategoryInputs"
-          />
-
-          <!-- Assignment Category Tables -->
-          <b-table 
-              :data="assCats" 
-              paginated 
-              per-page="5"
-              :selected.sync="selectedAssignmentCategory"
-          >
+    <button 
+      class="button is-primary is-small" 
+      @click="isCopyModalActive = true"
+      style="text-align: right"
+    >
+      Copy Section
+    </button>
+    <b-modal :active.sync="isCopyModalActive" :width="640" scroll="keep" has-modal-card>
+      <copy-section-modal :target="section"></copy-section-modal>
+    </b-modal>
+    <b-tabs v-model="activeTab">
+      <b-tab-item label="Enrollment">
+        <button class="button is-primary is-small" @click="isEnrollmentModalActive = true"> 
+          Enroll new Student
+        </button>
+        <b-modal :active.sync="isEnrollmentModalActive" :width="640" scroll="keep" has-modal-card>
+          <section-enrollment-modal-form :sectionId="Number($route.params.sectionId)"></section-enrollment-modal-form>
+        </b-modal>
+        <b-table :data="students" paginated per-page="10" :selected.sync="selectedStudent">
             <template slot-scope="props">
               <b-table-column field="Name" label="Name" width="300" sortable>
-                {{ props.row.name }}
+                {{ `${props.row.firstName} ${props.row.lastName}` }}
               </b-table-column>
-              <b-table-column field="Weight" label="Weight" sortable>
-                {{ props.row.weight }}
-              </b-table-column>
-              <b-table-column field="Lowest Grades Dropped" label="Lowest Grades Dropped" sortable>
-                {{ props.row.lowestGradesDropped }}
+              <b-table-column field="Email" label="Email" sortable>
+                {{ props.row.email }}
               </b-table-column>
             </template>
-          </b-table>
-        </b-tab-item>
-      </b-tabs>
-    </keep-alive>
+        </b-table>
+      </b-tab-item>
+      <b-tab-item label="Assignments">
+        <!-- Assignment modal-->
+          <crud-modal-bar
+            createTitle="Create Assignment"
+            :inputs="assignmentInputs"
+            :removed="['edit', 'delete']"
+          />
+        <!-- Assignments table-->
+          <template>
+            <b-table 
+              :data="assignments"
+              paginated 
+              per-page="10"
+              :selected.sync="selectedAssignment"
+              >
+              <template slot-scope="props">
+                <b-table-column field="name" label="Name" sortable>
+                  {{ props.row.name }}
+                </b-table-column>
+                <b-table-column field="category" label="Assignment Category" width="180" sortable>
+                  {{ props.row.assignmentCategory.name }}
+                </b-table-column>
+                <b-table-column field="totalPoints" label="Total Points" sortable>
+                  {{ props.row.totalPoints }}
+                </b-table-column>
+                <b-table-column field="dateCreated" label="Date Created" sortable>
+                  {{ new Date(props.row.dateCreated).toLocaleDateString() }}
+                </b-table-column>
+                <b-table-column field="dueDate" label="Due Date" sortable>
+                  {{ new Date(props.row.dueDate).toLocaleDateString() }}
+                </b-table-column>
+
+                <b-table-column label="Modify">
+                  <crud-modal-bar
+                    @click="selectedAssignment = props.row"
+                    editTitle="Edit"
+                    deleteTitle="Delete"
+                    :inputs="assignmentInputs"
+                    :target="props.row"
+                    :removed="['create']"
+                  />
+                </b-table-column>
+              </template>
+            </b-table>
+          </template>
+        </b-table-column>
+      </b-tab-item>
+      <b-tab-item label="Grades">
+
+      </b-tab-item>
+      <b-tab-item label="Section Settings">
+        <!-- Assignment Category Modals -->
+        <crud-modal-bar
+          createTitle="Create Assignment Category"
+          editTitle="Edit Assignment Category"
+          deleteTitle="Delete Assignment Category"
+          :target="selectedAssignmentCategory"
+          :inputs="assignmentCategoryInputs"
+        />
+
+        <!-- Assignment Category Tables -->
+        <b-table 
+            :data="assCats" 
+            paginated 
+            per-page="5"
+            :selected.sync="selectedAssignmentCategory"
+        >
+          <template slot-scope="props">
+            <b-table-column field="Name" label="Name" width="300" sortable>
+              {{ props.row.name }}
+            </b-table-column>
+            <b-table-column field="Weight" label="Weight" sortable>
+              {{ props.row.weight }}
+            </b-table-column>
+            <b-table-column field="Lowest Grades Dropped" label="Lowest Grades Dropped" sortable>
+              {{ props.row.lowestGradesDropped }}
+            </b-table-column>
+          </template>
+        </b-table>
+      </b-tab-item>
+    </b-tabs>
   </div>
 </template>
 
@@ -116,6 +124,7 @@ import {
   SectionCrud, StudentCrud, EventBus, AssignmentCategoryCrud, AssignmentCrud,
 } from '../../../../middleware';
 import BackButton from '../BackButton.vue';
+import CopySectionModal from './CopySectionModal.vue';
 
 export default {
   name: 'SectionPage',
@@ -123,6 +132,7 @@ export default {
     BackButton,
     SectionEnrollmentModalForm,
     CrudModalBar,
+    CopySectionModal,
   },
 
   created() {
@@ -169,6 +179,7 @@ export default {
       selectedAssignmentCategory: null,
       selectedAssignment: null,
       isEnrollmentModalActive: false,
+      isCopyModalActive: false,
 
       // Modal input details.
       assignmentCategoryInputs: {
@@ -265,6 +276,8 @@ export default {
       this.assignments = this.assignments.filter(s => s.id !== assignment.id);
     },
     assignmentUpdated(assignment) {
+      const finder = (ac) => ac.id === assignment.assignmentCategoryId;
+      assignment.assignmentCategory = this.assCats.find(finder);
       this.assignments[this.assignment.findIndex(a => a.id === assignment.id)] = assignment;
     },
 
@@ -292,19 +305,14 @@ export default {
       const assPromises = rawAssCats.map(async (ac) => {
         const newUrl = urljoin(String(ac.id), '/assignments');
         const asscatAssCrud = AssignmentCategoryCrud.fromAppendedRoute(newUrl);
-        ac.assignments = (await asscatAssCrud.get()).data;
+        const assignments = (await asscatAssCrud.get()).data;
+        assignments.forEach((a) => {
+          a.assignmentCategory = ac;
+          this.assignments.push(a);
+        });
+        ac.assignments = assignments;
       });
       await Promise.all(assPromises);
-
-      // load all assignments
-      const assignments = (await AssignmentCrud.get()).data;
-      assignments.forEach(a => {
-        // Find and link the associated assignment caterogy. We've awaited this info already,
-        //    so just link it together.
-        a.dueDate = new Date(Date.parse(a.dueDate));
-        a.assignmentCategory = this.assCats.find(ac => ac.id === a.assignmentCategoryId);
-      });
-      this.assignments = assignments;
     },
 
   },

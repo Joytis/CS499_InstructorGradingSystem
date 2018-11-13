@@ -18,7 +18,7 @@
 
 <script>
 import { Multipane, MultipaneResizer } from 'vue-multipane';
-import { EventBus } from '../../middleware';
+import { EventBus, AccountCrud } from '../../middleware';
 import AuthModal from './components/AuthModal/AuthModal.vue';
 import Navbar from './components/Navbar.vue';
 import MenuLeft from './components/NavMenu/MenuLeft.vue';
@@ -39,22 +39,31 @@ export default {
   created() {
     EventBus.$on('login', this.login);
     EventBus.$on('logout', this.logout);
+    EventBus.$on('request-instructor', this.requestInstructor);
   },
   beforeDestroy() {
     EventBus.$off('login', this.login);
     EventBus.$off('logout', this.logout);
+    EventBus.$off('request-instructor', this.requestInstructor);
   },
 
   data() {
     return {
       menuActive: true,
       loggedIn: false,
+      instructor: null,
     };
   },
   methods: {
+    requestInstructor() { EventBus.$emit('response-instructor', this.instructor); },
     // Let's have this run constantly
-    login() { this.loggedIn = true; },
-    logout() { this.loggedIn = false; },
+    async login() {
+      this.loggedIn = true;
+      this.instructor = (await AccountCrud.get()).data;
+    },
+    logout() {
+      this.loggedIn = false;
+    },
   },
 };
 </script>

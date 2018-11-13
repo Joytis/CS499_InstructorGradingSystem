@@ -29,12 +29,9 @@ async function findValueThrough(requestEvent, responseEvent) {
 }
 
 const SelectedTerm = async () => findValueThrough('request-selected-term', 'response-selected-term');
-
-function LoggedInInstructor() {
-  return {};
-}
+const CurrentInstructor = async () => findValueThrough('request-instructor', 'response-instructor');
 
 export default {
   SelectedTerm,
-  LoggedInInstructor,
+  CurrentInstructor,
 };

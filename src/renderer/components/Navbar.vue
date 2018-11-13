@@ -22,7 +22,7 @@
               <b-icon icon="chevron-down"></b-icon>
             </button>
             <div v-for="Term in Terms">
-              <b-dropdown-item v-on:click="CurrentTerm=Term">{{ Term.title }}</b-dropdown-item>
+              <b-dropdown-item v-on:click="swapTerms(Term)">{{ Term.title }}</b-dropdown-item>
             </div>
           </b-dropdown>
         </div>
@@ -41,7 +41,7 @@
           </b-dropdown>
           <!-- Simple little logout modal -->
           <b-modal :active.sync="isLogoutModalActive" :width="640" scroll="keep" has-modal-card >
-            <div class="modal-card" style="width: auto">
+            <div class="modal-card" style="width: auto; color: black">
               <header class="modal-card-head">
                 <p class="modal-card-title">Logout</p>
               </header>
@@ -116,6 +116,10 @@ export default {
   },
 
   methods: {
+    swapTerms(term) {
+      this.CurrentTerm = term;
+      EventBus.$emit('term-swapped', term);
+    },
     termAdded(newTerm) { this.Terms.push(newTerm); },
     requestSelectedTerm() { EventBus.$emit('response-selected-term', this.CurrentTerm); },
 
@@ -141,6 +145,7 @@ export default {
       try {
         this.dropdown.state = 'loading';
         this.Terms = (await TermCrud.get()).data;
+        if (this.Terms.length > 0) [this.CurrentTerm] = this.Terms;
         this.dropdown.state = 'main';
       } catch (err) {
         this.dropdown.state = 'error';

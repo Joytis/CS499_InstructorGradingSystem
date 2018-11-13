@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-card" style="width: auto">
+  <div class="modal-card crud-modal" style="width: auto">
     <header class="modal-card-head">
       <p class="modal-card-title"> {{ this.title }} </p>
     </header>
@@ -8,7 +8,7 @@
         <atom-spinner :animation-duration="1000" :size="200" :color="'#cd5bef'"/>
       </div>
       <div v-else-if="state === 'error'">
-        <div> {{ error.message }} </div>
+        <div> {{ error }} </div>
       </div>
       <div v-else-if="state === 'success'">
         Success!
@@ -43,7 +43,7 @@
     <footer class="modal-card-foot">
       <div v-if="state === 'main'">
         <button class="button" type="button" @click="$parent.close()">Close</button>
-        <button class="button is-primary"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
+        <button class="button is-warning"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
       </div>
     </footer>
   </div>
@@ -54,6 +54,7 @@
 <script>
 /* eslint-disable no-console */
 import { AtomSpinner } from 'epic-spinners';
+import { ParseError } from '../../../middleware';
 
 export default {
   name: 'EditThingsModalForm',
@@ -82,7 +83,6 @@ export default {
     primaryButtonText() {
       return ((this.inputs.primaryText !== undefined) ? this.inputs.primaryText : 'Update');
     },
-
     async attemptDatabaseCreate() {
       try {
         // If we have a preUpdate defined, mutate staged with its staged.
@@ -103,7 +103,7 @@ export default {
         }
       } catch (err) {
         this.state = 'error';
-        this.error = err;
+        this.error = ParseError(err);
         // DISPLAY ERROR MODAL?
       }
     },
@@ -113,6 +113,10 @@ export default {
 </script>
 
 <style>
+.crud-modal {
+  color: black;
+}
+
 .modal .animation-content .modal-card {
   overflow: visible !important;
 }
