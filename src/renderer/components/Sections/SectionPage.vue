@@ -14,7 +14,6 @@
     <b-tabs v-model="activeTab">
       <b-tab-item label="Enrollment">
         <crud-modal-bar 
-          style="color: black"
           createTitle="Enroll Student"
           deleteTitle="Unenroll Student"
           deleteMessage= "Are you sure? This will mess up student grades."
@@ -221,14 +220,16 @@ export default {
             getData: null,
             value: 'id',
             key: 'id',
-            display: option => option.name,
+            display: option => `${option.lastName}, ${option.firstName}`,
           },
         },
       },
 
       assignmentInputs: {
         crudTarget: AssignmentCrud,
-        preCreate: null,
+        postCreate(result) { EventBus.$emit('assignment-added', result); },
+        postUpdate(result) { EventBus.$emit('assignment-updated', result); },
+        postDelete(result) { EventBus.$emit('assignment-removed', result); },
         templates: {
           assignmentCategoryId: {
             label: 'Assignment Category',
@@ -236,7 +237,7 @@ export default {
             getData: null,
             value: 'id',
             key: 'id,',
-            display: option => `${option.lastName}, ${option.firstName}`,
+            display: option => option.name,
           },
           name: {
             label: 'Name', type: 'input', placeholder: 'Assignment name',
@@ -358,6 +359,7 @@ export default {
         const assignments = (await asscatAssCrud.get()).data;
         assignments.forEach((a) => {
           a.assignmentCategory = ac;
+          a.dueDate = new Date(Date.parse(a.dueDate));
           this.assignments.push(a);
         });
         ac.assignments = assignments;
