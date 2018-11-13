@@ -54,6 +54,8 @@
   },
   "dependencies": {
     "@mdi/font": "^2.8.94",
+    "ag-grid-community": "^19.1.2",
+    "ag-grid-vue": "^19.1.2",
     "app-root-path": "^2.1.0",
     "axios": "^0.18.0",
     "bootstrap-vue": "^2.0.0-rc.11",

@@ -80,7 +80,11 @@
         </b-table-column>
       </b-tab-item>
       <b-tab-item label="Grades">
-
+        <ag-grid-vue style="width: 100%; height: 70vh;"
+          class="ag-theme-balham"
+          :columnDefs="assignmentColumns"
+          :rowData="rowData"
+          :cellValueChanged="out"/>
       </b-tab-item>
       <b-tab-item label="Section Settings">
         <!-- Assignment Category Modals -->
@@ -120,6 +124,7 @@
 // import data from '../Courses/CourseListDataMock';
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
+import { AgGridVue } from 'ag-grid-vue';
 import SectionEnrollmentModalForm from './SectionEnrollmentModal.vue';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
@@ -128,6 +133,8 @@ import {
 } from '../../../../middleware';
 import BackButton from '../BackButton.vue';
 import CopySectionModal from './CopySectionModal.vue';
+import '../../../../node_modules/ag-grid-community/dist/styles/ag-grid.css';
+import '../../../../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
 
 export default {
   name: 'SectionPage',
@@ -136,6 +143,7 @@ export default {
     SectionEnrollmentModalForm,
     CrudModalBar,
     CopySectionModal,
+    AgGridVue,
   },
 
   created() {
@@ -144,7 +152,50 @@ export default {
     this.sectionStudentCrud = SectionCrud.fromAppendedRoute(studentSectionRoute);
     const assCatRoute = urljoin(this.$route.params.sectionId, '/assignmentCategories');
     this.assignmentCategoryCrud = SectionCrud.fromAppendedRoute(assCatRoute);
-
+    this.rowData = [{
+      'a-num': 25222222,
+      name: 'Chris',
+      Ass2: 100,
+      Ass3: 100,
+      Ass4: 100,
+      Ass5: 100,
+      Ass6: 100,
+      Ass7: 100,
+      Ass8: 100,
+    },
+    {
+      'a-num': 25222223,
+      name: 'Clark',
+      Ass2: 100,
+      Ass3: 100,
+      Ass4: 100,
+      Ass5: 100,
+      Ass6: 100,
+      Ass7: 100,
+      Ass8: 100,
+    },
+    {
+      'a-num': 25222224,
+      name: 'Matt',
+      Ass2: 100,
+      Ass3: 100,
+      Ass4: 100,
+      Ass5: 100,
+      Ass6: 100,
+      Ass7: 100,
+      Ass8: 100,
+    },
+    {
+      'a-num': 25222225,
+      name: 'Sam',
+      Ass2: 100,
+      Ass3: 100,
+      Ass4: 100,
+      Ass5: 100,
+      Ass6: 100,
+      Ass7: 100,
+      Ass8: 100,
+    }];
     // Fetch data
     this.fetchData();
 
@@ -177,6 +228,7 @@ export default {
     // Javascript doesn't allow us to reference other objects in our object, so
     //  we create a self-initializing object to manually assign the references after
     //  creation.
+
     const data = {
       activeTab: 0,
       section: null,
@@ -313,6 +365,7 @@ export default {
       this.assCats = this.assCats.filter(a => a.id !== assCat.id);
     },
 
+
     // assignment stuff
     assignmentAdded(assignment) {
       const asscat = this.assCats.find(a => a.id === assignment.assignmentCategoryId);
@@ -330,6 +383,10 @@ export default {
       const finder = (ac) => ac.id === assignment.assignmentCategoryId;
       assignment.assignmentCategory = this.assCats.find(finder);
       this.assignments[this.assignment.findIndex(a => a.id === assignment.id)] = assignment;
+    },
+
+    out(args) {
+      console.log(args);
     },
 
     async fetchData() {
@@ -369,6 +426,29 @@ export default {
       this.allStudents = (await StudentCrud.get()).data;
     },
 
+  },
+  computed: {
+    assignmentColumns() {
+      return [
+        {
+          headerName: 'Student ID',
+          field: 'a-num',
+          pinned: 'left',
+          hide: true,
+        },
+        {
+          headerName: 'Student',
+          field: 'name',
+          pinned: 'left',
+          editable: false,
+        }].concat(
+        this.assignments.map(a => ({
+          headerName: a.name,
+          field: `Ass${a.id}`,
+          editable: true,
+        })),
+      );
+    },
   },
 };
 </script>
