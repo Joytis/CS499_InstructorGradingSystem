@@ -145,6 +145,19 @@ export default {
           sectionNumber: {
             label: 'Section Number', type: 'input', subtype: 'number', placeholder: '00',
           },
+          gradeScaleA: {
+            label: 'Grade Scale: A (Out of 100)', type: 'input', subtype: 'number', placeholder: '90',
+          },
+          gradeScaleB: {
+            label: 'Grade Scale: B (Out of 100)', type: 'input', subtype: 'number', placeholder: '80',
+          },
+          gradeScaleC: {
+            label: 'Grade Scale: C (Out of 100)', type: 'input', subtype: 'number', placeholder: '70',
+          },
+          gradeScaleD: {
+            label: 'Grade Scale: D (Out of 100)', type: 'input', subtype: 'number', placeholder: '60',
+          },
+
         },
       },
       init() {

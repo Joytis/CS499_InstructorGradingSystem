@@ -68,6 +68,15 @@ export class SimpleCrud {
     const response = await request.delete(options);
     return response.body;
   }
+
+  // This is only used once. But gat damn am I not inclined to redesign this whole thing.
+  //  to work better
+  async spicyDelete(body) {
+    const options = this.copyOptions();
+    options.body = body;
+    const response = await request.delete(options);
+    return response.body;
+  }
 }
 
 export const AccountCrud = new SimpleCrud(config.serverHost, '/instructor/account');

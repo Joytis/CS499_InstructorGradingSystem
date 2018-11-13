@@ -13,12 +13,15 @@
     </b-modal>
     <b-tabs v-model="activeTab">
       <b-tab-item label="Enrollment">
-        <button class="button is-primary is-small" @click="isEnrollmentModalActive = true"> 
-          Enroll new Student
-        </button>
-        <b-modal :active.sync="isEnrollmentModalActive" :width="640" scroll="keep" has-modal-card>
-          <section-enrollment-modal-form :sectionId="Number($route.params.sectionId)"></section-enrollment-modal-form>
-        </b-modal>
+        <crud-modal-bar 
+          style="color: black"
+          createTitle="Enroll Student"
+          deleteTitle="Unenroll Student"
+          deleteMessage= "Are you sure? This will mess up student grades."
+          :inputs="enrollmentModalInputs"
+          :target="selectedStudent"
+          :removed="['edit']"
+        />
         <b-table :data="students" paginated per-page="10" :selected.sync="selectedStudent">
             <template slot-scope="props">
               <b-table-column field="Name" label="Name" width="300" sortable>
@@ -122,6 +125,7 @@ import SectionEnrollmentModalForm from './SectionEnrollmentModal.vue';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
   SectionCrud, StudentCrud, EventBus, AssignmentCategoryCrud, AssignmentCrud,
+  EnrollmentCrud,
 } from '../../../../middleware';
 import BackButton from '../BackButton.vue';
 import CopySectionModal from './CopySectionModal.vue';
@@ -154,6 +158,7 @@ export default {
     EventBus.$on('assignment-removed', this.assignmentRemoved);
     EventBus.$on('enrolled-in-this-section', this.enrolledInThisSection);
     EventBus.$on('unenrolled-in-this-section', this.unenrolledInThisSection);
+    EventBus.$on('screw-it-reload-everything', this.fetchData);
   },
 
   beforeDestroy() {
@@ -161,8 +166,12 @@ export default {
     EventBus.$off('asscat-added', this.asscatAdded);
     EventBus.$off('asscat-updated', this.asscatUpdated);
     EventBus.$off('asscat-removed', this.asscatRemoved);
+    EventBus.$off('assignment-added', this.assignmentAdded);
+    EventBus.$off('assignment-updated', this.assignmentUpdated);
+    EventBus.$off('assignment-removed', this.assignmentRemoved);
     EventBus.$off('enrolled-in-this-section', this.enrolledInThisSection);
     EventBus.$off('unenrolled-in-this-section', this.unenrolledInThisSection);
+    EventBus.$off('screw-it-reload-everything', this.fetchData);
   },
 
   data() {
@@ -172,6 +181,7 @@ export default {
     const data = {
       activeTab: 0,
       section: null,
+      allStudents: [],
       students: [],
       assCats: [],
       assignments: [],
@@ -199,11 +209,26 @@ export default {
         },
       },
 
+      enrollmentModalInputs: {
+        crudTarget: EnrollmentCrud,
+        preCreate: null,
+        preDelete: null,
+        spicyDeletion: true,
+        templates: {
+          studentId: {
+            label: 'Student',
+            type: 'dropdown',
+            getData: null,
+            value: 'id',
+            key: 'id',
+            display: option => option.name,
+          },
+        },
+      },
+
       assignmentInputs: {
         crudTarget: AssignmentCrud,
-        postCreate(result) { EventBus.$emit('assignment-added', result); },
-        postUpdate(result) { EventBus.$emit('assignment-updated', result); },
-        postDelete(result) { EventBus.$emit('assignment-removed', result); },
+        preCreate: null,
         templates: {
           assignmentCategoryId: {
             label: 'Assignment Category',
@@ -211,6 +236,7 @@ export default {
             getData: null,
             value: 'id',
             key: 'id,',
+            display: option => `${option.lastName}, ${option.firstName}`,
           },
           name: {
             label: 'Name', type: 'input', placeholder: 'Assignment name',
@@ -232,6 +258,30 @@ export default {
           // Retrieve the desired course and term ID
           const sectionId = this.section.id;
           return Object.assign({ sectionId }, staged);
+        };
+
+        // Enrollment inputs
+        this.enrollmentModalInputs.templates.studentId.getData = () => {
+          // Only allow enrollment of students that aren't already enrolled.
+          const filter = (s) => this.students.findIndex(a => a.id === s.id) === -1;
+          return this.allStudents.filter(filter);
+        };
+        this.enrollmentModalInputs.preCreate = (staged) => {
+          const sectionId = this.section.id;
+          return Object.assign({ sectionId }, staged);
+        };
+        this.enrollmentModalInputs.postCreate = () => {
+          // THIS IS EXPENSIVE, BUT IT'S EASY TO DO HERE compared to the ALTERNATIVE.
+          EventBus.$emit('screw-it-reload-everything');
+        };
+        this.enrollmentModalInputs.preDelete = () => {
+          const sectionId = this.section.id;
+          const studentId = this.selectedStudent.id;
+          return { sectionId, studentId };
+        };
+        this.enrollmentModalInputs.postDelete = () => {
+          // THIS IS EXPENSIVE, BUT IT'S EASY TO DO HERE compared to the ALTERNATIVE.
+          EventBus.$emit('screw-it-reload-everything');
         };
       },
     };
@@ -313,6 +363,8 @@ export default {
         ac.assignments = assignments;
       });
       await Promise.all(assPromises);
+
+      this.allStudents = (await StudentCrud.get()).data;
     },
 
   },

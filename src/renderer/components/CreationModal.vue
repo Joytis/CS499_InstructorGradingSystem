@@ -16,7 +16,13 @@
       <div v-else v-for="(field, key) in inputs.templates">
         <b-field :label="field.label">
           <div v-if="field.type === 'input'">
-            <b-input v-model="staged[key]" :type="field.subtype" :step="field.step || 1" :min="field.min || 0" :placeholder="field.placeholder" required/>
+            <b-input 
+              v-model="staged[key]" 
+              :type="field.subtype" 
+              :step="field.step || 1" 
+              :min="field.min || 0" 
+              :placeholder="(field.placeholder) ? field.placeholder : ''" 
+              required/>
           </div>
           <div v-else-if="field.type === 'datepicker'">
             <b-datepicker
@@ -41,7 +47,7 @@
                       :value="option[field.value]"
                       :key="option[field.key]"
               >
-                {{ option.name }}
+                {{ field.display(option) }}
               </option>
             </b-select>
           </div>
@@ -111,8 +117,8 @@ export default {
         }
       } catch (err) {
         this.state = 'error';
-        this.error = ParseError(err);
         console.log(err);
+        this.error = ParseError(err);
         // DISPLAY ERROR MODAL?
       }
     },

@@ -62,7 +62,12 @@ export default {
         // Display loading
         this.state = 'loading';
         // Wait for term creation
-        await this.inputs.crudTarget.delete(this.target.id);
+        if (this.inputs.spicyDeletion) {
+          const staged = await this.inputs.preDelete(this.target);
+          await this.inputs.crudTarget.spicyDelete(staged);
+        } else {
+          await this.inputs.crudTarget.delete(this.target.id);
+        }
         // wait for two seconds then close window.
         this.state = 'success';
 

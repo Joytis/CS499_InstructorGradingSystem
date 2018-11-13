@@ -1,43 +1,45 @@
 <template>
-  <section>
-    <crud-modal-bar
-      createTitle="Create Student"
-      editTitle="Edit Student"
-      deleteTitle="Delete Student"
-      :target="(checkedRows.length == 1) ? checkedRows[0] : null"
-      :inputs="studentModalInputs"
-    />
-    <b-input v-model="searchString"
-      placeholder="Filter Results..."
-      style="padding-top: .3em;"
-    ></b-input>
-    <button class="button is-success is-small" :disabled="checkedRows.length==0">
-      Add All To Section
-    </button>
-    
-    <b-table
-      :data="filteredData"
-      paginated
-      per-page="8"
-      checkable=""
-      :checked-rows.sync="checkedRows"
-    >
-      <template slot-scope="props">
-        <b-table-column field="aNumber" label="A-Number" sortable >
-          {{ props.row.aNumber }}
-        </b-table-column>
-        <b-table-column field="firstName" label="First Name" sortable>
-          {{ props.row.firstName }}
-        </b-table-column>
-        <b-table-column field="lastName" label="Last Name" sortable>
-          {{ props.row.lastName }}
-        </b-table-column>
-        <b-table-column field="email" label="Email" sortable>
-          {{ props.row.email }}
-        </b-table-column>
-      </template>
-    </b-table>
-  </section>
+  <keep-alive>
+    <section>
+      <crud-modal-bar
+        createTitle="Create Student"
+        editTitle="Edit Student"
+        deleteTitle="Delete Student"
+        :target="(checkedRows.length == 1) ? checkedRows[0] : null"
+        :inputs="studentModalInputs"
+      />
+      <b-input v-model="searchString"
+        placeholder="Filter Results..."
+        style="padding-top: .3em;"
+      ></b-input>
+      <button class="button is-success is-small" :disabled="checkedRows.length==0">
+        Add All To Section
+      </button>
+      
+      <b-table
+        :data="filteredData"
+        paginated
+        per-page="8"
+        checkable=""
+        :checked-rows.sync="checkedRows"
+      >
+        <template slot-scope="props">
+          <b-table-column field="aNumber" label="A-Number" sortable >
+            {{ props.row.aNumber }}
+          </b-table-column>
+          <b-table-column field="firstName" label="First Name" sortable>
+            {{ props.row.firstName }}
+          </b-table-column>
+          <b-table-column field="lastName" label="Last Name" sortable>
+            {{ props.row.lastName }}
+          </b-table-column>
+          <b-table-column field="email" label="Email" sortable>
+            {{ props.row.email }}
+          </b-table-column>
+        </template>
+      </b-table>
+    </section>
+  </keep-alive>
 </template>
 
 
