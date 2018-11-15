@@ -8,7 +8,7 @@
       <div class="level-item">
         {{ course.title }} - {{ section.sectionNumber }}
       </div>
-      <button @click="out(assignmentTableData)"/>>
+      <button @click="out(student)"/>>
     </nav>
     <b-table
       :data="assignmentTableData"
@@ -22,7 +22,7 @@
           {{ props.row.name }}
         </b-table-column>
         <b-table-column field="categoryAverage" label="Grade Average">
-          {{ props.row.categoryAverage }}
+          {{ getAverage(props.row) }}%
         </b-table-column>
       </template>
       <template slot="detail" slot-scope="props">
@@ -130,31 +130,36 @@ export default {
 
       // Get grade info from student
       this.getFilteredGrades(this.student);
-      // const promises = this.student.map(async (s) => {
-      //   await this.getFilteredGrades(s);
-      // });
-      // await Promise.all(promises);
     },
     out(args) {
       console.log(args);
     },
+    getAverage(category) {
+      // get the students average score for each category
+      let scoreTotal = 0;
+      let scorePossible = 0;
+      if (category.assignments.length <= 0) {
+        // return false;
+      }
+      for (let i = 0; i < category.assignments.length; i += 1) {
+        if (typeof (category.assignments[i].grade) === 'undefined') {
+          // return false;
+        } else {
+          scoreTotal += category.assignments[i].grade.score;
+          scorePossible += category.assignments[i].totalPoints;
+        }
+      }
+      return Number((scoreTotal / scorePossible) * 100).toFixed(2);
+    },
   },
   computed: {
     assignmentTableData() {
+      // let scoreTotal = 0;
+      // let scorePossible = 0;
       const data = this.assCats.map(ac => {
         ac.assignments.forEach(a => {
           a.grade = this.rawStudentGrades.find(g => g.assignmentId === a.id);
         });
-        if (ac.assignments.length !== 0) {
-          const scoreTotal = ac.assignments.reduce(
-            (accumulator, currentValue) => accumulator + currentValue.grade.score,
-          );
-          const scorePossible = ac.assignments.reduce(
-            (accumulator, currentValue) => accumulator + currentValue.totalPoints,
-          );
-          console.log(scoreTotal, scorePossible);
-          ac.categoryAverage = scoreTotal / scorePossible;
-        } else ac.categoryAverage = 'No assignment';
         return ac;
       });
       return data;
