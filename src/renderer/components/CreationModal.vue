@@ -51,6 +51,28 @@
               </option>
             </b-select>
           </div>
+          <div v-else-if="field.type === 'filteredTable'">
+            <b-input v-model="searchString"
+              placeholder="Filter Results..."
+              style="padding-top: .3em;"
+            ></b-input>
+            <b-table
+              :data="filteredData(field.getData())"
+              paginated
+              per-page="8"
+              checkable=""
+              :checked-rows.sync="checkedRows"
+            >
+              <template slot-scope="props">
+                <b-table-column field="firstName" label="First Name" sortable>
+                  {{ props.row.firstName }}
+                </b-table-column>
+                <b-table-column field="lastName" label="Last Name" sortable>
+                  {{ props.row.lastName }}
+                </b-table-column>
+              </template>
+            </b-table>
+          </div>
           <div v-else>
             NO VALID TYPE GIVEN
           </div>
@@ -87,6 +109,8 @@ export default {
       error: undefined,
       state: 'main',
       staged: {},
+      searchString: '',
+      checkRows: [],
     };
   },
 
@@ -122,8 +146,12 @@ export default {
         // DISPLAY ERROR MODAL?
       }
     },
+    filteredData(allStudents) {
+      return allStudents.filter((student) => (
+        student.firstName.toLowerCase().includes(this.searchString.toLowerCase())
+        || student.lastName.toLowerCase().includes(this.searchString.toLowerCase())));
+    },
   },
-
 };
 </script>
 
