@@ -95,7 +95,7 @@
           :cellValueChanged="trySubmitOrUpdateGrade"/>
         Show Analytics: <b-switch v-model="showAnalytics" class="is-primary is-small"/>
         <div v-if="showAnalytics">
-          <ag-grid-vue style="width: 100%; height: 20vh;"
+          <ag-grid-vue style="width: 100%; height: 21vh;"
           class="ag-theme-balham"
           :columnDefs="analyticsColumns"
           :rowData="analyticsRows"
@@ -142,6 +142,8 @@
 /* eslint-disable no-console */
 import urljoin from 'url-join';
 import { AgGridVue } from 'ag-grid-vue';
+import customCellEditor from '../customCellEditor';
+import customValueParser from '../customValueParser';
 import SectionEnrollmentModalForm from './SectionEnrollmentModal.vue';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
@@ -474,7 +476,7 @@ export default {
   },
   computed: {
     gradeTableHeight() {
-      return (this.showAnalytics) ? '50vh' : '70vh';
+      return (this.showAnalytics) ? '49vh' : '70vh';
     },
     assignmentColumns() {
       return [
@@ -495,6 +497,8 @@ export default {
           field: `Ass${a.id}`,
           editable: true,
           assignmentId: a.id,
+          cellEditor: customCellEditor,
+          valueSetter: customValueParser,
         })),
       );
     },

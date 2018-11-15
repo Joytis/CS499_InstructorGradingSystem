@@ -84,10 +84,6 @@ export default {
     };
   },
   methods: {
-    out(args) {
-      console.log(args);
-    },
-
     async fetchData() {
       this.students = (await StudentCrud.get()).data;
     },
