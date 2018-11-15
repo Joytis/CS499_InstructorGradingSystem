@@ -29,6 +29,14 @@
               <b-table-column field="Email" label="Email" sortable>
                 {{ props.row.email }}
               </b-table-column>
+              <b-table-column label="Student Page">
+                <button class="button is-success is-small">
+                  <router-link :to=" $route.params.sectionId + '/' + props.row.id">
+                    <b-icon type="is-accent" icon="expand-all">
+                    </b-icon>
+                  </router-link>
+                </button>
+              </b-table-column>
             </template>
         </b-table>
       </b-tab-item>
