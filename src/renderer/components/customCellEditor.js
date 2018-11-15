@@ -1,5 +1,10 @@
-/* eslint-disable func-names */
+/* eslint-disable func-names, prefer-destructuring */
 function MyCellEditor() {}
+
+const KEY_LEFT = 37;
+const KEY_UP = 38;
+const KEY_RIGHT = 39;
+const KEY_DOWN = 40;
 
 // gets called once before the renderer is used
 MyCellEditor.prototype.init = function (params) {
@@ -9,6 +14,15 @@ MyCellEditor.prototype.init = function (params) {
   this.eInput.setAttribute('step', 0.01);
   this.eInput.setAttribute('min', 0);
   this.eInput.value = params.value;
+  this.eInput.addEventListener('keydown', (event) => {
+    const keyCode = event.keyCode;
+    const isNavigationKey = keyCode === KEY_LEFT || keyCode === KEY_RIGHT || keyCode === KEY_UP
+    || keyCode === KEY_DOWN;
+    if (isNavigationKey) {
+      // this stops the grid from receiving the event and executing keyboard navigation
+      event.stopPropagation();
+    }
+  });
 };
 
 // gets called once when grid ready to insert the element
