@@ -8,7 +8,7 @@ export default {
       firstName: { label: 'First Name', type: 'input', placeholder: 'Jon' },
       lastName: { label: 'Last Name', type: 'input', placeholder: 'Smith' },
       email: {
-        label: 'Last Name',
+        label: 'Email',
         type: 'input',
         subtype: 'email',
         placeholder: 'email@uah.edu',
@@ -18,7 +18,9 @@ export default {
   },
   signInModalInputs: {
     crudTarget: LoginCrud,
-    postCreate(result) { EventBus.$emit('login', result); },
+    postCreate(result) {
+      EventBus.$emit('login', result);
+    },
     primaryText: 'Sign In',
     templates: {
       username: { label: 'Username', type: 'input', placeholder: '' },
