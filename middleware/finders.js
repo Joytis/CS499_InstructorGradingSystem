@@ -29,14 +29,11 @@ async function findValueThrough(requestEvent, responseEvent) {
 }
 
 const SelectedTerm = async () => findValueThrough('request-selected-term', 'response-selected-term');
-const SelectedCourse = async () => findValueThrough('request-selected-course', 'response-selected-course');
-
-function LoggedInInstructor() {
-  return {};
-}
+const CurrentInstructor = async () => findValueThrough('request-instructor', 'response-instructor');
+const GetAllStudents = async () => findValueThrough('request-students', 'response-students');
 
 export default {
   SelectedTerm,
-  SelectedCourse,
-  LoggedInInstructor,
+  CurrentInstructor,
+  GetAllStudents,
 };

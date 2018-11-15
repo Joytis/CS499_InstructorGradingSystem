@@ -22,12 +22,7 @@ export default new Router({
       component: require('../components/Courses/CoursePage.vue').default,
     },
     {
-      path: '/courses/:id/sections',
-      name: 'Sections',
-      component: require('../components/OtherPage.vue').default,
-    },
-    {
-      path: '/courses/:id/:section',
+      path: '/courses/:courseId/:sectionId',
       name: 'Section page',
       component: require('../components/Sections/SectionPage.vue').default,
     },
@@ -66,11 +61,11 @@ export default new Router({
     //   name: 'Documentation',
     //   component: require('../components/Documentation/Documentation.vue').default,
     // },
-    {
-      path: '/auth',
-      name: 'Auth Testing',
-      component: require('../components/AuthModal/AuthModal.vue').default,
-    },
+    // {
+    //   path: '/auth',
+    //   name: 'Auth Testing',
+    //   component: require('../components/AuthModal/AuthModal.vue').default,
+    // },
     {
       path: '*',
       redirect: '/dashboard',

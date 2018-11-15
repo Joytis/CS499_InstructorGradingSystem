@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import request from 'request-promise-native';
 import urljoin from 'url-join';
 import { config } from '../config';
@@ -11,6 +12,8 @@ function appendIdIfExists(url, id) {
   return url;
 }
 
+const cookieJar = request.jar();
+
 export class SimpleCrud {
   constructor(host, route) {
     this.target = urljoin(host, route);
@@ -18,7 +21,7 @@ export class SimpleCrud {
     this.basicRequestOptions = {
       url: this.target,
       json: true,
-      jar: true, // enable cached cookies
+      jar: cookieJar, // enable cached cookies
       resolveWithFullResponse: true, // Ensure we can get the status code of our response
     };
   }
@@ -65,6 +68,15 @@ export class SimpleCrud {
     const response = await request.delete(options);
     return response.body;
   }
+
+  // This is only used once. But gat damn am I not inclined to redesign this whole thing.
+  //  to work better
+  async spicyDelete(body) {
+    const options = this.copyOptions();
+    options.body = body;
+    const response = await request.delete(options);
+    return response.body;
+  }
 }
 
 export const AccountCrud = new SimpleCrud(config.serverHost, '/instructor/account');
@@ -75,5 +87,6 @@ export const SectionCrud = new SimpleCrud(config.serverHost, '/sections');
 export const TermCrud = new SimpleCrud(config.serverHost, '/terms');
 export const EnrollmentCrud = new SimpleCrud(config.serverHost, '/enrollment');
 export const StudentCrud = new SimpleCrud(config.serverHost, '/students');
+export const GradeCrud = new SimpleCrud(config.serverHost, '/grades');
 export const AssignmentCrud = new SimpleCrud(config.serverHost, '/assignments');
 export const AssignmentCategoryCrud = new SimpleCrud(config.serverHost, '/assignmentCategories');

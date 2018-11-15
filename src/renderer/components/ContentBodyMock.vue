@@ -1,7 +1,7 @@
 <template>
-  <section>
-    Dashboard
-  </section>
+  <button class="button is-primary" @click="fileSelect">
+    File Menu
+  </button>
 </template>
   
 <script>
@@ -15,7 +15,16 @@ export default {
       isSignUpModalActive: false,
     };
   },
-  methods: {},
+  methods: {
+    fileSelect() {
+      this.$electron.remote.dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] },
+        (files) => {
+          if (files !== undefined) {
+            // handle files
+          }
+        });
+    },
+  },
 };
 </script>
 

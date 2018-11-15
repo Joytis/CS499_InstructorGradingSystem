@@ -16,30 +16,13 @@
       <div v-else v-for="(field, key) in inputs.templates">
         <b-field :label="field.label">
           <div v-if="field.type === 'input'">
-            <b-input 
-              v-model="staged[key]" 
-              :type="field.subtype" 
-              :step="field.step || 1" 
-              :min="field.min || 0" 
-              :placeholder="(field.placeholder) ? field.placeholder : ''" 
-              required/>
+            <b-input v-model="staged[key]" :type="field.subtype" required/>
           </div>
           <div v-else-if="field.type === 'datepicker'">
-            <b-datepicker
-              v-model="staged[key]"
-              :placeholder="field.placeholder"
-              icon="calendar-today" 
-              editable 
-              inline
-              required />
+            <b-datepicker v-model="staged[key]" icon="calendar-today" editable inline required/>
           </div>
           <div v-else-if="field.type === 'password'">
-            <b-input 
-              type="password" 
-              v-model="staged[key]" 
-              password-reveal 
-              :placeholder="field.placeholder" 
-              required/>
+            <b-input type="password" v-model="staged[key]" password-reveal required/>
           </div>
           <div v-else-if="field.type === 'dropdown'">
             <b-select v-model="staged[key]" placeholder="Select an option" required>
@@ -47,7 +30,7 @@
                       :value="option[field.value]"
                       :key="option[field.key]"
               >
-                {{ field.display(option) }}
+                {{ option.name }}
               </option>
             </b-select>
           </div>
@@ -60,7 +43,7 @@
     <footer class="modal-card-foot">
       <div v-if="state === 'main'">
         <button class="button" type="button" @click="$parent.close()">Close</button>
-        <button class="button is-primary"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
+        <button class="button is-warning"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
       </div>
     </footer>
   </div>
@@ -74,12 +57,13 @@ import { AtomSpinner } from 'epic-spinners';
 import { ParseError } from '../../../middleware';
 
 export default {
-  name: 'CreationModalForm',
+  name: 'EditThingsModalForm',
   components: {
     AtomSpinner,
   },
   props: {
     title: String,
+    target: Object,
     inputs: Object,
   },
   data() {
@@ -91,33 +75,34 @@ export default {
   },
 
   created() {
-    Object.keys(this.inputs.templates).forEach((key) => { this.staged[key] = ''; });
+    // Update all our values with the passed args.
+    this.staged = this.target;
   },
 
   methods: {
     primaryButtonText() {
-      return ((this.inputs.primaryText !== undefined) ? this.inputs.primaryText : 'Create');
+      return ((this.inputs.primaryText !== undefined) ? this.inputs.primaryText : 'Update');
     },
-
     async attemptDatabaseCreate() {
       try {
-        // If we have a preCreate defined, mutate staged with its staged.
-        if (this.inputs.preCreate !== undefined) {
-          this.staged = await this.inputs.preCreate(this.staged);
+        // If we have a preUpdate defined, mutate staged with its staged.
+        if (this.inputs.preUpdate !== undefined) {
+          this.staged = await this.inputs.preUpdate(this.staged);
         }
+
         // Display loading
         this.state = 'loading';
         // Wait for term creation
-        const result = (await this.inputs.crudTarget.post(this.staged)).data;
+        await this.inputs.crudTarget.put(this.target.id, { data: this.staged });
         // wait for two seconds then close window.
         this.state = 'success';
+
         // if we want to do something afterwards, do it here!
-        if (this.inputs.postCreate !== undefined) {
-          await this.inputs.postCreate(result);
+        if (this.inputs.postUpdate !== undefined) {
+          await this.inputs.postUpdate(this.staged);
         }
       } catch (err) {
         this.state = 'error';
-        console.log(err);
         this.error = ParseError(err);
         // DISPLAY ERROR MODAL?
       }
