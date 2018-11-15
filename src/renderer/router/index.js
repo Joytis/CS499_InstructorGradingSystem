@@ -26,6 +26,11 @@ export default new Router({
       name: 'Section page',
       component: require('../components/Sections/SectionPage.vue').default,
     },
+    {
+      path: '/courses/:courseId/:sectionId/:studentId',
+      name: 'Student Page',
+      component: require('../components/Sections/StudentPage.vue').default,
+    },
     // {
     //   path: '/courses/:id/:section/enrollment',
     //   name: 'Section Enrollment',

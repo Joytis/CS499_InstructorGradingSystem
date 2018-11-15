@@ -31,7 +31,7 @@
 
         <b-table-column label="Course Page">
           <button class="button is-warning is-small">
-            <router-link :to="'courses/' + props.row.CourseId">
+            <router-link :to="'courses/' + props.row.id">
               <b-icon type="is-accent" icon="expand-all"/>
             </router-link>
           </button>
