@@ -135,6 +135,7 @@
 import urljoin from 'url-join';
 import { AgGridVue } from 'ag-grid-vue';
 import customCellEditor from '../customCellEditor';
+import customValueParser from '../customValueParser';
 import SectionEnrollmentModalForm from './SectionEnrollmentModal.vue';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
@@ -489,6 +490,7 @@ export default {
           editable: true,
           assignmentId: a.id,
           cellEditor: customCellEditor,
+          valueSetter: customValueParser,
         })),
       );
     },

@@ -214,7 +214,6 @@ export default {
     },
     getSection(courseID) {
       const section = this.courses.find(s => s.sections.courseId === courseID);
-      console.log(section);
       return section;
     },
   },
