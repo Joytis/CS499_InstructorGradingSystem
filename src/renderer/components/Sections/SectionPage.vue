@@ -80,11 +80,19 @@
         </b-table-column>
       </b-tab-item>
       <b-tab-item label="Grades">
-        <ag-grid-vue style="width: 100%; height: 70vh;"
+        <ag-grid-vue :style="{width: '100%', height: gradeTableHeight}"
           class="ag-theme-balham"
           :columnDefs="assignmentColumns"
           :rowData="studentGradeRows"
           :cellValueChanged="trySubmitOrUpdateGrade"/>
+        Show Analytics: <b-switch v-model="showAnalytics" class="is-primary is-small"/>
+        <div v-if="showAnalytics">
+          <ag-grid-vue style="width: 100%; height: 20vh;"
+          class="ag-theme-balham"
+          :columnDefs="analyticsColumns"
+          :rowData="analyticsRows"
+          :cellValueChanged="trySubmitOrUpdateGrade"/>
+        </div>
       </b-tab-item>
       <b-tab-item label="Section Settings">
         <!-- Assignment Category Modals -->
@@ -130,7 +138,7 @@ import SectionEnrollmentModalForm from './SectionEnrollmentModal.vue';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
   SectionCrud, StudentCrud, EventBus, AssignmentCategoryCrud, AssignmentCrud,
-  EnrollmentCrud, GradeCrud,
+  EnrollmentCrud, GradeCrud, QuickMaffs,
 } from '../../../../middleware';
 import BackButton from '../BackButton.vue';
 import CopySectionModal from './CopySectionModal.vue';
@@ -199,6 +207,7 @@ export default {
       selectedAssignment: null,
       isEnrollmentModalActive: false,
       isCopyModalActive: false,
+      showAnalytics: false,
 
       // Modal input details.
       assignmentCategoryInputs: {
@@ -210,7 +219,7 @@ export default {
         templates: {
           name: { label: 'Name', type: 'input', placeholder: 'Category Name' },
           weight: {
-            label: 'Weight', type: 'input', subtype: 'number', placeholder: 0.0, step: 0.01,
+            label: 'Weight', type: 'input', subtype: 'number', placeholder: 0.0, step: 0.01, max: 1,
           },
           lowestGradesDropped: {
             label: 'Lowest Grades Dropped', type: 'input', subtype: 'number', placeholder: 0,
@@ -300,6 +309,10 @@ export default {
     return data;
   },
   methods: {
+    out(args) {
+      console.log(args);
+    },
+
     // Do grade stuff
     async trySubmitOrUpdateGrade(submission) {
       if (submission.newValue !== submission.oldValue) {
@@ -312,7 +325,7 @@ export default {
         };
         try {
           const linkedGrade = submission.data[`${submission.colDef.field}Link`];
-          if (submission.data[`${submission.colDef.field}Link`] === undefined) {
+          if (!linkedGrade) {
             await GradeCrud.post(gradeArgs);
           } else {
             await GradeCrud.put(linkedGrade.id, { data: gradeArgs });
@@ -320,7 +333,35 @@ export default {
         } catch (err) {
           console.log(err);
         }
+        this.updateAssignmentGrade(gradeArgs).then().catch(err => console.log(err));
       }
+    },
+
+    async getAssignmentGrades(assignment) {
+      const assignmentGradeCrud = AssignmentCrud.fromAppendedRoute(urljoin(String(assignment.id), '/grades'));
+      const rawAssignmentGrades = (await assignmentGradeCrud.get()).data;
+      console.log('assGradeCrud Results: ', rawAssignmentGrades);
+      rawAssignmentGrades.forEach(g => {
+        assignment.grades.push(g);
+      });
+    },
+
+    async updateAssignmentGrade(assignment) {
+      console.log('Assignment for Updating: ', assignment);
+      const assIndex = this.assignments.findIndex(a => a.id === assignment.assignmentId);
+      console.log('AssIndex', assIndex);
+      const assignmentGradeCrud = AssignmentCrud.fromAppendedRoute(urljoin(String(assignment.assignmentId), '/grades'));
+      const rawAssignmentGrades = (await assignmentGradeCrud.get()).data;
+      console.log('assGradeCrud Results: ', rawAssignmentGrades);
+      rawAssignmentGrades.forEach(g => {
+        const gradeIndex = this.assignments[assIndex].grades.findIndex(eg => g.id === eg.id);
+        console.log('gradeIndex', gradeIndex);
+        console.log('Grade: ', g);
+        if (gradeIndex >= 0) {
+          this.assignments[assIndex].grades.splice(gradeIndex, 1, g);
+          console.log(this.assignments[assIndex].grades);
+        } else this.assignments[assIndex].grades.push(g);
+      });
     },
 
     async getFilteredGrades(student) {
@@ -398,6 +439,7 @@ export default {
         const asscatAssCrud = AssignmentCategoryCrud.fromAppendedRoute(newUrl);
         const assignments = (await asscatAssCrud.get()).data;
         assignments.forEach((a) => {
+          a.grades = [];
           a.assignmentCategory = ac;
           a.dueDate = new Date(Date.parse(a.dueDate));
           this.assignments.push(a);
@@ -407,17 +449,25 @@ export default {
       await Promise.all(assPromises);
 
       // Get grade info from said student.
+
       const promises = this.students.map(async (s) => {
         await this.getFilteredGrades(s);
       });
 
-      await Promise.all(promises);
+      const promises1 = this.assignments.map(async (a) => {
+        await this.getAssignmentGrades(a);
+      });
+
+      await Promise.all(promises.concat(promises1));
 
       this.allStudents = (await StudentCrud.get()).data;
     },
 
   },
   computed: {
+    gradeTableHeight() {
+      return (this.showAnalytics) ? '50vh' : '70vh';
+    },
     assignmentColumns() {
       return [
         {
@@ -440,7 +490,16 @@ export default {
         })),
       );
     },
-
+    categoryWeights() {
+      const catWeightsTotal = this.assCats.reduce(
+        (accumulator, currentValue) => accumulator + currentValue.weight,
+      );
+      const catWeights = {};
+      this.assCats.forEach(assCat => {
+        catWeights[assCat.id] = assCat.weight / catWeightsTotal;
+      });
+      return catWeights;
+    },
     studentGradeRows() {
       const rows = this.students.map(student => {
         const data = {
@@ -456,6 +515,47 @@ export default {
         return data;
       });
       return rows;
+    },
+    analyticsColumns() {
+      return [
+        {
+          headerName: 'Operation',
+          field: 'opname',
+          pinned: 'left',
+          editable: false,
+        },
+      ].concat(
+        this.assignments.map(a => ({
+          headerName: a.name,
+          field: `Ass${a.id}`,
+          editable: false,
+          assignmentId: a.id,
+        })),
+      );
+    },
+    analyticsRows() {
+      const filter = g => !Number.isNaN(Number(g.score));
+      let ops = [
+        { opname: 'Mean', function: QuickMaffs.Mean },
+        { opname: 'Median', function: QuickMaffs.Median },
+        { opname: 'Mode', function: QuickMaffs.Mode },
+        { opname: 'Std. Dev.', function: QuickMaffs.StandardDeviation },
+      ];
+      ops = ops.map(op => {
+        this.assignments.forEach(ass => {
+          try {
+            const rawScores = ass.grades.filter(filter).map(g => g.score);
+            op[`Ass${ass.id}`] = op.function(
+              rawScores,
+            );
+            if (Number.isNaN(op[`Ass${ass.id}`])) op[`Ass${ass.id}`] = 'None';
+          } catch (err) {
+            op[`Ass${ass.id}`] = 'None';
+          }
+        });
+        return op;
+      });
+      return ops;
     },
   },
 };
