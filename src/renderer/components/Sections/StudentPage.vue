@@ -8,10 +8,10 @@
       <div class="level-item">
         {{ course.title }} - {{ section.sectionNumber }}
       </div>
-      <button @click="out(assignments)"/>>
+      <button @click="out(assignmentTableData)"/>>
     </nav>
     <b-table
-      :data="assCats"
+      :data="assignmentTableData"
       paginated
       per-page="5"
       detailed
@@ -21,6 +21,9 @@
         <b-table-column field="name" label="Assignemnt Category">
           {{ props.row.name }}
         </b-table-column>
+        <b-table-column field="categoryAverage" label="Grade Average">
+          {{ props.row.categoryAverage }}
+        </b-table-column>
       </template>
       <template slot="detail" slot-scope="props">
         <b-table 
@@ -29,6 +32,9 @@
           <template slot-scope="props">
             <b-table-column field="name" label="Assignment Name">
               {{ props.row.name }}
+            </b-table-column>
+            <b-table-column field="score" label="Points earned">
+              {{ (props.row.grade) ? props.row.grade.score : 'No Grade' }}
             </b-table-column>
             <b-table-column field="totalPoints" label="Total points">
               {{ props.row.totalPoints }}
@@ -45,7 +51,7 @@
 import urljoin from 'url-join';
 import BackButton from '../BackButton.vue';
 import {
-  SectionCrud, CourseCrud, AssignmentCategoryCrud, // AssignmentCrud,
+  SectionCrud, CourseCrud, AssignmentCategoryCrud, StudentCrud, // AssignmentCrud,
   // GradeCrud,
 } from '../../../../middleware';
 
@@ -68,14 +74,26 @@ export default {
   data() {
     return {
       section: [],
-      student: [],
+      student: {},
       course: [],
       assCats: [],
       assignments: [],
+      rawStudentGrades: [],
 
     };
   },
   methods: {
+    async getFilteredGrades(student) {
+      const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(student.id), '/grades'));
+      this.rawStudentGrades = (await studentGradeCrud.get()).data;
+      const filter = g => this.assignments.findIndex(a => g.assignmentId === a.id) !== -1;
+      student.grades = this.rawStudentGrades.filter(filter);
+
+      // Add linked assignment to grade
+      student.grades.forEach(g => {
+        g.assignment = this.assignments.find(a => g.assignmentId === a.id);
+      });
+    },
     async fetchData() {
       // get course info for header
       this.course = (await CourseCrud.get(this.$route.params.courseId)).data;
@@ -84,8 +102,11 @@ export default {
       this.section = (await SectionCrud.get(this.$route.params.sectionId)).data;
 
       // get student
-      this.rawStudents = (await this.sectionStudentCrud.get()).data;
-      this.student = this.rawStudents.find(s => String(s.id) === this.$route.params.studentId);
+      let rawStudents = (await this.sectionStudentCrud.get()).data;
+      rawStudents.forEach(stud => { stud.grades = []; });
+      rawStudents = rawStudents.find(s => String(s.id) === this.$route.params.studentId);
+      this.student = rawStudents;
+      console.log(this.student);
 
       // Get assignments categories for section
       const rawAssCats = (await this.assignmentCategoryCrud.get()).data;
@@ -100,15 +121,43 @@ export default {
         rawAssignments.forEach((a) => {
           // a.assignments = ac;
           a.dueDate = new Date(Date.parse(a.dueDate));
-          console.log(a);
+          // console.log(a);
           this.assignments.push(a);
         });
         ac.assignments = rawAssignments;
       });
       await Promise.all(assPromises);
+
+      // Get grade info from student
+      this.getFilteredGrades(this.student);
+      // const promises = this.student.map(async (s) => {
+      //   await this.getFilteredGrades(s);
+      // });
+      // await Promise.all(promises);
     },
     out(args) {
       console.log(args);
+    },
+  },
+  computed: {
+    assignmentTableData() {
+      const data = this.assCats.map(ac => {
+        ac.assignments.forEach(a => {
+          a.grade = this.rawStudentGrades.find(g => g.assignmentId === a.id);
+        });
+        if (ac.assignments.length !== 0) {
+          const scoreTotal = ac.assignments.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.grade.score,
+          );
+          const scorePossible = ac.assignments.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.totalPoints,
+          );
+          console.log(scoreTotal, scorePossible);
+          ac.categoryAverage = scoreTotal / scorePossible;
+        } else ac.categoryAverage = 'No assignment';
+        return ac;
+      });
+      return data;
     },
   },
 };
