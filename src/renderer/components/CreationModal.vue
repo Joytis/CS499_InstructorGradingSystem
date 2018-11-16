@@ -51,6 +51,20 @@
               </option>
             </b-select>
           </div>
+          <div v-else-if="field.type === 'filteredDropdown'">
+            <b-input v-model="searchString"
+              placeholder="Filter Results..."
+              style="padding-top: .3em;"
+            ></b-input>
+            <b-select v-model="staged[key]" placeholder="Select an option" required>
+              <option v-for="option in filteredData(field.getData())"
+                      :value="option[field.value]"
+                      :key="option[field.key]"
+              >
+                {{ field.display(option) }}
+              </option>
+            </b-select>
+          </div>
           <div v-else-if="field.type === 'filteredTable'">
             <b-input v-model="searchString"
               placeholder="Filter Results..."

@@ -245,7 +245,7 @@ export default {
         templates: {
           studentId: {
             label: 'Student',
-            type: 'filteredTable',
+            type: 'filteredDropdown',
             getData: null,
             value: 'id',
             key: 'id',
