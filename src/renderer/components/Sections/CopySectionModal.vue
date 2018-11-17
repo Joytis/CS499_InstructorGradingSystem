@@ -84,7 +84,6 @@ export default {
       this.terms = (await TermCrud.get()).data;
       const selectedTerm = await Finders.SelectedTerm();
       this.terms = this.terms.filter(t => t.id !== selectedTerm.id);
-      console.log(this.terms);
     },
   },
 

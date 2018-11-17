@@ -78,7 +78,6 @@ export default {
           studentId: Number(this.studentId),
           sectionId: Number(this.sectionId),
         };
-        console.log(staged);
         await EnrollmentCrud.post(staged);
         // wait for two seconds then close window.
         this.state = 'success';

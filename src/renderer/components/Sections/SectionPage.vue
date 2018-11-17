@@ -85,7 +85,6 @@
               </template>
             </b-table>
           </template>
-        </b-table-column>
       </b-tab-item>
       <b-tab-item label="Grades">
         <ag-grid-vue :style="{width: '100%', height: gradeTableHeight}"
@@ -95,7 +94,7 @@
           :cellValueChanged="trySubmitOrUpdateGrade"/>
         Show Analytics: <b-switch v-model="showAnalytics" class="is-primary is-small"/>
         <div v-if="showAnalytics">
-          <ag-grid-vue style="width: 100%; height: 20vh;"
+          <ag-grid-vue style="width: 100%; height: 21vh;"
           class="ag-theme-balham"
           :columnDefs="analyticsColumns"
           :rowData="analyticsRows"
@@ -142,6 +141,8 @@
 /* eslint-disable no-console */
 import urljoin from 'url-join';
 import { AgGridVue } from 'ag-grid-vue';
+import customCellEditor from '../customCellEditor';
+import customValueParser from '../customValueParser';
 import SectionEnrollmentModalForm from './SectionEnrollmentModal.vue';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
@@ -348,26 +349,19 @@ export default {
     async getAssignmentGrades(assignment) {
       const assignmentGradeCrud = AssignmentCrud.fromAppendedRoute(urljoin(String(assignment.id), '/grades'));
       const rawAssignmentGrades = (await assignmentGradeCrud.get()).data;
-      console.log('assGradeCrud Results: ', rawAssignmentGrades);
       rawAssignmentGrades.forEach(g => {
         assignment.grades.push(g);
       });
     },
 
     async updateAssignmentGrade(assignment) {
-      console.log('Assignment for Updating: ', assignment);
       const assIndex = this.assignments.findIndex(a => a.id === assignment.assignmentId);
-      console.log('AssIndex', assIndex);
       const assignmentGradeCrud = AssignmentCrud.fromAppendedRoute(urljoin(String(assignment.assignmentId), '/grades'));
       const rawAssignmentGrades = (await assignmentGradeCrud.get()).data;
-      console.log('assGradeCrud Results: ', rawAssignmentGrades);
       rawAssignmentGrades.forEach(g => {
         const gradeIndex = this.assignments[assIndex].grades.findIndex(eg => g.id === eg.id);
-        console.log('gradeIndex', gradeIndex);
-        console.log('Grade: ', g);
         if (gradeIndex >= 0) {
           this.assignments[assIndex].grades.splice(gradeIndex, 1, g);
-          console.log(this.assignments[assIndex].grades);
         } else this.assignments[assIndex].grades.push(g);
       });
     },
@@ -474,7 +468,7 @@ export default {
   },
   computed: {
     gradeTableHeight() {
-      return (this.showAnalytics) ? '50vh' : '70vh';
+      return (this.showAnalytics) ? '49vh' : '70vh';
     },
     assignmentColumns() {
       return [
@@ -495,6 +489,15 @@ export default {
           field: `Ass${a.id}`,
           editable: true,
           assignmentId: a.id,
+          cellEditor: customCellEditor,
+          valueSetter: customValueParser,
+          maxScore: a.totalPoints,
+          cellStyle: (params) => {
+            if (params.value > params.colDef.maxScore) {
+              return { backgroundColor: '#FFDD57' };
+            }
+            return null;
+          },
         })),
       );
     },
