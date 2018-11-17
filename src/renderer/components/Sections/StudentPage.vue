@@ -8,7 +8,19 @@
       <div class="level-item">
         {{ course.title }} - {{ section.sectionNumber }}
       </div>
-      <button @click="out(student)"/>>
+      <button @click="out(assCats)"/>>
+    </nav>
+    <nav class="level">
+      <div class="level-item">
+        <button class="button" @click="overallGrade(), displayGrade = true">
+          <div v-if="displayGrade === true">
+            {{ this.grade * 100 }}%
+          </div>
+          <div v-else>
+            Click to display grade
+          </div>
+        </button>
+      </div>
     </nav>
     <b-table
       :data="assignmentTableData"
@@ -22,7 +34,8 @@
           {{ props.row.name }}
         </b-table-column>
         <b-table-column field="categoryAverage" label="Grade Average">
-          {{ getAverage(props.row) }}%
+          {{ getAverage(props.row) }}
+          {{ props.row.categoryAverage }}%
         </b-table-column>
       </template>
       <template slot="detail" slot-scope="props">
@@ -47,6 +60,7 @@
 </template>
 
 <script>
+// {{ (overallGrade * 100) || 'Nothing' }}%
 /* eslint-disable no-param-reassign */
 import urljoin from 'url-join';
 import BackButton from '../BackButton.vue';
@@ -79,7 +93,8 @@ export default {
       assCats: [],
       assignments: [],
       rawStudentGrades: [],
-
+      grade: 0,
+      displayGrade: false,
     };
   },
   methods: {
@@ -106,7 +121,6 @@ export default {
       rawStudents.forEach(stud => { stud.grades = []; });
       rawStudents = rawStudents.find(s => String(s.id) === this.$route.params.studentId);
       this.student = rawStudents;
-      console.log(this.student);
 
       // Get assignments categories for section
       const rawAssCats = (await this.assignmentCategoryCrud.get()).data;
@@ -130,6 +144,8 @@ export default {
 
       // Get grade info from student
       this.getFilteredGrades(this.student);
+      // this.getAverage;
+      // this.grade = this.overAllGrade;
     },
     out(args) {
       console.log(args);
@@ -139,17 +155,24 @@ export default {
       let scoreTotal = 0;
       let scorePossible = 0;
       if (category.assignments.length <= 0) {
+        category.categoryAverage = 'Nope';
         // return false;
-      }
-      for (let i = 0; i < category.assignments.length; i += 1) {
-        if (typeof (category.assignments[i].grade) === 'undefined') {
-          // return false;
-        } else {
-          scoreTotal += category.assignments[i].grade.score;
-          scorePossible += category.assignments[i].totalPoints;
+      } else {
+        for (let i = 0; i < category.assignments.length; i += 1) {
+          if (typeof (category.assignments[i].grade) !== 'undefined') {
+            scoreTotal += category.assignments[i].grade.score;
+            scorePossible += category.assignments[i].totalPoints;
+          }
         }
       }
-      return Number((scoreTotal / scorePossible) * 100).toFixed(2);
+      category.categoryAverage = Number((scoreTotal / scorePossible) * 100).toFixed(2);
+      // return Number((scoreTotal / scorePossible) * 100).toFixed(2);
+    },
+    overallGrade() {
+      this.grade = 0;
+      this.assCats.forEach(ac => {
+        this.grade += (ac.categoryAverage / 100) * this.categoryWeights[ac.id];
+      });
     },
   },
   computed: {
@@ -164,6 +187,24 @@ export default {
       });
       return data;
     },
+    categoryWeights() {
+      let catWeightsTotal = 0;
+      this.assCats.forEach(ac => { catWeightsTotal += ac.weight; });
+      const catWeights = {};
+      this.assCats.forEach(assCat => {
+        catWeights[assCat.id] = assCat.weight / catWeightsTotal;
+      });
+      return catWeights;
+    },
+    // overallGrade() {
+    //   let grade = 0;
+    //   this.assCats.forEach(ac => {
+    //     grade += (ac.categoryAverage / 100) * this.categoryWeights[ac.id];
+    //     console.log(ac.categoryAverage / 100);
+    //     console.log(this.categoryWeights[ac.id]);
+    //   });
+    //   return grade;
+    // },
   },
 };
 </script>
