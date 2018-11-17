@@ -205,26 +205,18 @@ export default {
     assignmentTableData() {
       // attaching grades to assignments and flagging grades to be dropped
       const data = this.assCats.map(ac => {
-        // let lowestGrade = 999999999999999;
-        // let droppedGrade = 0;
         const grades = [];
         ac.assignments.forEach(a => {
           a.grade = this.rawStudentGrades.find(g => g.assignmentId === a.id);
           if (typeof (a.grade) !== 'undefined') {
             grades.push(a);
-          //   if ((a.grade.score / a.totalPoints) < lowestGrade) {
-          //     lowestGrade = a.grade.score / a.totalPoints;
-          //     droppedGrade = a.id;
-          //   }
           }
         });
         grades.sort(this.sortedGrades);
         console.log(grades);
-        if (grades.length > ac.lowestGradesDropped) {
-          for (let i = 0; i < ac.lowestGradesDropped; i += 1) {
-            if (typeof (grades[i]) !== 'undefined') {
-              grades[i].dropped = true;
-            }
+        for (let i = 0; i < ac.lowestGradesDropped; i += 1) {
+          if (typeof (grades[i]) !== 'undefined') {
+            grades[i].dropped = true;
           }
         }
         return ac;
@@ -233,7 +225,11 @@ export default {
     },
     categoryWeights() {
       let catWeightsTotal = 0;
-      this.assCats.forEach(ac => { catWeightsTotal += ac.weight; });
+      this.assCats.forEach(ac => {
+        if (ac.categoryAverage !== -1) {
+          catWeightsTotal += ac.weight;
+        }
+      });
       const catWeights = {};
       this.assCats.forEach(assCat => {
         catWeights[assCat.id] = assCat.weight / catWeightsTotal;
