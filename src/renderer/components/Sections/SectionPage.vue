@@ -85,7 +85,6 @@
               </template>
             </b-table>
           </template>
-        </b-table-column>
       </b-tab-item>
       <b-tab-item label="Grades">
         <ag-grid-vue :style="{width: '100%', height: gradeTableHeight}"

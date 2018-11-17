@@ -8,13 +8,13 @@
       <div class="level-item">
         {{ course.title }} - {{ section.sectionNumber }}
       </div>
-      <button @click="out(assCats)"/>>
+      <button @click="out(rawStudentGrades.sort(sortedGrades))"/>
     </nav>
     <nav class="level">
       <div class="level-item">
         <button class="button" @click="overallGrade(), displayGrade = true">
           <div v-if="displayGrade === true">
-            {{ this.grade * 100 }}%
+            {{ Number(this.grade * 100).toFixed(2) }}%
           </div>
           <div v-else>
             Click to display grade
@@ -35,7 +35,7 @@
         </b-table-column>
         <b-table-column field="categoryAverage" label="Grade Average">
           {{ getAverage(props.row) }}
-          {{ props.row.categoryAverage }}%
+          {{ (props.row.categoryAverage > -1) ? `${props.row.categoryAverage}%` : 'None'}}
         </b-table-column>
       </template>
       <template slot="detail" slot-scope="props">
@@ -44,7 +44,14 @@
         >
           <template slot-scope="props">
             <b-table-column field="name" label="Assignment Name">
-              {{ props.row.name }}
+              <b-tooltip v-if="props.row.dropped" class="is-accent" label="Dropped from calculation" position="is-right">
+                <s>
+                  {{ props.row.name }}
+                </s>
+              </b-tooltip>
+              <div v-else>
+                {{ props.row.name }}
+              </div>
             </b-table-column>
             <b-table-column field="score" label="Points earned">
               {{ (props.row.grade) ? props.row.grade.score : 'No Grade' }}
@@ -62,6 +69,7 @@
 <script>
 // {{ (overallGrade * 100) || 'Nothing' }}%
 /* eslint-disable no-param-reassign */
+/* eslint-disable no-loop-func */
 import urljoin from 'url-join';
 import BackButton from '../BackButton.vue';
 import {
@@ -150,39 +158,75 @@ export default {
     out(args) {
       console.log(args);
     },
+    sortedGrades(a, b) {
+      if ((a.grade.score / a.totalPoints) < (b.grade.score / b.totalPoints)) {
+        return -1;
+      }
+      if ((a.grade.score / a.totalPoints) > (b.grade.score / b.totalPoints)) {
+        return 1;
+      }
+      return 0;
+    },
     getAverage(category) {
       // get the students average score for each category
       let scoreTotal = 0;
-      let scorePossible = 0;
+      let scorePossible = 1;
       if (category.assignments.length <= 0) {
         category.categoryAverage = 'Nope';
         // return false;
       } else {
+        scorePossible = 0;
         for (let i = 0; i < category.assignments.length; i += 1) {
           if (typeof (category.assignments[i].grade) !== 'undefined') {
-            scoreTotal += category.assignments[i].grade.score;
-            scorePossible += category.assignments[i].totalPoints;
+            if (category.assignments[i].dropped !== true) {
+              scoreTotal += category.assignments[i].grade.score;
+              scorePossible += category.assignments[i].totalPoints;
+            }
           }
         }
       }
-      category.categoryAverage = Number((scoreTotal / scorePossible) * 100).toFixed(2);
+      if (scorePossible !== 0) {
+        category.categoryAverage = Number((scoreTotal / scorePossible) * 100).toFixed(2);
+      } else {
+        category.categoryAverage = -1;
+      }
       // return Number((scoreTotal / scorePossible) * 100).toFixed(2);
     },
     overallGrade() {
       this.grade = 0;
       this.assCats.forEach(ac => {
-        this.grade += (ac.categoryAverage / 100) * this.categoryWeights[ac.id];
+        if (ac.categoryAverage !== -1) {
+          this.grade += (ac.categoryAverage / 100) * this.categoryWeights[ac.id];
+        }
       });
     },
   },
   computed: {
     assignmentTableData() {
-      // let scoreTotal = 0;
-      // let scorePossible = 0;
+      // attaching grades to assignments and flagging grades to be dropped
       const data = this.assCats.map(ac => {
+        // let lowestGrade = 999999999999999;
+        // let droppedGrade = 0;
+        const grades = [];
         ac.assignments.forEach(a => {
           a.grade = this.rawStudentGrades.find(g => g.assignmentId === a.id);
+          if (typeof (a.grade) !== 'undefined') {
+            grades.push(a);
+          //   if ((a.grade.score / a.totalPoints) < lowestGrade) {
+          //     lowestGrade = a.grade.score / a.totalPoints;
+          //     droppedGrade = a.id;
+          //   }
+          }
         });
+        grades.sort(this.sortedGrades);
+        console.log(grades);
+        if (grades.length > ac.lowestGradesDropped) {
+          for (let i = 0; i < ac.lowestGradesDropped; i += 1) {
+            if (typeof (grades[i]) !== 'undefined') {
+              grades[i].dropped = true;
+            }
+          }
+        }
         return ac;
       });
       return data;
