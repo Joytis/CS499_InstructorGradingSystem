@@ -274,7 +274,7 @@ export default {
             label: 'Total Points', type: 'input', subtype: 'number', placeholder: 100,
           },
           dueDate: {
-            label: 'Due Date', type: 'datepicker', placeholder: 'Select a date (mm/dd/yyyy)',
+            label: 'Due Date', type: 'datepicker', placeholder: Date.now(),
           },
         },
       },
@@ -493,7 +493,7 @@ export default {
           valueSetter: customValueParser,
           maxScore: a.totalPoints,
           cellStyle: (params) => {
-            if (params.value > params.colDef.maxScore) {
+            if (params.value > params.colDef.maxScore && params.value !== 'Unsubmitted') {
               return { backgroundColor: '#FFDD57' };
             }
             return null;
