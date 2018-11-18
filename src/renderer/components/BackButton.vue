@@ -1,6 +1,6 @@
 <template>
     <button class="button is-navbutton is-small" @click="goBack()">
-        &nbsp <b-icon icon="arrow-left-bold-outline"/> &nbsp
+        &nbsp;<b-icon icon="arrow-left-bold-outline"/>&nbsp;
     </button>
 </template>
 
@@ -17,3 +17,9 @@ export default {
   },
 };
 </script>
+
+<style>
+button {
+  padding-bottom: .3em;
+}
+</style>

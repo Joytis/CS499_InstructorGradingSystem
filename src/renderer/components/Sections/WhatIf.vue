@@ -1,15 +1,32 @@
 <template>
   <div>
-    Eh, it probably works<br>
-    <button class="button is-primary is-small" @click="out(section)">
-      Section
-    </button>
-    <button class="button is-primary is-small" @click="out(assignments)">
-      Assignments
-    </button>
-    <button class="button is-primary is-small" @click="out(indices)">
-      Indices
-    </button>
+    <div id="button-row">
+      <nav class="level">
+        <div class="level-left">
+          <back-button/>
+        </div>
+        <div class="level-right">
+          <button class="button is-primary is-small" @click="out(section)">
+            Section
+          </button>
+          <button class="button is-primary is-small" @click="out(assignments)">
+            Assignments
+          </button>
+          <button class="button is-primary is-small" @click="out(indices)">
+            Indices
+          </button>
+          <button class="button is-primary is-small" @click="out(assCatRows)">
+            Rows
+          </button>
+        </div>
+      </nav>
+    </div>
+    <ag-grid-vue v-if="!loading" 
+      style="width: 100%; height: 80vh;"
+      class="ag-theme-balham"
+      :columnDefs="assCatColumns"
+      :rowData="assCatRows"
+      />
   </div>
 </template>
 
@@ -17,6 +34,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-console */
 import urljoin from 'url-join';
+import { AtomSpinner, SelfBuildingSquareSpinner } from 'epic-spinners';
 import { AgGridVue } from 'ag-grid-vue';
 // import customCellEditor from '../customCellEditor';
 // import customValueParser from '../customValueParser';
@@ -37,6 +55,8 @@ export default {
     CrudModalBar,
     CopySectionModal,
     AgGridVue,
+    AtomSpinner,
+    SelfBuildingSquareSpinner,
   },
   created() {
     const studentSectionRoute = urljoin(this.$route.params.sectionId, '/students');
@@ -61,7 +81,26 @@ export default {
       selectedAssignment: null,
       isEnrollmentModalActive: false,
       isCopyModalActive: false,
-      showAnalytics: false,
+      loading: true,
+
+      changeQueue: {
+        AssignmentCategories: {
+          New: [],
+          Updates: [],
+          Deletes: [],
+        },
+        Assignments: {
+          Updates: [],
+          Deletes: [],
+        },
+        GradingScale: {
+          Update: {},
+        },
+        Grades: {
+          Updates: [],
+          Deletes: [],
+        },
+      },
 
       // Modal input details.
       assignmentCategoryInputs: {
@@ -145,8 +184,6 @@ export default {
         const assignments = (await asscatAssCrud.get()).data;
         assignments.forEach((a) => {
           a.dueDate = new Date(Date.parse(a.dueDate));
-          a.grade = {};
-          this.assignments.push(a);
         });
         ac.assignments = assignments;
       });
@@ -155,7 +192,7 @@ export default {
 
       // Append assignment categories to each student
       this.section.students.forEach(stud => {
-        stud.assCats = this.rawAssCats;
+        stud.assCats = JSON.parse(JSON.stringify(this.rawAssCats));
       });
 
       // Calculate indices once to avoid doing comps for each student
@@ -165,8 +202,6 @@ export default {
         && this.section.students[0].assCats[0]
         && this.section.students[0].assCats[0].assignments
         && this.section.students[0].assCats[0].assignments[0]) {
-        console.log('I\'m executing!');
-
         this.section.students[0].assCats.forEach((ac, acind) => {
           ac.assignments.forEach((a, aind) => {
             this.indices[`IndexOf${a.id}`] = {
@@ -175,7 +210,6 @@ export default {
             };
           });
         });
-        console.log('Indices!', this.indices);
 
         const gradePromises = this.section.students.map(async (s) => {
           const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(s.id), '/grades'));
@@ -188,6 +222,8 @@ export default {
           });
         });
         await Promise.all(gradePromises);
+
+        this.loading = false;
       }
 
     //   const promises1 = this.assignments.map(async (a) => {
@@ -199,6 +235,65 @@ export default {
     //   this.allStudents = (await StudentCrud.get()).data;
     },
   },
+  computed: {
+    assCatColumns() {
+      return [
+        {
+          headerName: 'Student ID',
+          field: 'studentId',
+          pinned: 'left',
+          hide: true,
+        },
+        {
+          headerName: 'Student',
+          field: 'studentName',
+          pinned: 'left',
+          editable: false,
+        }].concat(
+        this.section.students[0].assCats.map(ac => ({
+          headerName: ac.name,
+          field: `AC${ac.id}`,
+          editable: false,
+          // assCatId: ac.id,
+        })),
+      );
+    },
+    assCatRows() {
+      const rows = this.section.students.map(student => {
+        const data = {
+          studentId: student.id,
+          studentName: `${student.lastName}, ${student.firstName}`,
+        };
+        student.assCats.forEach(ac => {
+          ac.assignments = ac.assignments
+            .filter(a => typeof (a.grade) !== 'undefined' && typeof (a.grade.score) === 'number')
+            .sort((a, b) => {
+              const aScore = a.grade.score / a.totalPoints;
+              const bScore = b.grade.score / b.totalPoints;
+              if (aScore < bScore) {
+                return -1;
+              } if (aScore > bScore) {
+                return 1;
+              }
+              return 0;
+            });
+
+          if (ac.assignments && ac.assignments.length > ac.lowestGradesDropped) {
+            let totalPossible = 0;
+            let actualTotal = 0;
+            for (let i = ac.lowestGradesDropped; i < ac.assignments.length; i += 1) {
+              totalPossible += ac.assignments[i].totalPoints;
+              actualTotal += ac.assignments[i].grade.score;
+            }
+            ac.categoryAverage = actualTotal / totalPossible;
+          } else ac.categoryAverage = NaN;
+
+          data[`AC${ac.id}`] = (!Number.isNaN(ac.categoryAverage)) ? `${Number(ac.categoryAverage * 100).toFixed(2)}%` : 'None';
+        });
+        return data;
+      });
+      return rows;
+    },
+  },
 };
 </script>
-
