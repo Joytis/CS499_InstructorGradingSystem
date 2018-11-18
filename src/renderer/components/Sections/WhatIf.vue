@@ -1,5 +1,16 @@
 <template>
-    
+  <div>
+    Eh, it probably works<br>
+    <button class="button is-primary is-small" @click="out(section)">
+      Section
+    </button>
+    <button class="button is-primary is-small" @click="out(assignments)">
+      Assignments
+    </button>
+    <button class="button is-primary is-small" @click="out(indices)">
+      Indices
+    </button>
+  </div>
 </template>
 
 <script>
@@ -7,12 +18,12 @@
 /* eslint-disable no-console */
 import urljoin from 'url-join';
 import { AgGridVue } from 'ag-grid-vue';
-import customCellEditor from '../customCellEditor';
-import customValueParser from '../customValueParser';
+// import customCellEditor from '../customCellEditor';
+// import customValueParser from '../customValueParser';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
-  SectionCrud, StudentCrud, EventBus, AssignmentCategoryCrud, AssignmentCrud,
-  EnrollmentCrud, GradeCrud, QuickMaffs,
+  SectionCrud, EventBus, AssignmentCategoryCrud, AssignmentCrud, StudentCrud,
+  // EnrollmentCrud, GradeCrud, QuickMaffs,
 } from '../../../../middleware';
 import BackButton from '../BackButton.vue';
 import CopySectionModal from './CopySectionModal.vue';
@@ -23,10 +34,17 @@ export default {
   name: 'SectionPage',
   components: {
     BackButton,
-    SectionEnrollmentModalForm,
     CrudModalBar,
     CopySectionModal,
     AgGridVue,
+  },
+  created() {
+    const studentSectionRoute = urljoin(this.$route.params.sectionId, '/students');
+    this.sectionStudentCrud = SectionCrud.fromAppendedRoute(studentSectionRoute);
+    const assCatRoute = urljoin(this.$route.params.sectionId, '/assignmentCategories');
+    this.assignmentCategoryCrud = SectionCrud.fromAppendedRoute(assCatRoute);
+
+    this.fetchData();
   },
   data() {
     const data = {
@@ -35,14 +53,16 @@ export default {
       allStudents: [],
       students: [],
       assCats: [],
+      rawAssCats: [],
       assignments: [],
+      indices: {},
       selectedStudent: null,
       selectedAssignmentCategory: null,
       selectedAssignment: null,
       isEnrollmentModalActive: false,
       isCopyModalActive: false,
       showAnalytics: false,
-  
+
       // Modal input details.
       assignmentCategoryInputs: {
         crudTarget: AssignmentCategoryCrud,
@@ -60,7 +80,7 @@ export default {
           },
         },
       },
-  
+
       assignmentInputs: {
         crudTarget: AssignmentCrud,
         postCreate(result) { EventBus.$emit('assignment-added', result); },
@@ -86,7 +106,7 @@ export default {
           },
         },
       },
-  
+
       init() {
         this.assignmentInputs.templates.assignmentCategoryId.getData = () => this.assCats;
         this.assignmentCategoryInputs.preCreate = (staged) => {
@@ -100,67 +120,85 @@ export default {
     return data;
   },
   methods: {
-    async trySubmitOrUpdateGrade(submission) {
-      if (submission.newValue !== submission.oldValue) {
-        const gradeArgs = {
-          studentId: submission.data.studentId,
-          assignmentId: submission.colDef.assignmentId,
-          isSubmitted: true,
-          score: Number(submission.newValue),
-          submissionDate: Date.now(),
-        };
-        try {
-          const linkedGrade = submission.data[`${submission.colDef.field}Link`];
-          if (!linkedGrade) {
-            await GradeCrud.post(gradeArgs);
-          } else {
-            await GradeCrud.put(linkedGrade.id, { data: gradeArgs });
-          }
-        } catch (err) {
-          console.log(err);
-        }
-        this.updateAssignmentGrade(gradeArgs).then().catch(err => console.log(err));
+    out(args) {
+      console.log(args);
+    },
+    async fetchData() {
+      // Get Section:
+      this.section = (
+        await SectionCrud.get(this.$route.params.sectionId)
+      ).data;
+
+      // Get students.
+      const rawStudents = (await this.sectionStudentCrud.get()).data;
+
+      // Get all students in section
+      this.section.students = rawStudents;
+
+      // Get the assignment categories for the section
+      this.rawAssCats = (await this.assignmentCategoryCrud.get()).data;
+
+      // Append an array of assignments to the assignment categories
+      const assPromises = this.rawAssCats.map(async (ac) => {
+        const newUrl = urljoin(String(ac.id), '/assignments');
+        const asscatAssCrud = AssignmentCategoryCrud.fromAppendedRoute(newUrl);
+        const assignments = (await asscatAssCrud.get()).data;
+        assignments.forEach((a) => {
+          a.dueDate = new Date(Date.parse(a.dueDate));
+          a.grade = {};
+          this.assignments.push(a);
+        });
+        ac.assignments = assignments;
+      });
+      await Promise.all(assPromises);
+
+
+      // Append assignment categories to each student
+      this.section.students.forEach(stud => {
+        stud.assCats = this.rawAssCats;
+      });
+
+      // Calculate indices once to avoid doing comps for each student
+      // If there are assignments, map the correct grade to each student
+      if (this.section.students
+        && this.section.students[0]
+        && this.section.students[0].assCats[0]
+        && this.section.students[0].assCats[0].assignments
+        && this.section.students[0].assCats[0].assignments[0]) {
+        console.log('I\'m executing!');
+
+        this.section.students[0].assCats.forEach((ac, acind) => {
+          ac.assignments.forEach((a, aind) => {
+            this.indices[`IndexOf${a.id}`] = {
+              aIndex: aind,
+              acIndex: acind,
+            };
+          });
+        });
+        console.log('Indices!', this.indices);
+
+        const gradePromises = this.section.students.map(async (s) => {
+          const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(s.id), '/grades'));
+          const rawStudentGrades = (await studentGradeCrud.get()).data;
+          const filter = g => this.indices[`IndexOf${g.assignmentId}`];
+          const grademap = rawStudentGrades.filter(filter);
+          grademap.forEach(g => {
+            s.assCats[this.indices[`IndexOf${g.assignmentId}`].acIndex]
+              .assignments[this.indices[`IndexOf${g.assignmentId}`].aIndex].grade = g;
+          });
+        });
+        await Promise.all(gradePromises);
       }
+
+    //   const promises1 = this.assignments.map(async (a) => {
+    //     await this.getAssignmentGrades(a);
+    //   });
+
+    //   await Promise.all(promises.concat(promises1));
+
+    //   this.allStudents = (await StudentCrud.get()).data;
     },
-
-  async getAssignmentGrades(assignment) {
-      const assignmentGradeCrud = AssignmentCrud.fromAppendedRoute(urljoin(String(assignment.id), '/grades'));
-      const rawAssignmentGrades = (await assignmentGradeCrud.get()).data;
-      rawAssignmentGrades.forEach(g => {
-        assignment.grades.push(g);
-      });
-    },
-
-  async updateAssignmentGrade(assignment) {
-      const assIndex = this.assignments.findIndex(a => a.id === assignment.assignmentId);
-      const assignmentGradeCrud = AssignmentCrud.fromAppendedRoute(urljoin(String(assignment.assignmentId), '/grades'));
-      const rawAssignmentGrades = (await assignmentGradeCrud.get()).data;
-      rawAssignmentGrades.forEach(g => {
-        const gradeIndex = this.assignments[assIndex].grades.findIndex(eg => g.id === eg.id);
-        if (gradeIndex >= 0) {
-          this.assignments[assIndex].grades.splice(gradeIndex, 1, g);
-        } else this.assignments[assIndex].grades.push(g);
-      });
-    },
-
-  async getFilteredGrades(student) {
-      const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(student.id), '/grades'));
-      const rawStudentGrades = (await studentGradeCrud.get()).data;
-      const filter = g => this.assignments.findIndex(a => g.assignmentId === a.id) !== -1;
-      student.grades = rawStudentGrades.filter(filter);
-
-      // Add linked assignment to grade
-      student.grades.forEach(g => {
-        g.assignment = this.assignments.find(a => g.assignmentId === a.id);
-      });
-    },
-
-    
-
   },
-}
+};
 </script>
 
-<style>
-
-</style>

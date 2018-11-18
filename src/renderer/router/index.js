@@ -27,14 +27,14 @@ export default new Router({
       component: require('../components/Sections/SectionPage.vue').default,
     },
     {
-      path: '/courses/:courseId/:sectionId/:studentId',
-      name: 'Student Page',
-      component: require('../components/Sections/StudentPage.vue').default,
-    },
-    {
       path: '/courses/:courseId/:sectionId/whatIf',
       name: 'Student Page',
       component: require('../components/Sections/WhatIf.vue').default,
+    },
+    {
+      path: '/courses/:courseId/:sectionId/:studentId',
+      name: 'Student Page',
+      component: require('../components/Sections/StudentPage.vue').default,
     },
     // {
     //   path: '/courses/:id/:section/enrollment',

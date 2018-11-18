@@ -1,6 +1,9 @@
 <template>
   <div>
     <back-button></back-button>
+    <router-link class="button is-primary is-small" :to=" $route.params.sectionId + '/whatIf'">
+      ?
+    </router-link>
     <button 
       class="button is-primary is-small" 
       @click="isCopyModalActive = true"
