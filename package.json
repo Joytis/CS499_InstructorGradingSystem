@@ -62,6 +62,7 @@
     "buefy": "^0.6.6",
     "epic-spinners": "^1.0.4",
     "express": "4.16.3",
+    "node-excel-export": "^1.4.4",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5",
     "sequelize": "^4.38.0",

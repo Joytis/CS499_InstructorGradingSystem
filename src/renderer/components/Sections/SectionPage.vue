@@ -32,7 +32,7 @@
               <b-table-column label="Student Page">
                 <button class="button is-success is-small">
                   <router-link :to=" $route.params.sectionId + '/' + props.row.id">
-                    <b-icon type="is-accent" icon="expand-all">
+                    <b-icon type="is-accent" icon="account-details">
                     </b-icon>
                   </router-link>
                 </button>
@@ -87,11 +87,15 @@
           </template>
       </b-tab-item>
       <b-tab-item label="Grades">
+        <button class="button" @click="OnExport()">
+          Export File
+        </button>
         <ag-grid-vue :style="{width: '100%', height: gradeTableHeight}"
           class="ag-theme-balham"
           :columnDefs="assignmentColumns"
           :rowData="studentGradeRows"
-          :cellValueChanged="trySubmitOrUpdateGrade"/>
+          :cellValueChanged="trySubmitOrUpdateGrade"
+          :gridReady="onGridReady"/>
         Show Analytics: <b-switch v-model="showAnalytics" class="is-primary is-small"/>
         <div v-if="showAnalytics">
           <ag-grid-vue style="width: 100%; height: 21vh;"
@@ -217,6 +221,8 @@ export default {
       isEnrollmentModalActive: false,
       isCopyModalActive: false,
       showAnalytics: false,
+      gridApi: null,
+      columnApi: null,
 
       // Modal input details.
       assignmentCategoryInputs: {
@@ -320,6 +326,16 @@ export default {
   methods: {
     out(args) {
       console.log(args);
+    },
+    onGridReady(params) {
+      this.gridApi = params.api;
+      this.columnApi = params.columnApi;
+    },
+    OnExport() {
+      this.gridApi.exportDataAsCsv({
+        columnDefs: this.assignmentColumns,
+        fileName: 'Test',
+      });
     },
 
     // Do grade stuff
