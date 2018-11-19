@@ -1,32 +1,21 @@
 <template>
   <div>
-    <div id="button-row">
-      <nav class="level">
-        <div class="level-left">
-          <back-button/>
-        </div>
-        <div class="level-right">
-          <button class="button is-primary is-small" @click="out(section)">
-            Section
-          </button>
-          <button class="button is-primary is-small" @click="out(assignments)">
-            Assignments
-          </button>
-          <button class="button is-primary is-small" @click="out(indices)">
-            Indices
-          </button>
-          <button class="button is-primary is-small" @click="out(assCatRows)">
-            Rows
-          </button>
-        </div>
-      </nav>
-    </div>
-    <ag-grid-vue v-if="!loading" 
-      style="width: 100%; height: 80vh;"
-      class="ag-theme-balham"
-      :columnDefs="assCatColumns"
-      :rowData="assCatRows"
-      />
+    <back-button/>
+    <section>
+      <b-tabs v-model="activeTab">
+        <b-tab-item label="Section Settings">
+          a
+        </b-tab-item>
+        <b-tab-item label="Student Averages">
+          <ag-grid-vue v-if="!loading" 
+            style="width: 100%; height: 70vh;"
+            class="ag-theme-balham"
+            :columnDefs="assCatColumns"
+            :rowData="assCatRows"
+            />
+        </b-tab-item>
+      </b-tabs>
+    </section>
   </div>
 </template>
 
