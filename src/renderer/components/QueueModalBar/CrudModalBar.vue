@@ -15,7 +15,7 @@
       scroll="keep" 
       has-modal-card
     >
-      <creation-modal-form :inputs="inputs" :createMethod="createMethod"/>
+      <creation-modal-form :inputs="inputs"/>
     </b-modal>
 
     <!-- Editing -->
@@ -34,7 +34,7 @@
       scroll="keep" 
       has-modal-card
     >
-      <edit-things-modal-form :inputs="inputs" :target="target" :editMethod="editMethod"/>
+      <edit-things-modal-form :inputs="inputs" :target="target"/>
     </b-modal>
 
     <!-- Deletion -->
@@ -53,7 +53,7 @@
       scroll="keep" 
       has-modal-card
     >
-      <deletion-modal-form :inputs="inputs" :target="target" :deletionMessage="deleteMessage" :deleteMethod="deleteMethod"/>
+      <deletion-modal-form :inputs="inputs" :target="target" :deletionMessage="deleteMessage"/>
     </b-modal>
   </div>
 </template>
@@ -82,9 +82,6 @@ export default {
       type: Array,
       default: () => [],
     },
-    createMethod: Function,
-    editMethod: Function,
-    deleteMethod: Function,
   },
 
   data() {

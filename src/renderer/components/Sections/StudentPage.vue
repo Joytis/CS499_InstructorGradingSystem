@@ -8,7 +8,6 @@
       <div class="level-item">
         {{ course.title }} - {{ section.sectionNumber }}
       </div>
-      <button @click="out(rawStudentGrades.sort(sortedGrades))"/>
     </nav>
     <nav class="level">
       <div class="level-item">

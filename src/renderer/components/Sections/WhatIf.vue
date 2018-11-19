@@ -1,11 +1,26 @@
 <template>
   <div>
-    <back-button/>
+    <nav class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <back-button/>
+        </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <button class="button is-primary is-small" @click="out(assignmentsTableRows)">
+            Ass
+          </button>
+        </div>
+        <div class="level-item">
+          <button class="button is-primary is-small" @click="out(section)">
+            Section
+          </button>
+        </div>
+      </div>
+    </nav>
     <section>
       <b-tabs v-model="activeTab">
-        <b-tab-item label="Section Settings">
-          a
-        </b-tab-item>
         <b-tab-item label="Student Averages">
           <ag-grid-vue v-if="!loading" 
             style="width: 100%; height: 70vh;"
@@ -13,6 +28,84 @@
             :columnDefs="assCatColumns"
             :rowData="assCatRows"
             />
+        </b-tab-item>
+        <b-tab-item label="Assignments">
+          <b-table 
+            :data="assignmentsTableRows"
+            paginated 
+            per-page="5"
+            :selected.sync="selectedAssignment"
+            >
+            <template slot-scope="props">
+              <b-table-column field="name" label="Name" sortable>
+                {{ props.row.name }}
+              </b-table-column>
+              <b-table-column field="category" label="Assignment Category" sortable>
+                {{ props.row.acName }}
+              </b-table-column>
+              <b-table-column field="totalPoints" label="Total Points" sortable>
+                {{ props.row.totalPoints }}
+              </b-table-column>
+              <b-table-column field="dateCreated" label="Date Created" sortable>
+                {{ new Date(props.row.dateCreated).toLocaleDateString() }}
+              </b-table-column>
+              <b-table-column field="dueDate" label="Due Date" sortable>
+                {{ new Date(props.row.dueDate).toLocaleDateString() }}
+              </b-table-column>
+
+              <b-table-column label="Modify">
+                <crud-modal-bar
+                  @click="selectedAssignment = props.row"
+                  editTitle="Edit"
+                  deleteTitle="Delete"
+                  :inputs="assignmentInputs"
+                  :target="props.row"
+                  :removed="['create']"
+                />
+              </b-table-column>
+            </template>
+          </b-table>
+        </b-tab-item>
+        <b-tab-item label="Section Settings">
+          <crud-modal-bar
+            createTitle="Create Assignment Category"
+            editTitle="Edit Assignment Category"
+            deleteTitle="Delete Assignment Category"
+            :target="selectedAssignmentCategory"
+            :inputs="assignmentCategoryInputs"
+            :removed="['edit', 'delete']"
+          />
+
+          <!-- Assignment Category Tables -->
+          <b-table 
+              :data="assignmentCategoryRows" 
+              paginated 
+              per-page="5"
+              :selected.sync="selectedAssignmentCategory"
+          >
+            <template slot-scope="props">
+              <b-table-column field="Name" label="Name" width="300" sortable>
+                {{ props.row.name }}
+              </b-table-column>
+              <b-table-column field="Weight" label="Weight" sortable>
+                {{ props.row.weight }}
+              </b-table-column>
+              <b-table-column field="Lowest Grades Dropped" label="Lowest Grades Dropped" sortable>
+                {{ props.row.lowestGradesDropped }}
+              </b-table-column>
+              <b-table-column>
+                <crud-modal-bar
+                  @click="selectedAssignment = props.row"
+                  editTitle="Edit"
+                  deleteTitle="Delete"
+                  deleteMessage="Are you sure? This will delete ALL assignments and grades in this category."
+                  :inputs="assignmentCategoryInputs"
+                  :target="props.row"
+                  :removed="['create']"
+                />
+              </b-table-column>
+            </template>
+          </b-table>
         </b-tab-item>
       </b-tabs>
     </section>
@@ -173,6 +266,7 @@ export default {
         const assignments = (await asscatAssCrud.get()).data;
         assignments.forEach((a) => {
           a.dueDate = new Date(Date.parse(a.dueDate));
+          this.assignments.push(a);
         });
         ac.assignments = assignments;
       });
@@ -223,8 +317,73 @@ export default {
 
     //   this.allStudents = (await StudentCrud.get()).data;
     },
+    updateGS: (GS) => {
+      this.section.gradeScaleA = GS.gradeScaleA;
+      this.section.gradeScaleB = GS.gradeScaleB;
+      this.section.gradeScaleC = GS.gradeScaleC;
+      this.section.gradeScaleD = GS.gradeScaleD;
+      this.changeQueue.GradingScale.Update = GS;
+    },
+    newAC: (AC) => {
+      // GENERATE NEW AC.ID FOR ASSIGNMENTS TO REFERENCE!!
+      // PARSE IT!!
+      AC.new = true,
+      this.rawAssCats.push(AC);
+      this.section.students.forEach(s => s.assCats.push(AC));
+      this.changeQueue.AssignmentCategories.New.push(AC);
+    },
+    updateAC: (AC) => {
+      AC.assignments = this.rawAssCats.find(oldAC => oldAC.id === AC.id).assignments;
+      AC.assignments.forEach(a => {
+        a.assignmentCategoryId = AC.id;
+      });
+      this.rawAssCats.splice(this.rawAssCats.findIndex(oldAC => oldAC.id === AC.id), 1, JSON.parse(JSON.stringify(AC)));
+      this.section.students.forEach(s => {
+        const newAC = JSON.parse(JSON.stringify(AC));
+        newAC.assignments = s.assCats.find(ac => newAC.id === ac.id).assignments;
+        newAC.assignments.forEach(a => {
+          a.assignmentCategoryId = newAC.id
+        });
+        s.assCats.splice(s.assCats.findIndex(ac => ac.id === newAC.id), 1, newAC);
+      });
+    
+      if(AC.new) {
+        
+      } else {
+        // don't
+      }
+    }, 
+    deleteAC: (AC) => {
+
+    },
+    updateAss: (a) => {
+
+    },
+    deleteAss: (a) => {
+
+    },
+    updateGrade: (g) => {
+
+    },
+    deleteGrade: (g) => {
+
+    },
   },
   computed: {
+    assignmentCategoryRows() {
+      return this.rawAssCats;
+    },
+    assignmentsTableRows() {
+      let assignments1 = [];
+      this.rawAssCats.forEach(ac => {
+        ac.assignments.forEach(a => {
+          a.acName = ac.name;
+        });
+        assignments1 = assignments1.concat(ac.assignments);
+      });
+      console.log(assignments1);
+      return assignments1;
+    },
     assCatColumns() {
       return [
         {
