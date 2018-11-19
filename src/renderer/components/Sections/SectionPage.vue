@@ -62,7 +62,7 @@
                 <b-table-column field="name" label="Name" sortable>
                   {{ props.row.name }}
                 </b-table-column>
-                <b-table-column field="category" label="Assignment Category" width="180" sortable>
+                <b-table-column field="assignmentCategory.name" label="Assignment Category" width="180" sortable>
                   {{ props.row.assignmentCategory.name }}
                 </b-table-column>
                 <b-table-column field="totalPoints" label="Total Points" sortable>
