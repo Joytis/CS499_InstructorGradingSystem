@@ -501,7 +501,7 @@ export default {
           editable: false,
         }].concat(
         this.assignments.map(a => ({
-          headerName: a.name,
+          headerName: `${a.name} (${a.totalPoints})`,
           field: `Ass${a.id}`,
           editable: true,
           assignmentId: a.id,
