@@ -188,6 +188,7 @@ export default {
     EventBus.$on('assignment-added', this.assignmentAdded);
     EventBus.$on('assignment-updated', this.assignmentUpdated);
     EventBus.$on('assignment-removed', this.assignmentRemoved);
+    EventBus.$on('student-unenrolled', this.studentUnenrolled);
     EventBus.$on('screw-it-reload-everything', this.fetchData);
   },
 
@@ -199,6 +200,7 @@ export default {
     EventBus.$off('assignment-added', this.assignmentAdded);
     EventBus.$off('assignment-updated', this.assignmentUpdated);
     EventBus.$off('assignment-removed', this.assignmentRemoved);
+    EventBus.$off('student-unenrolled', this.studentUnenrolled);
     EventBus.$off('screw-it-reload-everything', this.fetchData);
   },
 
@@ -313,9 +315,9 @@ export default {
           const studentId = this.selectedStudent.id;
           return { sectionId, studentId };
         };
-        this.enrollmentModalInputs.postDelete = () => {
+        this.enrollmentModalInputs.postDelete = async (student) => {
           // THIS IS EXPENSIVE, BUT IT'S EASY TO DO HERE compared to the ALTERNATIVE.
-          EventBus.$emit('screw-it-reload-everything');
+          EventBus.$emit('student-unenrolled', student);
         };
       },
     };
@@ -335,6 +337,24 @@ export default {
         columnDefs: this.assignmentColumns,
         fileName: 'Test',
       });
+    },
+
+    async studentUnenrolled(student) {
+      // Cascade and delete all student grades from database.
+      // Find student in our student store.
+      console.log('Starting Unenrollment');
+      const foundStudent = this.students.find(s => s.id === student.id);
+      // Manually get the grades from database.
+      const newUrl = urljoin(String(foundStudent.id), '/grades');
+      const studentGrades = (await StudentCrud.fromAppendedRoute(newUrl).get()).data;
+      console.log(studentGrades);
+      const mappedDeletions = studentGrades.map(async (grade) => {
+        console.log(`Deleting grade ${grade}`);
+        await GradeCrud.delete(grade.id);
+      });
+      console.log(mappedDeletions);
+      await Promise.all(mappedDeletions);
+      EventBus.$emit('screw-it-reload-everything');
     },
 
     // Do grade stuff
