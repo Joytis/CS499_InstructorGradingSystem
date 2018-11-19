@@ -35,7 +35,7 @@
               <b-table-column label="Student Page">
                 <button class="button is-success is-small">
                   <router-link :to=" $route.params.sectionId + '/' + props.row.id">
-                    <b-icon type="is-accent" icon="expand-all">
+                    <b-icon type="is-accent" icon="account-details">
                     </b-icon>
                   </router-link>
                 </button>
@@ -62,7 +62,7 @@
                 <b-table-column field="name" label="Name" sortable>
                   {{ props.row.name }}
                 </b-table-column>
-                <b-table-column field="category" label="Assignment Category" width="180" sortable>
+                <b-table-column field="assignmentCategory.name" label="Assignment Category" width="180" sortable>
                   {{ props.row.assignmentCategory.name }}
                 </b-table-column>
                 <b-table-column field="totalPoints" label="Total Points" sortable>
@@ -90,11 +90,15 @@
           </template>
       </b-tab-item>
       <b-tab-item label="Grades">
+        <button class="button" @click="OnExport()">
+          Export File
+        </button>
         <ag-grid-vue :style="{width: '100%', height: gradeTableHeight}"
           class="ag-theme-balham"
           :columnDefs="assignmentColumns"
           :rowData="studentGradeRows"
-          :cellValueChanged="trySubmitOrUpdateGrade"/>
+          :cellValueChanged="trySubmitOrUpdateGrade"
+          :gridReady="onGridReady"/>
         Show Analytics: <b-switch v-model="showAnalytics" class="is-primary is-small"/>
         <div v-if="showAnalytics">
           <ag-grid-vue style="width: 100%; height: 21vh;"
@@ -184,8 +188,7 @@ export default {
     EventBus.$on('assignment-added', this.assignmentAdded);
     EventBus.$on('assignment-updated', this.assignmentUpdated);
     EventBus.$on('assignment-removed', this.assignmentRemoved);
-    EventBus.$on('enrolled-in-this-section', this.enrolledInThisSection);
-    EventBus.$on('unenrolled-in-this-section', this.unenrolledInThisSection);
+    EventBus.$on('student-unenrolled', this.studentUnenrolled);
     EventBus.$on('screw-it-reload-everything', this.fetchData);
   },
 
@@ -197,8 +200,7 @@ export default {
     EventBus.$off('assignment-added', this.assignmentAdded);
     EventBus.$off('assignment-updated', this.assignmentUpdated);
     EventBus.$off('assignment-removed', this.assignmentRemoved);
-    EventBus.$off('enrolled-in-this-section', this.enrolledInThisSection);
-    EventBus.$off('unenrolled-in-this-section', this.unenrolledInThisSection);
+    EventBus.$off('student-unenrolled', this.studentUnenrolled);
     EventBus.$off('screw-it-reload-everything', this.fetchData);
   },
 
@@ -220,6 +222,8 @@ export default {
       isEnrollmentModalActive: false,
       isCopyModalActive: false,
       showAnalytics: false,
+      gridApi: null,
+      columnApi: null,
 
       // Modal input details.
       assignmentCategoryInputs: {
@@ -311,9 +315,9 @@ export default {
           const studentId = this.selectedStudent.id;
           return { sectionId, studentId };
         };
-        this.enrollmentModalInputs.postDelete = () => {
+        this.enrollmentModalInputs.postDelete = async (student) => {
           // THIS IS EXPENSIVE, BUT IT'S EASY TO DO HERE compared to the ALTERNATIVE.
-          EventBus.$emit('screw-it-reload-everything');
+          EventBus.$emit('student-unenrolled', student);
         };
       },
     };
@@ -323,6 +327,34 @@ export default {
   methods: {
     out(args) {
       console.log(args);
+    },
+    onGridReady(params) {
+      this.gridApi = params.api;
+      this.columnApi = params.columnApi;
+    },
+    OnExport() {
+      this.gridApi.exportDataAsCsv({
+        columnDefs: this.assignmentColumns,
+        fileName: 'Test',
+      });
+    },
+
+    async studentUnenrolled(student) {
+      // Cascade and delete all student grades from database.
+      // Find student in our student store.
+      console.log('Starting Unenrollment');
+      const foundStudent = this.students.find(s => s.id === student.id);
+      // Manually get the grades from database.
+      const newUrl = urljoin(String(foundStudent.id), '/grades');
+      const studentGrades = (await StudentCrud.fromAppendedRoute(newUrl).get()).data;
+      console.log(studentGrades);
+      const mappedDeletions = studentGrades.map(async (grade) => {
+        console.log(`Deleting grade ${grade}`);
+        await GradeCrud.delete(grade.id);
+      });
+      console.log(mappedDeletions);
+      await Promise.all(mappedDeletions);
+      EventBus.$emit('screw-it-reload-everything');
     },
 
     // Do grade stuff
@@ -380,14 +412,6 @@ export default {
         g.assignment = this.assignments.find(a => g.assignmentId === a.id);
       });
     },
-    async enrolledInThisSection(studentId) {
-      const student = (await StudentCrud.get(studentId)).data;
-      await this.getFilteredGrades(student);
-      this.students.push(student);
-    },
-    unenrolledInThisSection(student) {
-      this.students = this.students.filter(s => s.id !== student.id);
-    },
 
     // Assignment category stuff
     async asscatAdded(assCat) {
@@ -411,6 +435,7 @@ export default {
       asscat.assignments.push(assignment);
       // Add an assignment category to the object, because we lazy up in here.
       assignment.assignmentCategory = asscat;
+      assignment.dueDate = new Date(Date.parse(assignment.dueDate));
       this.assignments.push(assignment);
     },
     assignmentRemoved(assignment) {
@@ -439,6 +464,7 @@ export default {
       this.assCats = rawAssCats;
 
       // Get assignments from said categories.
+      this.assignments = []; // Create a new array.
       const assPromises = rawAssCats.map(async (ac) => {
         const newUrl = urljoin(String(ac.id), '/assignments');
         const asscatAssCrud = AssignmentCategoryCrud.fromAppendedRoute(newUrl);
@@ -488,7 +514,7 @@ export default {
           editable: false,
         }].concat(
         this.assignments.map(a => ({
-          headerName: a.name,
+          headerName: `${a.name} (${a.totalPoints})`,
           field: `Ass${a.id}`,
           editable: true,
           assignmentId: a.id,

@@ -20,6 +20,6 @@ export default {
 
 <style>
 button {
-  padding-bottom: .3em;
+  padding-bottom: 0.3em;
 }
 </style>
