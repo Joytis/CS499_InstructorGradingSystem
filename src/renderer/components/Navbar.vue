@@ -152,7 +152,10 @@ export default {
         this.error = err;
       }
     },
-    async fetchInstructor() { this.instructor = (await AccountCrud.get()).data; },
+    async fetchInstructor() {
+      this.instructor = (await AccountCrud.get()).data;
+      this.instructor.password = '';
+    },
     async logout() {
       const result = (await LogoutCrud.post());
       EventBus.$emit('logout', result);
