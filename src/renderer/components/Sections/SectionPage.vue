@@ -188,8 +188,6 @@ export default {
     EventBus.$on('assignment-added', this.assignmentAdded);
     EventBus.$on('assignment-updated', this.assignmentUpdated);
     EventBus.$on('assignment-removed', this.assignmentRemoved);
-    EventBus.$on('enrolled-in-this-section', this.enrolledInThisSection);
-    EventBus.$on('unenrolled-in-this-section', this.unenrolledInThisSection);
     EventBus.$on('screw-it-reload-everything', this.fetchData);
   },
 
@@ -201,8 +199,6 @@ export default {
     EventBus.$off('assignment-added', this.assignmentAdded);
     EventBus.$off('assignment-updated', this.assignmentUpdated);
     EventBus.$off('assignment-removed', this.assignmentRemoved);
-    EventBus.$off('enrolled-in-this-section', this.enrolledInThisSection);
-    EventBus.$off('unenrolled-in-this-section', this.unenrolledInThisSection);
     EventBus.$off('screw-it-reload-everything', this.fetchData);
   },
 
@@ -396,14 +392,6 @@ export default {
         g.assignment = this.assignments.find(a => g.assignmentId === a.id);
       });
     },
-    async enrolledInThisSection(studentId) {
-      const student = (await StudentCrud.get(studentId)).data;
-      await this.getFilteredGrades(student);
-      this.students.push(student);
-    },
-    unenrolledInThisSection(student) {
-      this.students = this.students.filter(s => s.id !== student.id);
-    },
 
     // Assignment category stuff
     async asscatAdded(assCat) {
@@ -455,6 +443,7 @@ export default {
       this.assCats = rawAssCats;
 
       // Get assignments from said categories.
+      this.assignments = []; // Create a new array.
       const assPromises = rawAssCats.map(async (ac) => {
         const newUrl = urljoin(String(ac.id), '/assignments');
         const asscatAssCrud = AssignmentCategoryCrud.fromAppendedRoute(newUrl);
