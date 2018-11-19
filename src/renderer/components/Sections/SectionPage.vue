@@ -435,6 +435,7 @@ export default {
       asscat.assignments.push(assignment);
       // Add an assignment category to the object, because we lazy up in here.
       assignment.assignmentCategory = asscat;
+      assignment.dueDate = new Date(Date.parse(assignment.dueDate));
       this.assignments.push(assignment);
     },
     assignmentRemoved(assignment) {
