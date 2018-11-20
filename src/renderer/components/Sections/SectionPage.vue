@@ -35,6 +35,9 @@
               <b-table-column field="Email" label="Email" sortable>
                 {{ props.row.email }}
               </b-table-column>
+              <b-table-column label="Grade" numeric>
+                {{ studentCatAverage.find(g => g.id === props.row.id).overallAverage }}
+              </b-table-column>
               <b-table-column label="Student Page">
                 <button class="button is-success is-small">
                   <router-link :to=" $route.params.sectionId + '/' + props.row.id">
@@ -552,7 +555,7 @@ export default {
     },
     studentCatAverage() {
       // const formattedStudents = Object.assign({}, this.formattedData);
-      const shallowStudents = Object.assign({}, this.students);
+      const shallowStudents = Object.assign([], this.students);
       this.formattedData.map(student => {
         const studAC = student.assCats.map(asscat => {
           const ac = Object.assign({}, asscat);
@@ -584,29 +587,25 @@ export default {
         let grade = 0;
         // calculate the weights based on assignment categories
         let catWeightsTotal = 0;
-        catWeightsTotal = studAC.forEach(ac => {
+        studAC.forEach(ac => {
           if (!Number.isNaN(ac.categoryAverage)) {
             catWeightsTotal += ac.weight;
-            console.log('weight total', catWeightsTotal);
           }
         });
         const catWeights = {};
         studAC.forEach(assCat => {
           catWeights[assCat.id] = assCat.weight / catWeightsTotal;
-          console.log('weight', assCat.weight, 'weightTotal', catWeightsTotal);
         });
-        console.log(catWeights);
         // use the catWeights and catAverage to get overall grade
         studAC.forEach(ac => {
           if (!Number.isNaN(ac.categoryAverage)) {
             grade += ac.categoryAverage * catWeights[ac.id];
-            // console.log('catAverage', ac.categoryAverage, 'weight', this.categoryWeights[ac.id]);
           }
         });
+        grade = Number(grade * 100).toFixed(2);
         studAC.overallAverage = grade;
         studAC.studentId = student.id;
-        console.log(studAC);
-        // shallowStudents.find(s => s.id === stud.studentId).overallAverage = stud.overallAverage;
+        shallowStudents.find(s => s.id === studAC.studentId).overallAverage = studAC.overallAverage;
 
         return studAC;
       });
