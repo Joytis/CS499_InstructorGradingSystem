@@ -7,11 +7,6 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {
-      path: '/dashboard',
-      name: 'Dashboard',
-      component: require('../components/ContentBodyMock.vue').default,
-    },
-    {
       path: '/courses',
       name: 'My Courses',
       component: require('../components/Courses/CourseTable.vue').default,
@@ -78,7 +73,7 @@ export default new Router({
     // },
     {
       path: '*',
-      redirect: '/dashboard',
+      redirect: '/courses',
     },
   ],
 });

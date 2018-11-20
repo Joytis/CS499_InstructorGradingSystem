@@ -16,10 +16,6 @@ const menu = [
     title: 'General',
     menuItems: [
       {
-        itemTitle: 'Dashboard',
-        itemLink: '/dashboard',
-      },
-      {
         itemTitle: 'Courses',
         itemLink: '/courses',
       },
