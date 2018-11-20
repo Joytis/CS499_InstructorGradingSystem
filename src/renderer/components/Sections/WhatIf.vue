@@ -13,12 +13,12 @@
           </button>
         </div>
         <div class="level-item">
-          <button class="button is-primary is-small" @click="updateAC(mutateAC(selectedAssignmentCategory))">
-            Update AC
+          <button class="button is-primary is-small" @click="updateAssignment(mutateAC(selectedAssignment))">
+            Update Ass
           </button>
         </div>
         <div class="level-item">
-          <button class="button is-primary is-small" @click="deleteAssignment(selectedAssignment)">
+          <button class="button is-primary is-small" @click="deleteAC(selectedAssignmentCategory)">
             Delete Ass
           </button>
         </div>
@@ -165,7 +165,7 @@ import { AgGridVue } from 'ag-grid-vue';
 import CrudModalBar from '../CrudModalBar.vue';
 import {
   SectionCrud, EventBus, AssignmentCategoryCrud, AssignmentCrud, StudentCrud,
-  // EnrollmentCrud, GradeCrud, QuickMaffs,
+  EnrollmentCrud, GradeCrud, // QuickMaffs,
 } from '../../../../middleware';
 import BackButton from '../BackButton.vue';
 import CopySectionModal from './CopySectionModal.vue';
@@ -181,6 +181,8 @@ export default {
     AgGridVue,
     AtomSpinner,
     SelfBuildingSquareSpinner,
+    EnrollmentCrud,
+    GradeCrud,
   },
   created() {
     const studentSectionRoute = urljoin(this.$route.params.sectionId, '/students');
@@ -296,7 +298,7 @@ export default {
       this.students = (await this.sectionStudentCrud.get()).data;
 
       // Get the assignment categories for the section
-      this.assCats = (await this.assignmentCategoryCrud.get()).data;
+      this.assCats = (await AssignmentCategoryCrud.get()).data;
 
       this.assCats.forEach(ac => {
         if (ac.id > this.maxACId) this.maxACId = ac.id;
@@ -391,8 +393,13 @@ export default {
           this.grades.filter(g => g.assignmentId === a.id).forEach(g => {
             g.score *= a.totalPoints / oldA.totalPoints;
             const guIndex = this.changeQueue.Grades.Updates.findIndex(gu => gu.id === g.id);
-            if (guIndex) this.changeQueue.Grades.Updates.splice(guIndex, 1, Object.assign({}, g));
-            else this.changeQueue.Grades.Updates.push(Object.assign({}, g));
+            if (guIndex >= 0) {
+              this.changeQueue.Grades.Updates.splice(
+                guIndex,
+                1,
+                Object.assign({}, g),
+              );
+            } else this.changeQueue.Grades.Updates.push(Object.assign({}, g));
           });
         }
       }
@@ -419,62 +426,55 @@ export default {
       const cq = this.changeQueue;
       if (cq.AssignmentCategories.New.length) {
         const newACPromises = cq.AssignmentCategories.New.map(async (ac) => {
-          oldACId = ac.id;
-          ac = (await assignmentCategoryCrud.post(ac)).data;
+          const oldACId = ac.id;
+          ac = (await AssignmentCategoryCrud.post(ac)).data;
           ac.oldId = oldACId;
           cq.Assignments.Updates.forEach(a => {
             if (a.assignmentCategoryId === ac.oldId) a.assignmentCategoryId = ac.id;
           });
         });
         await Promise.all(newACPromises);
-      };
-      if (exists(cq.GradingScale.Update)) {
-        await SectionCrud.put(cq.GradingScale.Update.id);
-      };
+      }
+      if (cq.GradingScale.Update.id) {
+        await SectionCrud.put(cq.GradingScale.Update.id, { data: cq.GradingScale.Update });
+      }
       if (cq.AssignmentCategories.Updates.length) {
         const updateACPromises = cq.AssignmentCategories.Updates.map(async (ac) => {
-          await assignmentCategoryCrud.put(ac.id, { data: ac });
+          await AssignmentCategoryCrud.put(ac.id, { data: ac });
         });
         await Promise.all(updateACPromises);
-      };
+      }
       if (cq.Assignments.Updates.length) {
         const updateAsses = cq.Assignments.Updates.map(async (a) => {
-          await AssignmentCrud.put(a.id, {data: a});
+          await AssignmentCrud.put(a.id, { data: a });
         });
         await Promise.all(updateAsses);
-      };
+      }
       if (cq.Grades.Updates.length) {
         const updateGrades = cq.Grades.Updates.map(async (g) => {
-          await GradeCrud.put(g.id, {data: g});
+          await GradeCrud.put(g.id, { data: g });
         });
         await Promise.all(updateGrades);
-      };
+      }
       if (cq.Grades.Deletes.length) {
         const deleteGrades = cq.Grades.Deletes.map(async (g) => {
           await GradeCrud.delete(g.id);
         });
         await Promise.all(deleteGrades);
-      };
+      }
       if (cq.Assignments.Deletes.length) {
         const deleteAsses = cq.Assignments.Deletes.map(async (a) => {
           await AssignmentCrud.delete(a.id);
         });
         await Promise.all(deleteAsses);
-      };
+      }
       if (cq.AssignmentCategories.Deletes.length) {
         const deleteACPromises = cq.AssignmentCategories.Deletes.map(async (ac) => {
-          await assignmentCategoryCrud.delete(ac.id);
+          await AssignmentCategoryCrud.delete(ac.id);
         });
         await Promise.all(deleteACPromises);
-      };
+      }
       this.$router.go(-1);
-    },
-    exists(obj) {
-      for(var key in obj) {
-        if(obj.hasOwnProperty(key))
-          return false;
-        }
-      return true;
     },
     getLetterGrade(grade) {
       const A = this.section.gradeScaleA;
@@ -498,7 +498,7 @@ export default {
       return letterGrade;
     },
     mutateAC(ac) {
-      ac.lowestGradesDropped = 0;
+      ac.totalPoints = 50;
       return ac;
     },
     makeNewAC() {
