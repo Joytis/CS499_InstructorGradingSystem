@@ -11,7 +11,7 @@
     >
       Copy Section
     </button>
-    <button @click="out(students)"/>
+    <button @click="out(assCats)"/>
     <button @click="out(formattedData)"/>
     <button @click="out(studentCatAverage)"/>
     <b-modal :active.sync="isCopyModalActive" :width="640" scroll="keep" has-modal-card>
@@ -119,6 +119,23 @@
       </b-tab-item>
       <b-tab-item label="Section Settings">
         <!-- Assignment Category Modals -->
+        <nav class="level" v-if="!loading">
+            <div class="level-item">
+              A: 100 - {{section.gradeScaleA}}
+            </div>
+            <div class="level-item">
+              B: &lt;{{section.gradeScaleA}} - {{section.gradeScaleB}}
+            </div>
+            <div class="level-item">
+              C: &lt;{{section.gradeScaleB}} - {{section.gradeScaleC}}
+            </div>
+            <div class="level-item">
+              D: &lt;{{section.gradeScaleC}} - {{section.gradeScaleD}}
+            </div>
+            <div class="level-item">
+              F: &lt;{{section.gradeScaleD}} - 0
+            </div>
+          </nav>
         <crud-modal-bar
           createTitle="Create Assignment Category"
           editTitle="Edit Assignment Category"

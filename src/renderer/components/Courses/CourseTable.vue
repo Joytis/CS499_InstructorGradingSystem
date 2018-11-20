@@ -28,13 +28,6 @@
         <b-table-column field="courseSections" label="Number of Sections" numeric>
           {{ props.row.sections.length }}
         </b-table-column>
-
-        <b-table-column label="Course Page">
-          <button class="button is-warning is-small">
-            <router-link :to="'courses/' + props.row.id">
-              <b-icon type="is-accent" icon="expand-all"/>
-            </router-link>
-          </button>
         </b-table-column>
         <b-table-column label="Create Section">
           <crud-modal-bar
