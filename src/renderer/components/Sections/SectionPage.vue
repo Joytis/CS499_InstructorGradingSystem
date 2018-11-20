@@ -11,25 +11,25 @@
     >
       Copy Section
     </button>
-    <button @click="out(assCats)"/>
-    <button @click="out(formattedData)"/>
-    <button @click="out(studentCatAverage)"/>
     <b-modal :active.sync="isCopyModalActive" :width="640" scroll="keep" has-modal-card>
       <copy-section-modal :target="section"></copy-section-modal>
     </b-modal>
     <b-tabs v-model="activeTab">
-      <b-tab-item label="Enrollment">
-        <crud-modal-bar 
-          createTitle="Enroll Student"
-          deleteTitle="Unenroll Student"
-          deleteMessage= "Are you sure? This will mess up student grades."
-          :inputs="enrollmentModalInputs"
-          :target="selectedStudent"
-          :removed="['edit']"
-        />
-        <b-checkbox v-model="gradesIsVisible">
-          Grades
-        </b-checkbox>
+      <b-tab-item label="Students">
+        <div>
+          <crud-modal-bar
+            id="gradeCrudBar"
+            createTitle="Enroll Student"
+            deleteTitle="Unenroll Student"
+            deleteMessage= "Are you sure? This will mess up student grades."
+            :inputs="enrollmentModalInputs"
+            :target="selectedStudent"
+            :removed="['edit']"
+          />
+          <b-checkbox v-model="gradesIsVisible">
+            Grades
+          </b-checkbox>
+        </div>
         <b-table :data="students" paginated per-page="10" :selected.sync="selectedStudent">
             <template slot-scope="props">
               <b-table-column field="Name" label="Name" width="300" sortable>
@@ -71,7 +71,7 @@
                 <b-table-column field="name" label="Name" sortable>
                   {{ props.row.name }}
                 </b-table-column>
-                <b-table-column field="category" label="Assignment Category" width="180" sortable>
+                <b-table-column field="assignmentCategory.name" label="Assignment Category" width="180" sortable>
                   {{ props.row.assignmentCategory.name }}
                 </b-table-column>
                 <b-table-column field="totalPoints" label="Total Points" sortable>
@@ -98,7 +98,7 @@
             </b-table>
           </template>
       </b-tab-item>
-      <b-tab-item label="Grades">
+      <b-tab-item label="Grade Entry">
         <button class="button" @click="OnExport()">
           Export File
         </button>
@@ -214,8 +214,7 @@ export default {
     EventBus.$on('assignment-added', this.assignmentAdded);
     EventBus.$on('assignment-updated', this.assignmentUpdated);
     EventBus.$on('assignment-removed', this.assignmentRemoved);
-    EventBus.$on('enrolled-in-this-section', this.enrolledInThisSection);
-    EventBus.$on('unenrolled-in-this-section', this.unenrolledInThisSection);
+    EventBus.$on('student-unenrolled', this.studentUnenrolled);
     EventBus.$on('screw-it-reload-everything', this.fetchData);
   },
 
@@ -227,8 +226,7 @@ export default {
     EventBus.$off('assignment-added', this.assignmentAdded);
     EventBus.$off('assignment-updated', this.assignmentUpdated);
     EventBus.$off('assignment-removed', this.assignmentRemoved);
-    EventBus.$off('enrolled-in-this-section', this.enrolledInThisSection);
-    EventBus.$off('unenrolled-in-this-section', this.unenrolledInThisSection);
+    EventBus.$off('student-unenrolled', this.studentUnenrolled);
     EventBus.$off('screw-it-reload-everything', this.fetchData);
   },
 
@@ -344,9 +342,9 @@ export default {
           const studentId = this.selectedStudent.id;
           return { sectionId, studentId };
         };
-        this.enrollmentModalInputs.postDelete = () => {
+        this.enrollmentModalInputs.postDelete = async (student) => {
           // THIS IS EXPENSIVE, BUT IT'S EASY TO DO HERE compared to the ALTERNATIVE.
-          EventBus.$emit('screw-it-reload-everything');
+          EventBus.$emit('student-unenrolled', student);
         };
       },
     };
@@ -366,6 +364,24 @@ export default {
         columnDefs: this.assignmentColumns,
         fileName: 'Test',
       });
+    },
+
+    async studentUnenrolled(student) {
+      // Cascade and delete all student grades from database.
+      // Find student in our student store.
+      console.log('Starting Unenrollment');
+      const foundStudent = this.students.find(s => s.id === student.id);
+      // Manually get the grades from database.
+      const newUrl = urljoin(String(foundStudent.id), '/grades');
+      const studentGrades = (await StudentCrud.fromAppendedRoute(newUrl).get()).data;
+      console.log(studentGrades);
+      const mappedDeletions = studentGrades.map(async (grade) => {
+        console.log(`Deleting grade ${grade}`);
+        await GradeCrud.delete(grade.id);
+      });
+      console.log(mappedDeletions);
+      await Promise.all(mappedDeletions);
+      EventBus.$emit('screw-it-reload-everything');
     },
 
     // Do grade stuff
@@ -430,14 +446,6 @@ export default {
         g.assignment = this.assignments.find(a => g.assignmentId === a.id);
       });
     },
-    async enrolledInThisSection(studentId) {
-      const student = (await StudentCrud.get(studentId)).data;
-      await this.getFilteredGrades(student);
-      this.students.push(student);
-    },
-    unenrolledInThisSection(student) {
-      this.students = this.students.filter(s => s.id !== student.id);
-    },
 
     // Assignment category stuff
     async asscatAdded(assCat) {
@@ -462,6 +470,7 @@ export default {
       asscat.assignments.push(assignment);
       // Add an assignment category to the object, because we lazy up in here.
       assignment.assignmentCategory = asscat;
+      assignment.dueDate = new Date(Date.parse(assignment.dueDate));
       this.assignments.push(assignment);
     },
     assignmentRemoved(assignment) {
@@ -491,6 +500,7 @@ export default {
       this.assCats = rawAssCats;
 
       // Get assignments from said categories.
+      this.assignments = []; // Create a new array.
       const assPromises = rawAssCats.map(async (ac) => {
         const newUrl = urljoin(String(ac.id), '/assignments');
         const asscatAssCrud = AssignmentCategoryCrud.fromAppendedRoute(newUrl);
@@ -764,3 +774,8 @@ export default {
   },
 };
 </script>
+<style>
+  #gradeCrudBar{
+    width: 25%;
+  }
+</style>

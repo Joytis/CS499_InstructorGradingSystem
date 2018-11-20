@@ -37,6 +37,10 @@
 import CrudModalBar from '../CrudModalBar.vue';
 import { TermCrud, EventBus } from '../../../../middleware';
 
+function parseDates(term) {
+  term.startDate = new Date(Date.parse(term.startDate));
+  term.endDate = new Date(Date.parse(term.endDate));
+}
 
 export default {
   name: 'Term',
@@ -83,16 +87,16 @@ export default {
   },
   methods: {
     out: console.log,
-    termAdded(term) { this.terms.push(term); },
+    termAdded(term) {
+      parseDates(term);
+      this.terms.push(term);
+    },
     termRemoved(term) { this.terms = this.terms.filter(t => t.id !== term.id); },
     termUpdated(term) { this.terms[this.terms.findIndex(t => t.id === term.id)] = term; },
 
     async fetchData() {
       const terms = (await TermCrud.get()).data;
-      terms.forEach(term => {
-        term.startDate = new Date(Date.parse(term.startDate));
-        term.endDate = new Date(Date.parse(term.endDate));
-      });
+      terms.forEach(parseDates);
       this.terms = terms;
     },
   },
