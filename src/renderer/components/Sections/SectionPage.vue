@@ -11,7 +11,7 @@
     >
       Copy Section
     </button>
-    <button @click="out(assCats)"/>
+    <button @click="out(students)"/>
     <button @click="out(formattedData)"/>
     <button @click="out(studentCatAverage)"/>
     <b-modal :active.sync="isCopyModalActive" :width="640" scroll="keep" has-modal-card>
@@ -35,8 +35,8 @@
               <b-table-column field="Email" label="Email" sortable>
                 {{ props.row.email }}
               </b-table-column>
-              <b-table-column label="Grade" numeric>
-                {{ studentCatAverage.find(g => g.id === props.row.id).overallAverage }}
+              <b-table-column label="Grade" sortable>
+                {{ (studentCatAverage.find(g => g.id === props.row.id).overallAverage !== 'None') ? `${studentCatAverage.find(g => g.id === props.row.id).overallAverage}%` : 'None' }} ({{ getLetterGrade(studentCatAverage.find(g => g.id === props.row.id).overallAverage)}})
               </b-table-column>
               <b-table-column label="Student Page">
                 <button class="button is-success is-small">
@@ -521,6 +521,27 @@ export default {
         gradeArray.push(grade);
       }
     },
+    getLetterGrade(grade) {
+      const A = this.section.gradeScaleA;
+      const B = this.section.gradeScaleB;
+      const C = this.section.gradeScaleC;
+      const D = this.section.gradeScaleD;
+      let letterGrade = '';
+      if (grade >= A) {
+        letterGrade = 'A';
+      } else if (grade < A && grade >= B) {
+        letterGrade = 'B';
+      } else if (grade < B && grade >= C) {
+        letterGrade = 'C';
+      } else if (grade < C && grade >= D) {
+        letterGrade = 'D';
+      } else if (grade < D) {
+        letterGrade = 'F';
+      } else if (grade === 'None') {
+        letterGrade = '';
+      }
+      return letterGrade;
+    },
   },
 
   computed: {
@@ -586,9 +607,11 @@ export default {
         });
         let grade = 0;
         // calculate the weights based on assignment categories
+        let hasGrades = false;
         let catWeightsTotal = 0;
         studAC.forEach(ac => {
           if (!Number.isNaN(ac.categoryAverage)) {
+            hasGrades = true;
             catWeightsTotal += ac.weight;
           }
         });
@@ -603,7 +626,11 @@ export default {
           }
         });
         grade = Number(grade * 100).toFixed(2);
-        studAC.overallAverage = grade;
+        if (!hasGrades) {
+          studAC.overallAverage = 'None';
+        } else {
+          studAC.overallAverage = grade;
+        }
         studAC.studentId = student.id;
         shallowStudents.find(s => s.id === studAC.studentId).overallAverage = studAC.overallAverage;
 
