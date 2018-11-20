@@ -283,7 +283,7 @@ export default {
       this.students = (await this.sectionStudentCrud.get()).data;
 
       // Get the assignment categories for the section
-      this.assCats = (await AssignmentCategoryCrud.get()).data;
+      this.assCats = (await this.assignmentCategoryCrud.get()).data;
 
       this.assCats.forEach(ac => {
         if (ac.id > this.maxACId) this.maxACId = ac.id;
