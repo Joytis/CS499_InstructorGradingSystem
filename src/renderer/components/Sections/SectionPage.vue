@@ -11,7 +11,7 @@
     >
       Copy Section
     </button>
-    <button @click="out(students)"/>
+    <button @click="out(assCats)"/>
     <button @click="out(formattedData)"/>
     <button @click="out(studentCatAverage)"/>
     <b-modal :active.sync="isCopyModalActive" :width="640" scroll="keep" has-modal-card>
@@ -552,12 +552,9 @@ export default {
     },
     studentCatAverage() {
       // const formattedStudents = Object.assign({}, this.formattedData);
-      const rows = this.formattedData.map(student => {
-        // const data = {
-        //   studentId: student.id,
-        //   studentName: `${student.lastName}, ${student.firstName}`,
-        // };
-        student.assCats.map(asscat => {
+      const shallowStudents = Object.assign({}, this.students);
+      this.formattedData.map(student => {
+        const studAC = student.assCats.map(asscat => {
           const ac = Object.assign({}, asscat);
           ac.assignments
             .sort((a, b) => {
@@ -582,12 +579,39 @@ export default {
             ac.categoryAverage = actualTotal / totalPossible;
           } else ac.categoryAverage = NaN;
 
-          ac.categoryAverage = (!Number.isNaN(ac.categoryAverage)) ? Number(ac.categoryAverage * 100).toFixed(2) : 'None';
           return ac;
         });
-        return student;
+        let grade = 0;
+        // calculate the weights based on assignment categories
+        let catWeightsTotal = 0;
+        catWeightsTotal = studAC.forEach(ac => {
+          if (!Number.isNaN(ac.categoryAverage)) {
+            catWeightsTotal += ac.weight;
+            console.log('weight total', catWeightsTotal);
+          }
+        });
+        const catWeights = {};
+        studAC.forEach(assCat => {
+          catWeights[assCat.id] = assCat.weight / catWeightsTotal;
+          console.log('weight', assCat.weight, 'weightTotal', catWeightsTotal);
+        });
+        console.log(catWeights);
+        // use the catWeights and catAverage to get overall grade
+        studAC.forEach(ac => {
+          if (!Number.isNaN(ac.categoryAverage)) {
+            grade += ac.categoryAverage * catWeights[ac.id];
+            // console.log('catAverage', ac.categoryAverage, 'weight', this.categoryWeights[ac.id]);
+          }
+        });
+        studAC.overallAverage = grade;
+        studAC.studentId = student.id;
+        console.log(studAC);
+        // shallowStudents.find(s => s.id === stud.studentId).overallAverage = stud.overallAverage;
+
+        return studAC;
       });
-      return rows;
+
+      return shallowStudents;
     },
     gradeTableHeight() {
       return (this.showAnalytics) ? '49vh' : '70vh';
@@ -624,9 +648,11 @@ export default {
       );
     },
     categoryWeights() {
-      const catWeightsTotal = this.assCats.reduce(
-        (accumulator, currentValue) => accumulator + currentValue.weight,
-      );
+      let catWeightsTotal = this.assCats.forEach(ac => {
+        if (ac.categoryAverage !== -1) {
+          catWeightsTotal += ac.weight;
+        }
+      });
       const catWeights = {};
       this.assCats.forEach(assCat => {
         catWeights[assCat.id] = assCat.weight / catWeightsTotal;
