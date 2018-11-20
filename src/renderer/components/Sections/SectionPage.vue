@@ -27,6 +27,9 @@
           :target="selectedStudent"
           :removed="['edit']"
         />
+        <b-checkbox v-model="gradesIsVisible">
+          Grades
+        </b-checkbox>
         <b-table :data="students" paginated per-page="10" :selected.sync="selectedStudent">
             <template slot-scope="props">
               <b-table-column field="Name" label="Name" width="300" sortable>
@@ -36,7 +39,9 @@
                 {{ props.row.email }}
               </b-table-column>
               <b-table-column label="Grade" sortable>
-                {{ (studentCatAverage.find(g => g.id === props.row.id).overallAverage !== 'None') ? `${studentCatAverage.find(g => g.id === props.row.id).overallAverage}%` : 'None' }} ({{ getLetterGrade(studentCatAverage.find(g => g.id === props.row.id).overallAverage)}})
+                <div v-if="gradesIsVisible">
+                  {{ (studentCatAverage.find(g => g.id === props.row.id).overallAverage !== 'None') ? `${studentCatAverage.find(g => g.id === props.row.id).overallAverage}%` : 'None' }} ({{ getLetterGrade(studentCatAverage.find(g => g.id === props.row.id).overallAverage)}})
+                </div>
               </b-table-column>
               <b-table-column label="Student Page">
                 <button class="button is-success is-small">
@@ -224,8 +229,7 @@ export default {
       students: [],
       assCats: [],
       assignments: [],
-      mattsRawAssCats: [],
-      indices: {},
+      gradesIsVisible: false,
       selectedStudent: null,
       selectedAssignmentCategory: null,
       selectedAssignment: null,
