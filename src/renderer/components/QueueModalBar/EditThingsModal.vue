@@ -13,7 +13,7 @@
       <div v-else-if="state === 'success'">
         Success!
       </div>
-      <div v-else v-for="(field, key) in inputs.templates">
+      <div v-else v-for="(field, key) in inputs.templates" :key="field.label">
         <b-field :label="field.label">
           <div v-if="field.type === 'input'">
             <b-input v-model="staged[key]" :type="field.subtype" required/>
@@ -22,12 +22,7 @@
             <b-datepicker v-model="staged[key]" icon="calendar-today" editable inline required/>
           </div>
           <div v-else-if="field.type === 'password'">
-            <b-input 
-              type="password" 
-              v-model="staged[key]" 
-              password-reveal 
-              :placeholder="field.placeholder" 
-              required/>
+            <b-input type="password" v-model="staged[key]" password-reveal required/>
           </div>
           <div v-else-if="field.type === 'dropdown'">
             <b-select v-model="staged[key]" placeholder="Select an option" required>
@@ -48,7 +43,7 @@
     <footer class="modal-card-foot">
       <div v-if="state === 'main'">
         <button class="button" type="button" @click="$parent.close()">Close</button>
-        <button class="button is-warning"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
+        <button class="button is-warning" v-text="primaryButtonText()" @click="emit()"/>
       </div>
     </footer>
   </div>
@@ -59,7 +54,7 @@
 <script>
 /* eslint-disable no-console */
 import { AtomSpinner } from 'epic-spinners';
-import { ParseError } from '../../../middleware';
+import { ParseError } from '../../../../middleware';
 
 export default {
   name: 'EditThingsModalForm',
@@ -70,6 +65,7 @@ export default {
     title: String,
     target: Object,
     inputs: Object,
+    editMethod: Function,
   },
   data() {
     return {
@@ -85,6 +81,10 @@ export default {
   },
 
   methods: {
+    emit() {
+      this.$emit('returnEvent', this.staged);
+      this.$parent.close();
+    },
     primaryButtonText() {
       return ((this.inputs.primaryText !== undefined) ? this.inputs.primaryText : 'Update');
     },
