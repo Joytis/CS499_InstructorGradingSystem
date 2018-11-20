@@ -61,11 +61,11 @@ export default new Router({
       name: 'Terms Testing',
       component: require('../components/Terms/Terms.vue').default,
     },
-    // {
-    //   path: '/docs',
-    //   name: 'Documentation',
-    //   component: require('../components/Documentation/Documentation.vue').default,
-    // },
+    {
+      path: '/docs',
+      name: 'Documentation',
+      component: require('../components/Documentation.vue').default,
+    },
     // {
     //   path: '/auth',
     //   name: 'Auth Testing',
