@@ -1,6 +1,9 @@
 <template>
   <div>
     <back-button></back-button>
+    <router-link class="button is-primary is-small" :to=" $route.params.sectionId + '/whatIf'">
+      ?
+    </router-link>
     <button 
       class="button is-primary is-small" 
       @click="isCopyModalActive = true"
@@ -8,6 +11,9 @@
     >
       Copy Section
     </button>
+    <button @click="out(students)"/>
+    <button @click="out(formattedData)"/>
+    <button @click="out(studentCatAverage)"/>
     <b-modal :active.sync="isCopyModalActive" :width="640" scroll="keep" has-modal-card>
       <copy-section-modal :target="section"></copy-section-modal>
     </b-modal>
@@ -21,6 +27,9 @@
           :target="selectedStudent"
           :removed="['edit']"
         />
+        <b-checkbox v-model="gradesIsVisible">
+          Grades
+        </b-checkbox>
         <b-table :data="students" paginated per-page="10" :selected.sync="selectedStudent">
             <template slot-scope="props">
               <b-table-column field="Name" label="Name" width="300" sortable>
@@ -28,6 +37,11 @@
               </b-table-column>
               <b-table-column field="Email" label="Email" sortable>
                 {{ props.row.email }}
+              </b-table-column>
+              <b-table-column label="Grade" sortable>
+                <div v-if="gradesIsVisible">
+                  {{ (studentCatAverage.find(g => g.id === props.row.id).overallAverage !== 'None') ? `${studentCatAverage.find(g => g.id === props.row.id).overallAverage}%` : 'None' }} ({{ getLetterGrade(studentCatAverage.find(g => g.id === props.row.id).overallAverage)}})
+                </div>
               </b-table-column>
               <b-table-column label="Student Page">
                 <button class="button is-success is-small">
@@ -215,6 +229,7 @@ export default {
       students: [],
       assCats: [],
       assignments: [],
+      gradesIsVisible: false,
       selectedStudent: null,
       selectedAssignmentCategory: null,
       selectedAssignment: null,
@@ -359,8 +374,10 @@ export default {
           console.log(err);
         }
         this.updateAssignmentGrade(gradeArgs).then().catch(err => console.log(err));
+        await this.updateGrades(gradeArgs);
       }
     },
+
 
     async getAssignmentGrades(assignment) {
       const assignmentGradeCrud = AssignmentCrud.fromAppendedRoute(urljoin(String(assignment.id), '/grades'));
@@ -381,6 +398,11 @@ export default {
         } else this.assignments[assIndex].grades.push(g);
       });
     },
+
+    // async updateStudentGrade(assignment) {
+    //   const assIndex = this.assignments.findIndex(a => a.id === assignment.assignmentId);
+    //   const
+    // },
 
     async getFilteredGrades(student) {
       const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(student.id), '/grades'));
@@ -411,10 +433,11 @@ export default {
       this.assCats.push(custom);
     },
     asscatUpdated(assCat) {
-      this.assCats[this.assCats.findIndex(a => a.id === assCat.id)] = assCat;
+      this.assCats.splice(this.assCats.findIndex(a => a.id === assCat.id), 1, assCat);
     },
     asscatRemoved(assCat) {
       this.assCats = this.assCats.filter(a => a.id !== assCat.id);
+      EventBus.$emit('screw-it-reload-everything');
     },
 
 
@@ -434,7 +457,8 @@ export default {
     assignmentUpdated(assignment) {
       const finder = (ac) => ac.id === assignment.assignmentCategoryId;
       assignment.assignmentCategory = this.assCats.find(finder);
-      this.assignments[this.assignment.findIndex(a => a.id === assignment.id)] = assignment;
+      this.assignments.splice(this.assignment
+        .findIndex(a => a.id === assignment.id), 1, assignment);
     },
 
     async fetchData() {
@@ -480,9 +504,145 @@ export default {
 
       this.allStudents = (await StudentCrud.get()).data;
     },
-
+    async updateGrades(gradeArgs) {
+      const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(gradeArgs.studentId), '/grades'));
+      const rawStudentGrades = (await studentGradeCrud.get()).data;
+      const grade = Object.assign({}, rawStudentGrades
+        .find(g => g.assignmentId === gradeArgs.assignmentId));
+      const oldGrade = this.students
+        .find(s => s.id === gradeArgs.studentId).grades
+        .find(g => g.id === grade.id);
+      if (oldGrade) {
+        grade.assignment = Object.assign({}, oldGrade.assignment);
+        const gradeArray = this.students.find(s => s.id === gradeArgs.studentId).grades;
+        gradeArray.splice(gradeArray.findIndex(g => g.id === grade.id), 1, grade);
+      } else {
+        grade.assignment = Object.assign({}, this.assignments
+          .find(a => a.id === gradeArgs.assignmentId));
+        grade.assignment.assignmentCategory = Object.assign({}, this.assCats
+          .find(ac => ac.id === grade.assignment.assignmentCategoryId));
+        const gradeArray = this.students.find(s => s.id === gradeArgs.studentId).grades;
+        gradeArray.push(grade);
+      }
+    },
+    getLetterGrade(grade) {
+      const A = this.section.gradeScaleA;
+      const B = this.section.gradeScaleB;
+      const C = this.section.gradeScaleC;
+      const D = this.section.gradeScaleD;
+      let letterGrade = '';
+      if (grade >= A) {
+        letterGrade = 'A';
+      } else if (grade < A && grade >= B) {
+        letterGrade = 'B';
+      } else if (grade < B && grade >= C) {
+        letterGrade = 'C';
+      } else if (grade < C && grade >= D) {
+        letterGrade = 'D';
+      } else if (grade < D) {
+        letterGrade = 'F';
+      } else if (grade === 'None') {
+        letterGrade = '';
+      }
+      return letterGrade;
+    },
   },
+
   computed: {
+    formattedData() {
+      const students = this.students.map(s => {
+        const AssCats = [];
+        const assignments = [];
+        const stud = Object.assign({}, s);
+        s.grades.forEach(g => {
+          if (!assignments.find(a => a.id === g.assignment.id)) {
+            const a = Object.assign({}, g.assignment);
+            delete a.assignmentCategory;
+            assignments.push(a);
+            if (!AssCats.find(ac => ac.id === g.assignment.assignmentCategoryId)) {
+              AssCats.push(Object.assign({}, g.assignment.assignmentCategory));
+            }
+          }
+        });
+        assignments.map(a => {
+          a.grade = Object.assign({}, s.grades.find(g => g.assignmentId === a.id));
+          delete a.grade.assignment;
+          return a;
+        });
+        AssCats.map(ac => {
+          ac.assignments = assignments.filter(a => a.assignmentCategoryId === ac.id);
+          return ac;
+        });
+        stud.assCats = AssCats;
+        return stud;
+      });
+      return students;
+    },
+    studentCatAverage() {
+      // const formattedStudents = Object.assign({}, this.formattedData);
+      const shallowStudents = Object.assign([], this.students);
+      this.formattedData.map(student => {
+        const studAC = student.assCats.map(asscat => {
+          const ac = Object.assign({}, asscat);
+          ac.assignments
+            .sort((a, b) => {
+              // console.log('a', a, 'b', b);
+              const aScore = a.grade.score / a.totalPoints;
+              const bScore = b.grade.score / b.totalPoints;
+              if (aScore < bScore) {
+                return -1;
+              } if (aScore > bScore) {
+                return 1;
+              }
+              return 0;
+            });
+
+          if (ac.assignments && ac.assignments.length > Number(ac.lowestGradesDropped)) {
+            let totalPossible = 0;
+            let actualTotal = 0;
+            for (let i = Number(ac.lowestGradesDropped); i < ac.assignments.length; i += 1) {
+              totalPossible += ac.assignments[i].totalPoints;
+              actualTotal += ac.assignments[i].grade.score;
+            }
+            ac.categoryAverage = actualTotal / totalPossible;
+          } else ac.categoryAverage = NaN;
+
+          return ac;
+        });
+        let grade = 0;
+        // calculate the weights based on assignment categories
+        let hasGrades = false;
+        let catWeightsTotal = 0;
+        studAC.forEach(ac => {
+          if (!Number.isNaN(ac.categoryAverage)) {
+            hasGrades = true;
+            catWeightsTotal += ac.weight;
+          }
+        });
+        const catWeights = {};
+        studAC.forEach(assCat => {
+          catWeights[assCat.id] = assCat.weight / catWeightsTotal;
+        });
+        // use the catWeights and catAverage to get overall grade
+        studAC.forEach(ac => {
+          if (!Number.isNaN(ac.categoryAverage)) {
+            grade += ac.categoryAverage * catWeights[ac.id];
+          }
+        });
+        grade = Number(grade * 100).toFixed(2);
+        if (!hasGrades) {
+          studAC.overallAverage = 'None';
+        } else {
+          studAC.overallAverage = grade;
+        }
+        studAC.studentId = student.id;
+        shallowStudents.find(s => s.id === studAC.studentId).overallAverage = studAC.overallAverage;
+
+        return studAC;
+      });
+
+      return shallowStudents;
+    },
     gradeTableHeight() {
       return (this.showAnalytics) ? '49vh' : '70vh';
     },
@@ -518,9 +678,11 @@ export default {
       );
     },
     categoryWeights() {
-      const catWeightsTotal = this.assCats.reduce(
-        (accumulator, currentValue) => accumulator + currentValue.weight,
-      );
+      let catWeightsTotal = this.assCats.forEach(ac => {
+        if (ac.categoryAverage !== -1) {
+          catWeightsTotal += ac.weight;
+        }
+      });
       const catWeights = {};
       this.assCats.forEach(assCat => {
         catWeights[assCat.id] = assCat.weight / catWeightsTotal;
