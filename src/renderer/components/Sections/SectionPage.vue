@@ -11,25 +11,26 @@
     >
       Copy Section
     </button>
-    <button @click="out(students)"/>
-    <button @click="out(formattedData)"/>
-    <button @click="out(studentCatAverage)"/>
+
     <b-modal :active.sync="isCopyModalActive" :width="640" scroll="keep" has-modal-card>
       <copy-section-modal :target="section"></copy-section-modal>
     </b-modal>
     <b-tabs v-model="activeTab">
       <b-tab-item label="Enrollment">
-        <crud-modal-bar 
-          createTitle="Enroll Student"
-          deleteTitle="Unenroll Student"
-          deleteMessage= "Are you sure? This will mess up student grades."
-          :inputs="enrollmentModalInputs"
-          :target="selectedStudent"
-          :removed="['edit']"
-        />
-        <b-checkbox v-model="gradesIsVisible">
-          Grades
-        </b-checkbox>
+        <div>
+          <crud-modal-bar
+            id="gradeCrudBar"
+            createTitle="Enroll Student"
+            deleteTitle="Unenroll Student"
+            deleteMessage= "Are you sure? This will mess up student grades."
+            :inputs="enrollmentModalInputs"
+            :target="selectedStudent"
+            :removed="['edit']"
+          />
+          <b-checkbox v-model="gradesIsVisible">
+            Grades
+          </b-checkbox>
+        </div>
         <b-table :data="students" paginated per-page="10" :selected.sync="selectedStudent">
             <template slot-scope="props">
               <b-table-column field="Name" label="Name" width="300" sortable>
@@ -757,3 +758,8 @@ export default {
   },
 };
 </script>
+<style>
+  #gradeCrudBar{
+    width: 25%;
+  }
+</style>

@@ -96,7 +96,7 @@
     <footer class="modal-card-foot">
       <div v-if="state === 'main'">
         <button class="button" type="button" @click="$parent.close()">Close</button>
-        <button class="button is-primary" v-text="primaryButtonText()" @click="createMethod || attemptDatabaseCreate"/>
+        <button class="button is-primary" v-text="primaryButtonText()" @click="emit()"/>
       </div>
     </footer>
   </div>
@@ -117,7 +117,7 @@ export default {
   props: {
     title: String,
     inputs: Object,
-    createMethod: Function,
+
   },
   data() {
     return {
@@ -134,6 +134,11 @@ export default {
   },
 
   methods: {
+    emit() {
+      this.$emit('returnEvent', this.staged);
+      this.$parent.close();
+    },
+
     primaryButtonText() {
       return ((this.inputs.primaryText !== undefined) ? this.inputs.primaryText : 'Create');
     },

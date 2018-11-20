@@ -8,33 +8,8 @@
       </div>
       <div class="level-right">
         <div class="level-item">
-          <button class="button is-primary is-small" @click="newAC(makeNewAC())">
-            New AC
-          </button>
-        </div>
-        <div class="level-item">
-          <button class="button is-primary is-small" @click="updateAssignment(mutateAC(selectedAssignment))">
-            Update Ass
-          </button>
-        </div>
-        <div class="level-item">
-          <button class="button is-primary is-small" @click="deleteAC(selectedAssignmentCategory)">
-            Delete Ass
-          </button>
-        </div>
-        <div class="level-item">
-          <button class="button is-primary is-small" @click="moveAssTo(selectedAssignment, selectedAssignmentCategory)">
-            Move Ass
-          </button>
-        </div>
-        <div class="level-item">
-          <button class="button is-primary is-small" @click="out(changeQueue)">
-            Change Queue
-          </button>
-        </div>
-        <div class="level-item">
-          <button class="button is-primary is-small" @click="out(sectionStructure)">
-            Section
+          <button class="button is-danger is-small" @click="$router.go(-1)">
+            Exit w/o Saving
           </button>
         </div>
         <div class="level-item">
@@ -81,6 +56,9 @@
               <b-table-column label="Modify">
                 <crud-modal-bar
                   @click="selectedAssignment = props.row"
+                  @assignmentdelete="deleteAssignment($event)"
+                  @assignmentedit="updateAssignment($event)"
+                  :emit-type="'assignment'"
                   editTitle="Edit"
                   deleteTitle="Delete"
                   :inputs="assignmentInputs"
@@ -113,6 +91,10 @@
             createTitle="Create Assignment Category"
             editTitle="Edit Assignment Category"
             deleteTitle="Delete Assignment Category"
+            @accreate="newAC($event)"
+            @acedit="updateAC($event)"
+            @acdelete="deleteAC($event)"
+            :emit-type="'ac'"
             :target="selectedAssignmentCategory"
             :inputs="assignmentCategoryInputs"
             :removed="['edit', 'delete']"
@@ -138,9 +120,12 @@
               <b-table-column>
                 <crud-modal-bar
                   @click="selectedAssignment = props.row"
+                  @acedit="updateAC($event)"
+                  @acdelete="deleteAC($event)"
                   editTitle="Edit"
                   deleteTitle="Delete"
                   deleteMessage="Are you sure? This will delete ALL assignments and grades in this category."
+                  :emit-type="'ac'"
                   :inputs="assignmentCategoryInputs"
                   :target="props.row"
                   :removed="['create']"
@@ -162,7 +147,7 @@ import { AtomSpinner, SelfBuildingSquareSpinner } from 'epic-spinners';
 import { AgGridVue } from 'ag-grid-vue';
 // import customCellEditor from '../customCellEditor';
 // import customValueParser from '../customValueParser';
-import CrudModalBar from '../CrudModalBar.vue';
+import CrudModalBar from '../QueueModalBar/CrudModalBar.vue';
 import {
   SectionCrud, EventBus, AssignmentCategoryCrud, AssignmentCrud, StudentCrud,
   EnrollmentCrud, GradeCrud, // QuickMaffs,

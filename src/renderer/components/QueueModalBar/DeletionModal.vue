@@ -14,7 +14,7 @@
     <footer class="modal-card-foot">
       <div v-if="state === 'main'">
         <button class="button" type="button" @click="$parent.close()">Close</button>
-        <button class="button is-danger" @click="attemptDatabaseDelete">Delete</button>
+        <button class="button is-danger" @click="emit()">Delete</button>
       </div>
     </footer>
   </div>
@@ -53,6 +53,11 @@ export default {
   },
 
   methods: {
+    emit() {
+      this.$emit('returnEvent', this.staged);
+      this.$parent.close();
+    },
+
     deletionString() {
       return (this.deletionMessage !== undefined)
         ? this.deletionMessage

@@ -15,7 +15,7 @@
       scroll="keep" 
       has-modal-card
     >
-      <creation-modal-form :inputs="inputs"/>
+      <creation-modal-form @returnEvent="emitCreate($event)" :inputs="inputs"/>
     </b-modal>
 
     <!-- Editing -->
@@ -34,7 +34,7 @@
       scroll="keep" 
       has-modal-card
     >
-      <edit-things-modal-form :inputs="inputs" :target="target"/>
+      <edit-things-modal-form @returnEvent="emitEdit($event)" :inputs="inputs" :target="target"/>
     </b-modal>
 
     <!-- Deletion -->
@@ -53,7 +53,7 @@
       scroll="keep" 
       has-modal-card
     >
-      <deletion-modal-form :inputs="inputs" :target="target" :deletionMessage="deleteMessage"/>
+      <deletion-modal-form @returnEvent="emitDelete($event)" :inputs="inputs" :target="target" :deletionMessage="deleteMessage"/>
     </b-modal>
   </div>
 </template>
@@ -78,6 +78,7 @@ export default {
     deleteMessage: String,
     target: Object,
     inputs: Object,
+    emitType: String,
     removed: {
       type: Array,
       default: () => [],
@@ -90,6 +91,21 @@ export default {
       isEditModalActive: false,
       isDeletionModalActive: false,
     };
+  },
+  methods: {
+    emitEdit(event) {
+      const eventtype = `${this.emitType}edit`;
+      this.$emit(eventtype, event);
+    },
+    emitCreate(event) {
+      const eventtype = `${this.emitType}create`;
+      this.$emit(eventtype, event);
+    },
+    emitDelete(event) {
+      const eventtype = `${this.emitType}delete`;
+      this.$emit(eventtype, event);
+    },
+
   },
 };
 </script>
