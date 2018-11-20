@@ -107,11 +107,13 @@ export default {
     this.fetchTerms();
     this.fetchInstructor();
     EventBus.$on('term-added', this.termAdded);
+    EventBus.$on('term-removed', this.termRemoved);
     EventBus.$on('request-selected-term', this.requestSelectedTerm);
   },
 
   beforeDestroy() {
     EventBus.$off('term-added', this.termAdded);
+    EventBus.$off('term-removed', this.termRemoved);
     EventBus.$off('request-selected-term', this.requestSelectedTerm);
   },
 
@@ -119,6 +121,10 @@ export default {
     swapTerms(term) {
       this.CurrentTerm = term;
       EventBus.$emit('term-swapped', term);
+    },
+    termRemoved(term) {
+      if (this.CurrentTerm.id === term.id) this.CurrentTerm = {};
+      this.Terms = this.Terms.filter(t => t.id !== term.id);
     },
     termAdded(newTerm) { this.Terms.push(newTerm); },
     requestSelectedTerm() { EventBus.$emit('response-selected-term', this.CurrentTerm); },

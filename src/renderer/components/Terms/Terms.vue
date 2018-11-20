@@ -66,6 +66,7 @@ export default {
       modalInputs: {
         crudTarget: TermCrud,
         postCreate(result) { EventBus.$emit('term-added', result); },
+        postDelete(result) { EventBus.$emit('term-removed', result); },
         postUpdate(result) { EventBus.$emit('term-updated', result); },
         templates: {
           title: { label: 'Term Name', type: 'input', placeholder: 'Spring \'18' },
