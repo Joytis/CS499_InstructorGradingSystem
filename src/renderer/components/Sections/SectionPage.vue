@@ -38,10 +38,8 @@
               <b-table-column field="Email" label="Email" sortable>
                 {{ props.row.email }}
               </b-table-column>
-              <b-table-column label="Grade" sortable>
-                <div v-if="gradesIsVisible">
-                  {{ (studentCatAverage.find(g => g.id === props.row.id).overallAverage !== 'None') ? `${studentCatAverage.find(g => g.id === props.row.id).overallAverage}%` : 'None' }} ({{ getLetterGrade(studentCatAverage.find(g => g.id === props.row.id).overallAverage)}})
-                </div>
+              <b-table-column label="Grade" sortable :visible="gradesIsVisible">
+                {{ (studentCatAverage.find(g => g.id === props.row.id).overallAverage !== 'None') ? `${studentCatAverage.find(g => g.id === props.row.id).overallAverage}%` : 'None' }} ({{ getLetterGrade(studentCatAverage.find(g => g.id === props.row.id).overallAverage)}})
               </b-table-column>
               <b-table-column label="Student Page">
                 <button class="button is-success is-small">
