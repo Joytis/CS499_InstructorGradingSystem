@@ -16,7 +16,7 @@
       <copy-section-modal :target="section"></copy-section-modal>
     </b-modal>
     <b-tabs v-model="activeTab">
-      <b-tab-item label="Enrollment">
+      <b-tab-item label="Students">
         <div>
           <crud-modal-bar
             id="gradeCrudBar"
@@ -99,7 +99,7 @@
             </b-table>
           </template>
       </b-tab-item>
-      <b-tab-item label="Grades">
+      <b-tab-item label="Grade Entry">
         <button class="button" @click="OnExport()">
           Export File
         </button>
