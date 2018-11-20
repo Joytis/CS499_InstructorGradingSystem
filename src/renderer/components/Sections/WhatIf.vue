@@ -8,13 +8,38 @@
       </div>
       <div class="level-right">
         <div class="level-item">
-          <button class="button is-primary is-small" @click="deleteAssignment(selectedAssignment), out(changeQueue)">
-            Delete Assignment
+          <button class="button is-primary is-small" @click="newAC(makeNewAC())">
+            New AC
           </button>
         </div>
         <div class="level-item">
-          <button class="button is-primary is-small" @click="out(section)">
+          <button class="button is-primary is-small" @click="updateAC(mutateAC(selectedAssignmentCategory))">
+            Update AC
+          </button>
+        </div>
+        <div class="level-item">
+          <button class="button is-primary is-small" @click="deleteAssignment(selectedAssignment)">
+            Delete Ass
+          </button>
+        </div>
+        <div class="level-item">
+          <button class="button is-primary is-small" @click="moveAssTo(selectedAssignment, selectedAssignmentCategory)">
+            Move Ass
+          </button>
+        </div>
+        <div class="level-item">
+          <button class="button is-primary is-small" @click="out(changeQueue)">
+            Change Queue
+          </button>
+        </div>
+        <div class="level-item">
+          <button class="button is-primary is-small" @click="out(sectionStructure)">
             Section
+          </button>
+        </div>
+        <div class="level-item">
+          <button class="button is-primary is-small" @click="flushChangeQueue()">
+            Save &amp; Exit
           </button>
         </div>
       </div>
@@ -67,6 +92,23 @@
           </b-table>
         </b-tab-item>
         <b-tab-item label="Section Settings">
+          <nav class="level" v-if="!loading">
+            <div class="level-item">
+              A: 100 - {{section.gradeScaleA}}
+            </div>
+            <div class="level-item">
+              B: &lt;{{section.gradeScaleA}} - {{section.gradeScaleB}}
+            </div>
+            <div class="level-item">
+              C: &lt;{{section.gradeScaleB}} - {{section.gradeScaleC}}
+            </div>
+            <div class="level-item">
+              D: &lt;{{section.gradeScaleC}} - {{section.gradeScaleD}}
+            </div>
+            <div class="level-item">
+              F: &lt;{{section.gradeScaleD}} - 0
+            </div>
+          </nav>
           <crud-modal-bar
             createTitle="Create Assignment Category"
             editTitle="Edit Assignment Category"
@@ -78,7 +120,7 @@
 
           <!-- Assignment Category Tables -->
           <b-table
-              :data="assignmentCategoryRows"
+              :data="assCats"
               paginated
               per-page="5"
               :selected.sync="selectedAssignmentCategory"
@@ -152,18 +194,17 @@ export default {
     const data = {
       activeTab: 0,
       section: null,
-      allStudents: [],
       students: [],
       assCats: [],
-      rawAssCats: [],
+      maxACId: -1,
       assignments: [],
+      grades: [],
       indices: {},
       selectedStudent: null,
       selectedAssignmentCategory: null,
       selectedAssignment: null,
       isEnrollmentModalActive: false,
       isCopyModalActive: false,
-      testingPropertyId: Number,
       loading: true,
 
       changeQueue: {
@@ -252,16 +293,17 @@ export default {
       ).data;
 
       // Get students.
-      const rawStudents = (await this.sectionStudentCrud.get()).data;
-
-      // Get all students in section
-      this.section.students = rawStudents;
+      this.students = (await this.sectionStudentCrud.get()).data;
 
       // Get the assignment categories for the section
-      this.rawAssCats = (await this.assignmentCategoryCrud.get()).data;
+      this.assCats = (await this.assignmentCategoryCrud.get()).data;
+
+      this.assCats.forEach(ac => {
+        if (ac.id > this.maxACId) this.maxACId = ac.id;
+      });
 
       // Append an array of assignments to the assignment categories
-      const assPromises = this.rawAssCats.map(async (ac) => {
+      const assPromises = this.assCats.map(async (ac) => {
         const newUrl = urljoin(String(ac.id), '/assignments');
         const asscatAssCrud = AssignmentCategoryCrud.fromAppendedRoute(newUrl);
         const assignments = (await asscatAssCrud.get()).data;
@@ -269,100 +311,68 @@ export default {
           a.dueDate = new Date(Date.parse(a.dueDate));
           this.assignments.push(a);
         });
-        ac.assignments = assignments;
       });
       await Promise.all(assPromises);
 
-
-      // Append assignment categories to each student
-      this.section.students.forEach(stud => {
-        stud.assCats = Object.assign({}, this.rawAssCats);
-      });
-
-      // Calculate indices once to avoid doing comps for each student
       // If there are assignments, map the correct grade to each student
-      if (this.section.students
-        && this.section.students[0]
-        && this.section.students[0].assCats[0]
-        && this.section.students[0].assCats[0].assignments
-        && this.section.students[0].assCats[0].assignments[0]) {
-        this.section.students[0].assCats.forEach((ac, acind) => {
-          ac.assignments.forEach((a, aind) => {
-            this.indices[`IndexOf${a.id}`] = {
-              aIndex: aind,
-              acIndex: acind,
-            };
-          });
-        });
+      const gradePromises = this.students.map(async (s) => {
+        const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(s.id), '/grades'));
+        const rawStudentGrades = (await studentGradeCrud.get()).data;
+        rawStudentGrades.forEach(g => this.grades.push(g));
+      });
+      await Promise.all(gradePromises);
 
-        const gradePromises = this.section.students.map(async (s) => {
-          const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(s.id), '/grades'));
-          const rawStudentGrades = (await studentGradeCrud.get()).data;
-          const filter = g => this.indices[`IndexOf${g.assignmentId}`];
-          const grademap = rawStudentGrades.filter(filter);
-          grademap.forEach(g => {
-            s.assCats[this.indices[`IndexOf${g.assignmentId}`].acIndex]
-              .assignments[this.indices[`IndexOf${g.assignmentId}`].aIndex].grade = g;
-          });
-        });
-        await Promise.all(gradePromises);
-
-        this.loading = false;
-      }
-
-    //   const promises1 = this.assignments.map(async (a) => {
-    //     await this.getAssignmentGrades(a);
-    //   });
-
-    //   await Promise.all(promises.concat(promises1));
-
-    //   this.allStudents = (await StudentCrud.get()).data;
+      this.loading = false;
     },
-    updateGS: (GS) => {
+
+    updateGS(GS) {
       this.section.gradeScaleA = GS.gradeScaleA;
       this.section.gradeScaleB = GS.gradeScaleB;
       this.section.gradeScaleC = GS.gradeScaleC;
       this.section.gradeScaleD = GS.gradeScaleD;
       this.changeQueue.GradingScale.Update = GS;
     },
-    newAC: (AC) => {
-      // GENERATE NEW AC.ID FOR ASSIGNMENTS TO REFERENCE!!
-      // PARSE IT!!
+    newAC(AC) {
       AC.new = true;
-      this.rawAssCats.push(AC);
-      this.section.students.forEach(s => s.assCats.push(AC));
+      this.maxACId += 1;
+      AC.id = this.maxACId;
+      this.assCats.push(AC);
       this.changeQueue.AssignmentCategories.New.push(AC);
     },
-    updateAC: (AC) => {
-      AC.assignments = this.rawAssCats.find(oldAC => oldAC.id === AC.id).assignments;
-      AC.assignments.forEach(a => {
-        a.assignmentCategoryId = AC.id;
-      });
-      this.rawAssCats
-        .splice(this.rawAssCats.findIndex(oldAC => oldAC.id === AC.id), 1, Object.assign({}, AC));
-      this.section.students.forEach(s => {
-        const newAC = Object.assign({}, AC);
-        newAC.assignments = s.assCats.find(ac => newAC.id === ac.id).assignments;
-        newAC.assignments.forEach(a => {
-          a.assignmentCategoryId = newAC.id;
-        });
-        s.assCats.splice(s.assCats.findIndex(ac => ac.id === newAC.id), 1, newAC);
-      });
-      // eslint-disable no-empty
+    updateAC(AC) {
+      this.assCats.splice(
+        this.assCats.findIndex(ac => ac.id === AC.id),
+        1,
+        AC,
+      );
       if (AC.new) {
-      // eslint-disable no-empty
+        this.changeQueue.AssignmentCategories.New.splice(
+          this.changeQueue.AssignmentCategories.New.findIndex(ac => ac.id === AC.id),
+          1,
+          AC,
+        );
       } else {
-        // don't
+        const cqIndex = this.changeQueue.AssignmentCategories.Updates
+          .findIndex(ac => ac.id === AC.id);
+        if (cqIndex >= 0) {
+          this.changeQueue.AssignmentCategories.splice(
+            cqIndex,
+            1,
+            Object.assign({}, AC),
+          );
+        } else this.changeQueue.AssignmentCategories.Updates.push(Object.assign({}, AC));
       }
     },
-    deleteAC: (AC) => {
-      // Prompt: Are you sure?
-      const tempAssCat = this.rawAssCats.find(ac => ac.id === AC.id);
-      const hasAssignments = tempAssCat.assignments.length > 0;
-      if (hasAssignments) {
-        tempAssCat.assignments.forEach(a => {
+    deleteAC(AC) {
+      if (this.assignments.find(a => a.assignmentCategoryId === AC.id)) {
+        this.assignments.filter(a => a.assignmentCategoryId === AC.id).forEach(a => {
+          this.grades.filter(g => g.assignmentId === a.id).forEach(g => {
+            this.changeQueue.Grades.Deletes.push(Object.assign({}, g));
+          });
+          this.grades = this.grades.filter(g => g.assignmentId !== a.id);
           this.changeQueue.Assignments.Deletes.push(Object.assign({}, a));
         });
+        this.assignments = this.assignments.filter(a => a.assignmentCategoryId !== AC.id);
       }
       if (AC.new) {
         this.changeQueue.AssignmentCategories.New.splice(
@@ -372,66 +382,171 @@ export default {
       } else {
         this.changeQueue.AssignmentCategories.Deletes.push(Object.assign({}, AC));
       }
-      this.rawAssCats.splice(this.rawAssCats.findIndex(ac => ac.id === AC.id), 1);
-      this.section.students.forEach(s => {
-        if (hasAssignments) {
-          const assCat = s.assCats.find(ac => ac.id === AC.id);
-          assCat.assignments.forEach(a => {
-            this.changeQueue.Grades.Deletes.push(Object.assign({}, a.grade));
-            delete a.grade;
+      this.assCats.splice(this.assCats.findIndex(ac => ac.id === AC.id), 1);
+    },
+    updateAssignment(a) {
+      if (this.grades.find(g => g.assignmentId === a.id)) {
+        const oldA = this.assignments.find(oa => oa.id === a.id);
+        if (oldA.totalPoints !== a.totalPoints) {
+          this.grades.filter(g => g.assignmentId === a.id).forEach(g => {
+            g.score *= a.totalPoints / oldA.totalPoints;
+            const guIndex = this.changeQueue.Grades.Updates.findIndex(gu => gu.id === g.id);
+            if (guIndex) this.changeQueue.Grades.Updates.splice(guIndex, 1, Object.assign({}, g));
+            else this.changeQueue.Grades.Updates.push(Object.assign({}, g));
           });
         }
-        s.assCats.splice(s.assCats.findIndex(ac => ac.id === AC.id), 1);
-      });
-      this.rawAssCats.splice(this.rawAssCats.findIndex(ac => ac.id === AC.id), 1);
+      }
+      this.assignments.splice(
+        this.assignments.findIndex(oa => oa.id === a.id),
+        1,
+        Object.assign({}, a),
+      );
+      const uaIndex = this.changeQueue.Assignments.Updates.findIndex(ua => ua.id === a.id);
+      if (uaIndex) this.changeQueue.Assignments.Updates.splice(uaIndex, 1, Object.assign({}, a));
+      else this.changeQueue.Assignments.Updates.push(Object.assign({}, a));
     },
-    updateAssignment: (a) => {
-      const tempAC = this.rawAssCats.find(ac => a.assignmentCategoryId === ac.id);
-      tempAC.assignments.splice(tempAC.assignments.findIndex(oldA => oldA.id === a.id), 1, a);
-      this.section.students.forEach(s => {
-        const newA = Object.assign({}, a);
-        const studentAssCat = s.assCats.find(ac => ac.id === a.assignmentCategoryId);
-        const studentAssIndex = studentAssCat.assignments.findIndex(ass => ass.id === a.id);
-        if (studentAssCat.assignments[studentAssIndex].totalPoints !== a.totalPoints) {
-          studentAssCat.assignments[studentAssIndex].grade.score = studentAssCat
-            .assignments[studentAssIndex].grade.score
-            / studentAssCat.assignments[studentAssIndex].totalPoints
-            * a.totalPoints;
-          this.changeQueue.Grades.Updates
-            .push(Object.assign({}, studentAssCat.assignments[studentAssIndex].grade));
-        }
-        newA.grade = Object.assign({}, studentAssCat.assignments[studentAssIndex].grade);
-        studentAssCat.assignments.splice(studentAssIndex, 1, newA);
-      });
-      this.changeQueue.Assignments.Updates.push(Object.assign({}, a));
-    },
-
-    deleteAssignment: (a) => {
-      const tempAC = this.rawAssCats.find(ac => a.assignmentCategoryId === ac.id).assignments;
+    deleteAssignment(a) {
+      if (this.grades.find(g => g.assignmentId === a.id)) {
+        this.grades.filter(g => g.assignmentId === a.id).forEach(g => {
+          this.changeQueue.Grades.Deletes.push(Object.assign({}, g));
+        });
+        this.grades = this.grades.filter(g => g.assignmentId !== a.id);
+      }
       this.changeQueue.Assignments.Deletes.push(Object.assign({}, a));
-      tempAC.splice(tempAC.findIndex(olda => a.id === olda.id), 1);
-      this.section.students.forEach(s => {
-        const studentAsses = s.assCats.find(ac => ac.id === a.assignmentCategoryId).assignments;
-        const studentAss = studentAsses.find(olda => a.id === olda.id);
-        this.changeQueue.Grades.Deletes.push(Object.assign({}, studentAss.grade));
-        studentAsses.splice(studentAsses.findIndex(ass => ass.id === studentAss.id), 1);
-      });
+      this.assignments.splice(this.assignments.findIndex(da => da.id === a.id), 1);
+    },
+    async flushChangeQueue() {
+      const cq = this.changeQueue;
+      if (cq.AssignmentCategories.New.length) {
+        const newACPromises = cq.AssignmentCategories.New.map(async (ac) => {
+          oldACId = ac.id;
+          ac = (await assignmentCategoryCrud.post(ac)).data;
+          ac.oldId = oldACId;
+          cq.Assignments.Updates.forEach(a => {
+            if (a.assignmentCategoryId === ac.oldId) a.assignmentCategoryId = ac.id;
+          });
+        });
+        await Promise.all(newACPromises);
+      };
+      if (exists(cq.GradingScale.Update)) {
+        await SectionCrud.put(cq.GradingScale.Update.id);
+      };
+      if (cq.AssignmentCategories.Updates.length) {
+        const updateACPromises = cq.AssignmentCategories.Updates.map(async (ac) => {
+          await assignmentCategoryCrud.put(ac.id, { data: ac });
+        });
+        await Promise.all(updateACPromises);
+      };
+      if (cq.Assignments.Updates.length) {
+        const updateAsses = cq.Assignments.Updates.map(async (a) => {
+          await AssignmentCrud.put(a.id, {data: a});
+        });
+        await Promise.all(updateAsses);
+      };
+      if (cq.Grades.Updates.length) {
+        const updateGrades = cq.Grades.Updates.map(async (g) => {
+          await GradeCrud.put(g.id, {data: g});
+        });
+        await Promise.all(updateGrades);
+      };
+      if (cq.Grades.Deletes.length) {
+        const deleteGrades = cq.Grades.Deletes.map(async (g) => {
+          await GradeCrud.delete(g.id);
+        });
+        await Promise.all(deleteGrades);
+      };
+      if (cq.Assignments.Deletes.length) {
+        const deleteAsses = cq.Assignments.Deletes.map(async (a) => {
+          await AssignmentCrud.delete(a.id);
+        });
+        await Promise.all(deleteAsses);
+      };
+      if (cq.AssignmentCategories.Deletes.length) {
+        const deleteACPromises = cq.AssignmentCategories.Deletes.map(async (ac) => {
+          await assignmentCategoryCrud.delete(ac.id);
+        });
+        await Promise.all(deleteACPromises);
+      };
+      this.$router.go(-1);
+    },
+    exists(obj) {
+      for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+          return false;
+        }
+      return true;
+    },
+    getLetterGrade(grade) {
+      const A = this.section.gradeScaleA;
+      const B = this.section.gradeScaleB;
+      const C = this.section.gradeScaleC;
+      const D = this.section.gradeScaleD;
+      let letterGrade = '';
+      if (grade >= A) {
+        letterGrade = 'A';
+      } else if (grade < A && grade >= B) {
+        letterGrade = 'B';
+      } else if (grade < B && grade >= C) {
+        letterGrade = 'C';
+      } else if (grade < C && grade >= D) {
+        letterGrade = 'D';
+      } else if (grade < D) {
+        letterGrade = 'F';
+      } else if (grade === 'None') {
+        letterGrade = '';
+      }
+      return letterGrade;
+    },
+    mutateAC(ac) {
+      ac.lowestGradesDropped = 0;
+      return ac;
+    },
+    makeNewAC() {
+      return {
+        id: Number,
+        createdAt: Date(Date.now() - 24 * 60 * 60 * 1000),
+        lowestGradesDropped: 1,
+        name: 'Bullshit',
+        sectionId: this.sectionStructure.id,
+        weight: 0.35,
+        updatedAt: Date(Date.now()),
+      };
+    },
+    moveAssTo(ass, ac) {
+      ass.assignmentCategoryId = ac.id;
+      this.updateAssignment(ass);
     },
   },
   computed: {
     assignmentCategoryRows() {
-      return this.rawAssCats;
+      return Object.assign({}, this.rawAssCats);
+    },
+    sectionStructure() {
+      const section = Object.assign({}, this.section);
+      section.students = JSON.parse(JSON.stringify(this.students));
+      section.students.forEach(s => {
+        s.assCats = JSON.parse(JSON.stringify(this.assCats));
+        s.assCats.forEach(ac => {
+          ac.assignments = JSON.parse(JSON.stringify(
+            this.assignments.filter(a => a.assignmentCategoryId === ac.id),
+          ));
+          ac.assignments.forEach(a => {
+            a.grade = Object.assign(
+              {},
+              this.grades.find(g => g.assignmentId === a.id && g.studentId === s.id),
+            );
+          });
+        });
+      });
+
+      return section;
     },
     assignmentsTableRows() {
-      let assignments1 = [];
-      this.rawAssCats.forEach(ac => {
-        ac.assignments.forEach(a => {
-          a.acName = ac.name;
-        });
-        assignments1 = assignments1.concat(ac.assignments);
+      const assignments = JSON.parse(JSON.stringify(this.assignments));
+      assignments.forEach(a => {
+        a.acName = this.assCats.find(ac => ac.id === a.assignmentCategoryId).name;
       });
-      console.log(assignments1);
-      return assignments1;
+      return assignments;
     },
     assCatColumns() {
       return [
@@ -447,16 +562,17 @@ export default {
           pinned: 'left',
           editable: false,
         }].concat(
-        this.section.students[0].assCats.map(ac => ({
+        this.assCats.map(ac => ({
           headerName: ac.name,
           field: `AC${ac.id}`,
           editable: false,
-          // assCatId: ac.id,
+          assCatId: ac.id,
         })),
       );
     },
     assCatRows() {
-      const rows = this.section.students.map(student => {
+      const rows = this.sectionStructure.students.map(realStudent => {
+        const student = Object.assign({}, realStudent);
         const data = {
           studentId: student.id,
           studentName: `${student.lastName}, ${student.firstName}`,

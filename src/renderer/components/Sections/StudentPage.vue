@@ -13,7 +13,8 @@
       <div class="level-item">
         <button class="button" @click="overallGrade(), displayGrade = true">
           <div v-if="displayGrade === true">
-            {{ Number(this.grade * 100).toFixed(2) }}%
+            {{ (this.grade === -1) ? 'None' : `${Number(this.grade * 100).toFixed(2)}%` }}
+            ({{ getLetterGrade(this.grade * 100) }})
           </div>
           <div v-else>
             Click to display grade
@@ -198,6 +199,30 @@ export default {
           this.grade += (ac.categoryAverage / 100) * this.categoryWeights[ac.id];
         }
       });
+      if (this.grade === 0) {
+        this.grade = -1;
+      }
+    },
+    getLetterGrade(grade) {
+      const A = this.section.gradeScaleA;
+      const B = this.section.gradeScaleB;
+      const C = this.section.gradeScaleC;
+      const D = this.section.gradeScaleD;
+      let letterGrade = '';
+      if (grade >= A) {
+        letterGrade = 'A';
+      } else if (grade < A && grade >= B) {
+        letterGrade = 'B';
+      } else if (grade < B && grade >= C) {
+        letterGrade = 'C';
+      } else if (grade < C && grade >= D) {
+        letterGrade = 'D';
+      } else if (grade < D && grade >= 0) {
+        letterGrade = 'F';
+      } else if (grade === -1) {
+        letterGrade = '';
+      }
+      return letterGrade;
     },
   },
   computed: {
