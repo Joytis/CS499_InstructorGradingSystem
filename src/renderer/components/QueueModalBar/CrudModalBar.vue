@@ -64,7 +64,7 @@ import EditThingsModalForm from './EditThingsModal.vue';
 import DeletionModalForm from './DeletionModal.vue';
 
 export default {
-  name: 'CrudModalBar',
+  name: 'CrudQueueModalBar',
   components: {
     CreationModalForm,
     EditThingsModalForm,

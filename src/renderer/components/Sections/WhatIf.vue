@@ -8,8 +8,8 @@
       </div>
       <div class="level-right">
         <div class="level-item">
-          <button class="button is-primary is-small" @click="out(assignmentsTableRows)">
-            Ass
+          <button class="button is-primary is-small" @click="deleteAssignment(selectedAssignment), out(changeQueue)">
+            Delete Assignment
           </button>
         </div>
         <div class="level-item">
@@ -22,7 +22,7 @@
     <section>
       <b-tabs v-model="activeTab">
         <b-tab-item label="Student Averages">
-          <ag-grid-vue v-if="!loading" 
+          <ag-grid-vue v-if="!loading"
             style="width: 100%; height: 70vh;"
             class="ag-theme-balham"
             :columnDefs="assCatColumns"
@@ -30,9 +30,9 @@
             />
         </b-tab-item>
         <b-tab-item label="Assignments">
-          <b-table 
+          <b-table
             :data="assignmentsTableRows"
-            paginated 
+            paginated
             per-page="5"
             :selected.sync="selectedAssignment"
             >
@@ -77,9 +77,9 @@
           />
 
           <!-- Assignment Category Tables -->
-          <b-table 
-              :data="assignmentCategoryRows" 
-              paginated 
+          <b-table
+              :data="assignmentCategoryRows"
+              paginated
               per-page="5"
               :selected.sync="selectedAssignmentCategory"
           >
@@ -163,6 +163,7 @@ export default {
       selectedAssignment: null,
       isEnrollmentModalActive: false,
       isCopyModalActive: false,
+      testingPropertyId: Number,
       loading: true,
 
       changeQueue: {
@@ -275,7 +276,7 @@ export default {
 
       // Append assignment categories to each student
       this.section.students.forEach(stud => {
-        stud.assCats = JSON.parse(JSON.stringify(this.rawAssCats));
+        stud.assCats = Object.assign({}, this.rawAssCats);
       });
 
       // Calculate indices once to avoid doing comps for each student
@@ -327,7 +328,7 @@ export default {
     newAC: (AC) => {
       // GENERATE NEW AC.ID FOR ASSIGNMENTS TO REFERENCE!!
       // PARSE IT!!
-      AC.new = true,
+      AC.new = true;
       this.rawAssCats.push(AC);
       this.section.students.forEach(s => s.assCats.push(AC));
       this.changeQueue.AssignmentCategories.New.push(AC);
@@ -337,36 +338,84 @@ export default {
       AC.assignments.forEach(a => {
         a.assignmentCategoryId = AC.id;
       });
-      this.rawAssCats.splice(this.rawAssCats.findIndex(oldAC => oldAC.id === AC.id), 1, JSON.parse(JSON.stringify(AC)));
+      this.rawAssCats
+        .splice(this.rawAssCats.findIndex(oldAC => oldAC.id === AC.id), 1, Object.assign({}, AC));
       this.section.students.forEach(s => {
-        const newAC = JSON.parse(JSON.stringify(AC));
+        const newAC = Object.assign({}, AC);
         newAC.assignments = s.assCats.find(ac => newAC.id === ac.id).assignments;
         newAC.assignments.forEach(a => {
-          a.assignmentCategoryId = newAC.id
+          a.assignmentCategoryId = newAC.id;
         });
         s.assCats.splice(s.assCats.findIndex(ac => ac.id === newAC.id), 1, newAC);
       });
-    
-      if(AC.new) {
-        
+      // eslint-disable no-empty
+      if (AC.new) {
+      // eslint-disable no-empty
       } else {
         // don't
       }
-    }, 
+    },
     deleteAC: (AC) => {
-
+      // Prompt: Are you sure?
+      const tempAssCat = this.rawAssCats.find(ac => ac.id === AC.id);
+      const hasAssignments = tempAssCat.assignments.length > 0;
+      if (hasAssignments) {
+        tempAssCat.assignments.forEach(a => {
+          this.changeQueue.Assignments.Deletes.push(Object.assign({}, a));
+        });
+      }
+      if (AC.new) {
+        this.changeQueue.AssignmentCategories.New.splice(
+          this.changeQueue.AssignmentCategories.New.findIndex(ac => ac.id === AC.id),
+          1,
+        );
+      } else {
+        this.changeQueue.AssignmentCategories.Deletes.push(Object.assign({}, AC));
+      }
+      this.rawAssCats.splice(this.rawAssCats.findIndex(ac => ac.id === AC.id), 1);
+      this.section.students.forEach(s => {
+        if (hasAssignments) {
+          const assCat = s.assCats.find(ac => ac.id === AC.id);
+          assCat.assignments.forEach(a => {
+            this.changeQueue.Grades.Deletes.push(Object.assign({}, a.grade));
+            delete a.grade;
+          });
+        }
+        s.assCats.splice(s.assCats.findIndex(ac => ac.id === AC.id), 1);
+      });
+      this.rawAssCats.splice(this.rawAssCats.findIndex(ac => ac.id === AC.id), 1);
     },
-    updateAss: (a) => {
-
+    updateAssignment: (a) => {
+      const tempAC = this.rawAssCats.find(ac => a.assignmentCategoryId === ac.id);
+      tempAC.assignments.splice(tempAC.assignments.findIndex(oldA => oldA.id === a.id), 1, a);
+      this.section.students.forEach(s => {
+        const newA = Object.assign({}, a);
+        const studentAssCat = s.assCats.find(ac => ac.id === a.assignmentCategoryId);
+        const studentAssIndex = studentAssCat.assignments.findIndex(ass => ass.id === a.id);
+        if (studentAssCat.assignments[studentAssIndex].totalPoints !== a.totalPoints) {
+          studentAssCat.assignments[studentAssIndex].grade.score = studentAssCat
+            .assignments[studentAssIndex].grade.score
+            / studentAssCat.assignments[studentAssIndex].totalPoints
+            * a.totalPoints;
+          this.changeQueue.Grades.Updates
+            .push(Object.assign({}, studentAssCat.assignments[studentAssIndex].grade));
+        }
+        newA.grade = Object.assign({}, studentAssCat.assignments[studentAssIndex].grade);
+        studentAssCat.assignments.splice(studentAssIndex, 1, newA);
+      });
+      this.changeQueue.Assignments.Updates.push(Object.assign({}, a));
     },
-    deleteAss: (a) => {
 
-    },
-    updateGrade: (g) => {
-
-    },
-    deleteGrade: (g) => {
-
+    deleteAssignment: (a) => {
+      const tempAC = this.rawAssCats.find(ac => a.assignmentCategoryId === ac.id).assignments;
+      this.changeQueue.Assignments.Deletes.push(Object.assign({}, a));
+      tempAC.splice(tempAC.findIndex(olda => a.id === olda.id), 1);
+      this.section.students.forEach(s => {
+        const studentAsses = s.assCats.find(ac => ac.id === a.assignmentCategoryId).assignments;
+        const studentAss = studentAsses.find(olda => a.id === olda.id);
+        this.changeQueue.Grades.Deletes.push(Object.assign({}, studentAss.grade));
+        studentAsses.splice(studentAsses.findIndex(ass => ass.id === studentAss.id), 1);
+      });
     },
   },
   computed: {
