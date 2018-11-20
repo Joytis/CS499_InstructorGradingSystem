@@ -16,7 +16,7 @@
       <div v-else>
         <b-field label="Simple">
           <b-select placeholder="Select a name" v-model="studentId">
-            <option v-for="option in students" :value="option.id">
+            <option v-for="option in students" :value="option.id" :key="option.id">
               {{ `${option.lastName}, ${option.firstName}` }}
             </option>
           </b-select>

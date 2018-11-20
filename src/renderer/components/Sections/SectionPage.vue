@@ -262,7 +262,7 @@ export default {
         templates: {
           name: { label: 'Name', type: 'input', placeholder: 'Category Name' },
           weight: {
-            label: 'Weight', type: 'input', subtype: 'number', placeholder: 0.0, step: 0.01, max: 1,
+            label: 'Weight', type: 'input', subtype: 'number', placeholder: 0.0, step: 0.01, min: 0, max: 1,
           },
           lowestGradesDropped: {
             label: 'Lowest Grades Dropped', type: 'input', subtype: 'number', placeholder: 0,
@@ -686,7 +686,7 @@ export default {
           editable: false,
         }].concat(
         this.assignments.map(a => ({
-          headerName: `${a.name} (${a.totalPoints})`,
+          headerName: `(${a.totalPoints}) ${a.name}`,
           field: `Ass${a.id}`,
           editable: true,
           assignmentId: a.id,

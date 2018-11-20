@@ -13,7 +13,7 @@
       <div v-else-if="state === 'success'">
         Success!
       </div>
-      <div v-else v-for="(field, key) in inputs.templates">
+      <div v-else v-for="(field, key) in inputs.templates" :key="field.label">
         <b-field :label="field.label">
           <div v-if="field.type === 'input'">
             <b-input 
@@ -21,6 +21,7 @@
               :type="field.subtype" 
               :step="field.step || 1" 
               :min="field.min || 0" 
+              :max="field.max || Number.MAX_SAFE_INTEGER"
               :placeholder="(field.placeholder) ? field.placeholder : ''" 
               required/>
           </div>
@@ -96,7 +97,7 @@
     <footer class="modal-card-foot">
       <div v-if="state === 'main'">
         <button class="button" type="button" @click="$parent.close()">Close</button>
-        <button class="button is-primary"v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
+        <button class="button is-primary" v-text="primaryButtonText()" @click="attemptDatabaseCreate"/>
       </div>
     </footer>
   </div>

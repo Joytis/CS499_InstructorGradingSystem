@@ -21,6 +21,7 @@
               :type="field.subtype" 
               :step="field.step || 1" 
               :min="field.min || 0" 
+              :max="field.max || Number.MAX_SAFE_INTEGER"
               :placeholder="(field.placeholder) ? field.placeholder : ''" 
               required/>
           </div>
