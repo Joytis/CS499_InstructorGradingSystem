@@ -11,6 +11,9 @@
     >
       Copy Section
     </button>
+    <button @click="out(students)"/>
+    <button @click="out(formattedData)"/>
+    <button @click="out(studentCatAverage)"/>
     <b-modal :active.sync="isCopyModalActive" :width="640" scroll="keep" has-modal-card>
       <copy-section-modal :target="section"></copy-section-modal>
     </b-modal>
@@ -218,6 +221,8 @@ export default {
       students: [],
       assCats: [],
       assignments: [],
+      mattsRawAssCats: [],
+      indices: {},
       selectedStudent: null,
       selectedAssignmentCategory: null,
       selectedAssignment: null,
@@ -362,8 +367,10 @@ export default {
           console.log(err);
         }
         this.updateAssignmentGrade(gradeArgs).then().catch(err => console.log(err));
+        await this.updateGrades(gradeArgs);
       }
     },
+
 
     async getAssignmentGrades(assignment) {
       const assignmentGradeCrud = AssignmentCrud.fromAppendedRoute(urljoin(String(assignment.id), '/grades'));
@@ -384,6 +391,11 @@ export default {
         } else this.assignments[assIndex].grades.push(g);
       });
     },
+
+    // async updateStudentGrade(assignment) {
+    //   const assIndex = this.assignments.findIndex(a => a.id === assignment.assignmentId);
+    //   const
+    // },
 
     async getFilteredGrades(student) {
       const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(student.id), '/grades'));
@@ -414,10 +426,11 @@ export default {
       this.assCats.push(custom);
     },
     asscatUpdated(assCat) {
-      this.assCats[this.assCats.findIndex(a => a.id === assCat.id)] = assCat;
+      this.assCats.splice(this.assCats.findIndex(a => a.id === assCat.id), 1, assCat);
     },
     asscatRemoved(assCat) {
       this.assCats = this.assCats.filter(a => a.id !== assCat.id);
+      EventBus.$emit('screw-it-reload-everything');
     },
 
 
@@ -437,7 +450,8 @@ export default {
     assignmentUpdated(assignment) {
       const finder = (ac) => ac.id === assignment.assignmentCategoryId;
       assignment.assignmentCategory = this.assCats.find(finder);
-      this.assignments[this.assignment.findIndex(a => a.id === assignment.id)] = assignment;
+      this.assignments.splice(this.assignment
+        .findIndex(a => a.id === assignment.id), 1, assignment);
     },
 
     async fetchData() {
@@ -483,9 +497,98 @@ export default {
 
       this.allStudents = (await StudentCrud.get()).data;
     },
-
+    async updateGrades(gradeArgs) {
+      const studentGradeCrud = StudentCrud.fromAppendedRoute(urljoin(String(gradeArgs.studentId), '/grades'));
+      const rawStudentGrades = (await studentGradeCrud.get()).data;
+      const grade = Object.assign({}, rawStudentGrades
+        .find(g => g.assignmentId === gradeArgs.assignmentId));
+      const oldGrade = this.students
+        .find(s => s.id === gradeArgs.studentId).grades
+        .find(g => g.id === grade.id);
+      if (oldGrade) {
+        grade.assignment = Object.assign({}, oldGrade.assignment);
+        const gradeArray = this.students.find(s => s.id === gradeArgs.studentId).grades;
+        gradeArray.splice(gradeArray.findIndex(g => g.id === grade.id), 1, grade);
+      } else {
+        grade.assignment = Object.assign({}, this.assignments
+          .find(a => a.id === gradeArgs.assignmentId));
+        grade.assignment.assignmentCategory = Object.assign({}, this.assCats
+          .find(ac => ac.id === grade.assignment.assignmentCategoryId));
+        const gradeArray = this.students.find(s => s.id === gradeArgs.studentId).grades;
+        gradeArray.push(grade);
+      }
+    },
   },
+
   computed: {
+    formattedData() {
+      const students = this.students.map(s => {
+        const AssCats = [];
+        const assignments = [];
+        const stud = Object.assign({}, s);
+        s.grades.forEach(g => {
+          if (!assignments.find(a => a.id === g.assignment.id)) {
+            const a = Object.assign({}, g.assignment);
+            delete a.assignmentCategory;
+            assignments.push(a);
+            if (!AssCats.find(ac => ac.id === g.assignment.assignmentCategoryId)) {
+              AssCats.push(Object.assign({}, g.assignment.assignmentCategory));
+            }
+          }
+        });
+        assignments.map(a => {
+          a.grade = Object.assign({}, s.grades.find(g => g.assignmentId === a.id));
+          delete a.grade.assignment;
+          return a;
+        });
+        AssCats.map(ac => {
+          ac.assignments = assignments.filter(a => a.assignmentCategoryId === ac.id);
+          return ac;
+        });
+        stud.assCats = AssCats;
+        return stud;
+      });
+      return students;
+    },
+    studentCatAverage() {
+      // const formattedStudents = Object.assign({}, this.formattedData);
+      const rows = this.formattedData.map(student => {
+        // const data = {
+        //   studentId: student.id,
+        //   studentName: `${student.lastName}, ${student.firstName}`,
+        // };
+        student.assCats.map(asscat => {
+          const ac = Object.assign({}, asscat);
+          ac.assignments
+            .sort((a, b) => {
+              // console.log('a', a, 'b', b);
+              const aScore = a.grade.score / a.totalPoints;
+              const bScore = b.grade.score / b.totalPoints;
+              if (aScore < bScore) {
+                return -1;
+              } if (aScore > bScore) {
+                return 1;
+              }
+              return 0;
+            });
+
+          if (ac.assignments && ac.assignments.length > Number(ac.lowestGradesDropped)) {
+            let totalPossible = 0;
+            let actualTotal = 0;
+            for (let i = Number(ac.lowestGradesDropped); i < ac.assignments.length; i += 1) {
+              totalPossible += ac.assignments[i].totalPoints;
+              actualTotal += ac.assignments[i].grade.score;
+            }
+            ac.categoryAverage = actualTotal / totalPossible;
+          } else ac.categoryAverage = NaN;
+
+          ac.categoryAverage = (!Number.isNaN(ac.categoryAverage)) ? Number(ac.categoryAverage * 100).toFixed(2) : 'None';
+          return ac;
+        });
+        return student;
+      });
+      return rows;
+    },
     gradeTableHeight() {
       return (this.showAnalytics) ? '49vh' : '70vh';
     },
