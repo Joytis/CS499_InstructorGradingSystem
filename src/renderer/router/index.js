@@ -7,50 +7,25 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {
-      path: '/courses',
+      path: '/sections',
       name: 'My Courses',
-      component: require('../components/Courses/CourseTable.vue').default,
+      component: require('../components/Sections/Sections.vue').default,
     },
     {
-      path: '/courses/:id',
-      name: 'Course Page',
-      component: require('../components/Courses/CoursePage.vue').default,
-    },
-    {
-      path: '/courses/:courseId/:sectionId',
+      path: '/sections/:courseId/:sectionId',
       name: 'Section page',
       component: require('../components/Sections/SectionPage.vue').default,
     },
     {
-      path: '/courses/:courseId/:sectionId/whatIf',
+      path: '/sections/:courseId/:sectionId/whatIf',
       name: 'Student Page',
       component: require('../components/Sections/WhatIf.vue').default,
     },
     {
-      path: '/courses/:courseId/:sectionId/:studentId',
+      path: '/sections/:courseId/:sectionId/:studentId',
       name: 'Student Page',
       component: require('../components/Sections/StudentPage.vue').default,
     },
-    // {
-    //   path: '/courses/:id/:section/enrollment',
-    //   name: 'Section Enrollment',
-    //   component: require('../components/Enrollment/SectionEnrollment.vue'),
-    // },
-    // {
-    //   path: '/courses/:id/:section/settings',
-    //   name: 'Section Settings',
-    //   component: require('../components/Sections/SectionSettings.vue').default,
-    // },
-    // {
-    //   path: '/courses/:id/:section/assignments',
-    //   name: 'Assignment Management',
-    //   component: require('../components/Sections/AssignmentMngr.vue').default,
-    // },
-    // {
-    //   path: '/courses/:id/:section/grades',
-    //   name: 'Section Grades',
-    //   component: require('../components/Sections/SectionGrades.vue').default,
-    // },
     {
       path: '/enrollment',
       name: 'Enrollment',
@@ -62,18 +37,18 @@ export default new Router({
       component: require('../components/Terms/Terms.vue').default,
     },
     {
+      path: '/courses',
+      name: 'Course Catalogue',
+      component: require('../components/Courses/Courses.vue').default,
+    },
+    {
       path: '/docs',
       name: 'Documentation',
       component: require('../components/Documentation.vue').default,
     },
-    // {
-    //   path: '/auth',
-    //   name: 'Auth Testing',
-    //   component: require('../components/AuthModal/AuthModal.vue').default,
-    // },
     {
       path: '*',
-      redirect: '/courses',
+      redirect: '/sections',
     },
   ],
 });

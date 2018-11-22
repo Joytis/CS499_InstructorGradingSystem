@@ -249,7 +249,7 @@ export default {
             label: 'Name', type: 'input', placeholder: 'Assignment name',
           },
           totalPoints: {
-            label: 'Total Points', type: 'input', subtype: 'number', placeholder: 100, min: 1
+            label: 'Total Points', type: 'input', subtype: 'number', placeholder: 100, min: 1,
           },
           dueDate: {
             label: 'Due Date', type: 'datepicker', placeholder: Date(Date.now()),

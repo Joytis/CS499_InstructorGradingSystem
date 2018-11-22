@@ -16,25 +16,29 @@ const menu = [
     title: 'General',
     menuItems: [
       {
-        itemTitle: 'Courses',
+        itemTitle: 'Sections',
+        itemLink: '/sections',
+      },
+      {
+        itemTitle: 'Student Listing',
+        itemLink: '/enrollment',
+      },
+      {
+        itemTitle: 'Course Catalogue',
         itemLink: '/courses',
       },
       {
-        itemTitle: 'Documentation',
-        itemLink: '/docs',
+        itemTitle: 'Term Catalogue',
+        itemLink: '/terms',
       },
     ],
   },
   {
-    title: 'Administration',
+    title: 'Help',
     menuItems: [
       {
-        itemTitle: 'Manage Enrollment',
-        itemLink: '/enrollment',
-      },
-      {
-        itemTitle: 'Manage Terms',
-        itemLink: '/terms',
+        itemTitle: 'Documentation',
+        itemLink: '/docs',
       },
     ],
   },

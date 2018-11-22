@@ -54,49 +54,49 @@
       </b-tab-item>
       <b-tab-item label="Assignments">
         <!-- Assignment modal-->
-          <crud-modal-bar
-            createTitle="Create Assignment"
-            :inputs="assignmentInputs"
-            :removed="['edit', 'delete']"
-          />
+        <crud-modal-bar
+          createTitle="Create Assignment"
+          :inputs="assignmentInputs"
+          :removed="['edit', 'delete']"
+        />
         <!-- Assignments table-->
-          <template>
-            <b-table 
-              :data="assignments"
-              paginated 
-              per-page="10"
-              :selected.sync="selectedAssignment"
-              >
-              <template slot-scope="props">
-                <b-table-column field="name" label="Name" sortable>
-                  {{ props.row.name }}
-                </b-table-column>
-                <b-table-column field="assignmentCategory.name" label="Assignment Category" width="180" sortable>
-                  {{ props.row.assignmentCategory.name }}
-                </b-table-column>
-                <b-table-column field="totalPoints" label="Total Points" sortable>
-                  {{ props.row.totalPoints }}
-                </b-table-column>
-                <b-table-column field="dateCreated" label="Date Created" sortable>
-                  {{ new Date(props.row.dateCreated).toLocaleDateString() }}
-                </b-table-column>
-                <b-table-column field="dueDate" label="Due Date" sortable>
-                  {{ new Date(props.row.dueDate).toLocaleDateString() }}
-                </b-table-column>
+        <template>
+          <b-table 
+            :data="assignments"
+            paginated 
+            per-page="10"
+            :selected.sync="selectedAssignment"
+            >
+            <template slot-scope="props">
+              <b-table-column field="name" label="Name" sortable>
+                {{ props.row.name }}
+              </b-table-column>
+              <b-table-column field="assignmentCategory.name" label="Assignment Category" width="180" sortable>
+                {{ props.row.assignmentCategory.name }}
+              </b-table-column>
+              <b-table-column field="totalPoints" label="Total Points" sortable>
+                {{ props.row.totalPoints }}
+              </b-table-column>
+              <b-table-column field="dateCreated" label="Date Created" sortable>
+                {{ new Date(props.row.dateCreated).toLocaleDateString() }}
+              </b-table-column>
+              <b-table-column field="dueDate" label="Due Date" sortable>
+                {{ new Date(props.row.dueDate).toLocaleDateString() }}
+              </b-table-column>
 
-                <b-table-column label="Modify">
-                  <crud-modal-bar
-                    @click="selectedAssignment = props.row"
-                    editTitle="Edit"
-                    deleteTitle="Delete"
-                    :inputs="assignmentInputs"
-                    :target="props.row"
-                    :removed="['create']"
-                  />
-                </b-table-column>
-              </template>
-            </b-table>
-          </template>
+              <b-table-column label="Modify">
+                <crud-modal-bar
+                  @click="selectedAssignment = props.row"
+                  editTitle="Edit"
+                  deleteTitle="Delete"
+                  :inputs="assignmentInputs"
+                  :target="props.row"
+                  :removed="['create']"
+                />
+              </b-table-column>
+            </template>
+          </b-table>
+        </template>
       </b-tab-item>
       <b-tab-item label="Grade Entry">
         <button class="button" @click="OnExport()">
@@ -169,7 +169,6 @@
 </template>
 
 <script>
-// import data from '../Courses/CourseListDataMock';
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-console */
 import urljoin from 'url-join';

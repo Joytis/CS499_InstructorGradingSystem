@@ -42,7 +42,7 @@
                       :value="option[field.value]"
                       :key="option[field.key]"
               >
-                {{ option.name }}
+                {{ field.display(option) }}
               </option>
             </b-select>
           </div>

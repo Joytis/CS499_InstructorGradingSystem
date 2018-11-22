@@ -155,9 +155,6 @@ export default {
       // this.getAverage;
       // this.grade = this.overAllGrade;
     },
-    out(args) {
-      console.log(args);
-    },
     sortedGrades(a, b) {
       if ((a.grade.score / a.totalPoints) < (b.grade.score / b.totalPoints)) {
         return -1;
@@ -237,7 +234,6 @@ export default {
           }
         });
         grades.sort(this.sortedGrades);
-        console.log(grades);
         for (let i = 0; i < ac.lowestGradesDropped; i += 1) {
           if (typeof (grades[i]) !== 'undefined') {
             grades[i].dropped = true;
