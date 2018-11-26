@@ -1,9 +1,6 @@
 <template>
   <div>
     <back-button></back-button>
-    <router-link class="button is-primary is-small" :to=" $route.params.sectionId + '/whatIf'">
-      ?
-    </router-link>
     <button 
       class="button is-primary is-small" 
       @click="isCopyModalActive = true"
@@ -11,6 +8,9 @@
     >
       Copy Section
     </button>
+    <router-link class="button is-primary is-small" :to=" $route.params.sectionId + '/whatIf'">
+      What-If Analysis
+    </router-link>
     <b-modal :active.sync="isCopyModalActive" :width="640" scroll="keep" has-modal-card>
       <copy-section-modal :target="section"></copy-section-modal>
     </b-modal>
@@ -54,67 +54,73 @@
       </b-tab-item>
       <b-tab-item label="Assignments">
         <!-- Assignment modal-->
-        <crud-modal-bar
-          createTitle="Create Assignment"
-          :inputs="assignmentInputs"
-          :removed="['edit', 'delete']"
-        />
+          <crud-modal-bar
+            createTitle="Create Assignment"
+            :inputs="assignmentInputs"
+            :removed="['edit', 'delete']"
+          />
         <!-- Assignments table-->
-        <template>
-          <b-table 
-            :data="assignments"
-            paginated 
-            per-page="10"
-            :selected.sync="selectedAssignment"
-            >
-            <template slot-scope="props">
-              <b-table-column field="name" label="Name" sortable>
-                {{ props.row.name }}
-              </b-table-column>
-              <b-table-column field="assignmentCategory.name" label="Assignment Category" width="180" sortable>
-                {{ props.row.assignmentCategory.name }}
-              </b-table-column>
-              <b-table-column field="totalPoints" label="Total Points" sortable>
-                {{ props.row.totalPoints }}
-              </b-table-column>
-              <b-table-column field="dateCreated" label="Date Created" sortable>
-                {{ new Date(props.row.dateCreated).toLocaleDateString() }}
-              </b-table-column>
-              <b-table-column field="dueDate" label="Due Date" sortable>
-                {{ new Date(props.row.dueDate).toLocaleDateString() }}
-              </b-table-column>
+          <template>
+            <b-table 
+              :data="assignments"
+              paginated 
+              per-page="10"
+              :selected.sync="selectedAssignment"
+              >
+              <template slot-scope="props">
+                <b-table-column field="name" label="Name" sortable>
+                  {{ props.row.name }}
+                </b-table-column>
+                <b-table-column field="assignmentCategory.name" label="Assignment Category" width="180" sortable>
+                  {{ props.row.assignmentCategory.name }}
+                </b-table-column>
+                <b-table-column field="totalPoints" label="Total Points" sortable>
+                  {{ props.row.totalPoints }}
+                </b-table-column>
+                <b-table-column field="dateCreated" label="Date Created" sortable>
+                  {{ new Date(props.row.dateCreated).toLocaleDateString() }}
+                </b-table-column>
+                <b-table-column field="dueDate" label="Due Date" sortable>
+                  {{ new Date(props.row.dueDate).toLocaleDateString() }}
+                </b-table-column>
 
-              <b-table-column label="Modify">
-                <crud-modal-bar
-                  @click="selectedAssignment = props.row"
-                  editTitle="Edit"
-                  deleteTitle="Delete"
-                  :inputs="assignmentInputs"
-                  :target="props.row"
-                  :removed="['create']"
-                />
-              </b-table-column>
-            </template>
-          </b-table>
-        </template>
+                <b-table-column label="Modify">
+                  <crud-modal-bar
+                    @click="selectedAssignment = props.row"
+                    editTitle="Edit"
+                    deleteTitle="Delete"
+                    :inputs="assignmentInputs"
+                    :target="props.row"
+                    :removed="['create']"
+                  />
+                </b-table-column>
+              </template>
+            </b-table>
+          </template>
       </b-tab-item>
       <b-tab-item label="Grade Entry">
-        <button class="button" @click="OnExport()">
-          Export File
+        <button class="button is-small is-primary" @click="OnExport()">
+          Export Grades
         </button>
-        <ag-grid-vue :style="{width: '100%', height: gradeTableHeight}"
+        <button class="button is-small is-primary" @click="OnAnalyticsExport()">
+          Export Assignment Analytics
+        </button>
+        Show Analytics: <b-switch v-model="showAnalytics" class="is-primary is-small"/>
+        <ag-grid-vue :style="{width: '100%', height: gradeTableHeight, 'padding-top': '.5em'}"
           class="ag-theme-balham"
           :columnDefs="assignmentColumns"
           :rowData="studentGradeRows"
           :cellValueChanged="trySubmitOrUpdateGrade"
-          :gridReady="onGridReady"/>
-        Show Analytics: <b-switch v-model="showAnalytics" class="is-primary is-small"/>
+          :gridReady="onGridReady"
+          :enableColResize="true"
+          :enterMovesDownAfterEdit="true"
+          />
         <div v-if="showAnalytics">
-          <ag-grid-vue style="width: 100%; height: 21vh;"
-          class="ag-theme-balham"
-          :columnDefs="analyticsColumns"
-          :rowData="analyticsRows"
-          :cellValueChanged="trySubmitOrUpdateGrade"/>
+          <ag-grid-vue style="width: 100%; height: 21vh; padding-top: .8em"
+            class="ag-theme-balham"
+            :columnDefs="analyticsColumns"
+            :rowData="analyticsRows"
+            :gridReady="onAnalyticsGridReady"/>
         </div>
       </b-tab-item>
       <b-tab-item label="Section Settings">
@@ -250,6 +256,8 @@ export default {
       showAnalytics: false,
       gridApi: null,
       columnApi: null,
+      analyticsGridApi: null,
+      analyticsColumnApi: null,
 
       // Modal input details.
       assignmentCategoryInputs: {
@@ -358,13 +366,23 @@ export default {
       this.gridApi = params.api;
       this.columnApi = params.columnApi;
     },
+    onAnalyticsGridReady(params) {
+      this.gridApi = params.api;
+      this.columnApi = params.columnApi;
+      this.columnApi.enableColResize = true;
+    },
     OnExport() {
       this.gridApi.exportDataAsCsv({
         columnDefs: this.assignmentColumns,
         fileName: 'Test',
       });
     },
-
+    OnAnalyticsExport() {
+      this.gridApi.exportDataAsCsv({
+        columnDefs: this.assignmentColumns,
+        fileName: 'Test',
+      });
+    },
     async studentUnenrolled(student) {
       // Cascade and delete all student grades from database.
       // Find student in our student store.
@@ -747,24 +765,26 @@ export default {
       );
     },
     analyticsRows() {
-      const filter = g => !Number.isNaN(Number(g.score));
+      const gradeArrObj = {};
+      this.assignments.forEach(a => {
+        gradeArrObj[`Ass${a.id}`] = [];
+      });
+      this.students.forEach(s => {
+        s.grades.forEach(g => {
+          gradeArrObj[`Ass${g.assignmentId}`].push(g.score);
+        });
+      });
       let ops = [
         { opname: 'Mean', function: QuickMaffs.Mean },
         { opname: 'Median', function: QuickMaffs.Median },
         { opname: 'Mode', function: QuickMaffs.Mode },
         { opname: 'Std. Dev.', function: QuickMaffs.StandardDeviation },
       ];
+      const gradeObjKeys = Object.keys(gradeArrObj);
       ops = ops.map(op => {
-        this.assignments.forEach(ass => {
-          try {
-            const rawScores = ass.grades.filter(filter).map(g => g.score);
-            op[`Ass${ass.id}`] = op.function(
-              rawScores,
-            );
-            if (Number.isNaN(op[`Ass${ass.id}`])) op[`Ass${ass.id}`] = 'None';
-          } catch (err) {
-            op[`Ass${ass.id}`] = 'None';
-          }
+        gradeObjKeys.forEach(key => {
+          const result = op.function(gradeArrObj[key]);
+          op[key] = (!Number.isNaN(result)) ? Number((result).toFixed(2)) : 'None';
         });
         return op;
       });

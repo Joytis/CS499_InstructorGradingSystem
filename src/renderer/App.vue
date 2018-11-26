@@ -60,9 +60,11 @@ export default {
     async login() {
       this.loggedIn = true;
       this.instructor = (await AccountCrud.get()).data;
+      this.$router.replace('/sections'); // Replaces browser history from previous user
     },
     logout() {
       this.loggedIn = false;
+      this.instructor = null;
     },
   },
 };

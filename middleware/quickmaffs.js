@@ -1,8 +1,13 @@
 function Mean(values) {
   if (!Array.isArray(values)) throw new Error('Values are not an array!');
   // Gets javascript to shut up about for in loops
-  const total = values.reduce((acc, entry) => acc + entry);
-  return total / values.length; // no need for ID
+  try {
+    const total = values.reduce((acc, entry) => acc + entry);
+    return total / values.length; // no need for ID
+  } catch (err) {
+    if (err.name === 'TypeError') return NaN;
+    throw err;
+  }
 }
 
 

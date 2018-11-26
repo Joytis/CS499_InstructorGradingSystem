@@ -27,6 +27,8 @@
             class="ag-theme-balham"
             :columnDefs="assCatColumns"
             :rowData="assCatRows"
+            :enableColResize="true"
+            :enterMovesDownAfterEdit="true"
             />
         </b-tab-item>
         <b-tab-item label="Assignments">
@@ -217,9 +219,9 @@ export default {
       assignmentCategoryInputs: {
         crudTarget: AssignmentCategoryCrud,
         preCreate: null,
-        postCreate(result) { EventBus.$emit('asscat-added', result); },
-        postUpdate(result) { EventBus.$emit('asscat-updated', result); },
-        postDelete(result) { EventBus.$emit('asscat-removed', result); },
+        // postCreate(result) { EventBus.$emit('asscat-added', result); },
+        // postUpdate(result) { EventBus.$emit('asscat-updated', result); },
+        // postDelete(result) { EventBus.$emit('asscat-removed', result); },
         templates: {
           name: { label: 'Name', type: 'input', placeholder: 'Category Name' },
           weight: {
@@ -409,57 +411,63 @@ export default {
     },
     async flushChangeQueue() {
       const cq = this.changeQueue;
-      if (cq.AssignmentCategories.New.length) {
-        const newACPromises = cq.AssignmentCategories.New.map(async (ac) => {
-          const oldACId = ac.id;
-          ac = (await AssignmentCategoryCrud.post(ac)).data;
-          ac.oldId = oldACId;
-          cq.Assignments.Updates.forEach(a => {
-            if (a.assignmentCategoryId === ac.oldId) a.assignmentCategoryId = ac.id;
+      try {
+        if (cq.AssignmentCategories.New.length) {
+          const newACPromises = cq.AssignmentCategories.New.map(async (ac) => {
+            const oldACId = ac.id;
+            ac.weight = Number(ac.weight);
+            ac.lowestGradesDropped = Number(ac.lowestGradesDropped);
+            ac = (await AssignmentCategoryCrud.post(ac)).data;
+            ac.oldId = oldACId;
+            cq.Assignments.Updates.forEach(a => {
+              if (a.assignmentCategoryId === ac.oldId) a.assignmentCategoryId = ac.id;
+            });
           });
-        });
-        await Promise.all(newACPromises);
+          await Promise.all(newACPromises);
+        }
+        if (cq.GradingScale.Update.id) {
+          await SectionCrud.put(cq.GradingScale.Update.id, { data: cq.GradingScale.Update });
+        }
+        if (cq.AssignmentCategories.Updates.length) {
+          const updateACPromises = cq.AssignmentCategories.Updates.map(async (ac) => {
+            await AssignmentCategoryCrud.put(ac.id, { data: ac });
+          });
+          await Promise.all(updateACPromises);
+        }
+        if (cq.Assignments.Updates.length) {
+          const updateAsses = cq.Assignments.Updates.map(async (a) => {
+            await AssignmentCrud.put(a.id, { data: a });
+          });
+          await Promise.all(updateAsses);
+        }
+        if (cq.Grades.Updates.length) {
+          const updateGrades = cq.Grades.Updates.map(async (g) => {
+            await GradeCrud.put(g.id, { data: g });
+          });
+          await Promise.all(updateGrades);
+        }
+        if (cq.Grades.Deletes.length) {
+          const deleteGrades = cq.Grades.Deletes.map(async (g) => {
+            await GradeCrud.delete(g.id);
+          });
+          await Promise.all(deleteGrades);
+        }
+        if (cq.Assignments.Deletes.length) {
+          const deleteAsses = cq.Assignments.Deletes.map(async (a) => {
+            await AssignmentCrud.delete(a.id);
+          });
+          await Promise.all(deleteAsses);
+        }
+        if (cq.AssignmentCategories.Deletes.length) {
+          const deleteACPromises = cq.AssignmentCategories.Deletes.map(async (ac) => {
+            await AssignmentCategoryCrud.delete(ac.id);
+          });
+          await Promise.all(deleteACPromises);
+        }
+        this.$router.go(-1);
+      } catch (err) {
+        console.log(JSON.stringify(err, null, 2));
       }
-      if (cq.GradingScale.Update.id) {
-        await SectionCrud.put(cq.GradingScale.Update.id, { data: cq.GradingScale.Update });
-      }
-      if (cq.AssignmentCategories.Updates.length) {
-        const updateACPromises = cq.AssignmentCategories.Updates.map(async (ac) => {
-          await AssignmentCategoryCrud.put(ac.id, { data: ac });
-        });
-        await Promise.all(updateACPromises);
-      }
-      if (cq.Assignments.Updates.length) {
-        const updateAsses = cq.Assignments.Updates.map(async (a) => {
-          await AssignmentCrud.put(a.id, { data: a });
-        });
-        await Promise.all(updateAsses);
-      }
-      if (cq.Grades.Updates.length) {
-        const updateGrades = cq.Grades.Updates.map(async (g) => {
-          await GradeCrud.put(g.id, { data: g });
-        });
-        await Promise.all(updateGrades);
-      }
-      if (cq.Grades.Deletes.length) {
-        const deleteGrades = cq.Grades.Deletes.map(async (g) => {
-          await GradeCrud.delete(g.id);
-        });
-        await Promise.all(deleteGrades);
-      }
-      if (cq.Assignments.Deletes.length) {
-        const deleteAsses = cq.Assignments.Deletes.map(async (a) => {
-          await AssignmentCrud.delete(a.id);
-        });
-        await Promise.all(deleteAsses);
-      }
-      if (cq.AssignmentCategories.Deletes.length) {
-        const deleteACPromises = cq.AssignmentCategories.Deletes.map(async (ac) => {
-          await AssignmentCategoryCrud.delete(ac.id);
-        });
-        await Promise.all(deleteACPromises);
-      }
-      this.$router.go(-1);
     },
     getLetterGrade(grade) {
       const A = this.section.gradeScaleA;
