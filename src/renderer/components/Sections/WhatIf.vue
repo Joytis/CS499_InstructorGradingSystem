@@ -76,14 +76,13 @@
         </b-tab-item>
         <b-tab-item label="Section Settings">
           <crud-modal-bar
-            @gradescaleedit="updateGS($event)"
+            @gsedit="updateGS($event)"
             editTitle="Edit Grading Scale"
+            :emit-type="'gs'"
             :inputs="GradeScaleInputs"
             :target="section"
             :removed="['create', 'delete']"
           />
-          <button @click="out(changeQueue)"/>
-          <button @click="out(section)"/>
           <nav class="level" v-if="!loading">
             <div class="level-item">A: 100 - {{section.gradeScaleA}}</div>
             <div class="level-item">B: &lt;{{section.gradeScaleA}} - {{section.gradeScaleB}}</div>
@@ -144,12 +143,12 @@
 <script>
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-console */
-import urljoin from "url-join";
-import { AtomSpinner, SelfBuildingSquareSpinner } from "epic-spinners";
-import { AgGridVue } from "ag-grid-vue";
+import urljoin from 'url-join';
+import { AtomSpinner, SelfBuildingSquareSpinner } from 'epic-spinners';
+import { AgGridVue } from 'ag-grid-vue';
 // import customCellEditor from '../customCellEditor';
 // import customValueParser from '../customValueParser';
-import CrudModalBar from "../QueueModalBar/CrudModalBar.vue";
+import CrudModalBar from '../QueueModalBar/CrudModalBar.vue';
 import {
   SectionCrud,
   EventBus,
@@ -157,15 +156,15 @@ import {
   AssignmentCrud,
   StudentCrud,
   EnrollmentCrud,
-  GradeCrud // QuickMaffs,
-} from "../../../../middleware";
-import BackButton from "../BackButton.vue";
-import CopySectionModal from "./CopySectionModal.vue";
-import "../../../../node_modules/ag-grid-community/dist/styles/ag-grid.css";
-import "../../../../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css";
+  GradeCrud, // QuickMaffs,
+} from '../../../../middleware';
+import BackButton from '../BackButton.vue';
+import CopySectionModal from './CopySectionModal.vue';
+import '../../../../node_modules/ag-grid-community/dist/styles/ag-grid.css';
+import '../../../../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
 
 export default {
-  name: "SectionPage",
+  name: 'SectionPage',
   components: {
     BackButton,
     CrudModalBar,
@@ -174,19 +173,19 @@ export default {
     AtomSpinner,
     SelfBuildingSquareSpinner,
     EnrollmentCrud,
-    GradeCrud
+    GradeCrud,
   },
   created() {
     const studentSectionRoute = urljoin(
       this.$route.params.sectionId,
-      "/students"
+      '/students',
     );
     this.sectionStudentCrud = SectionCrud.fromAppendedRoute(
-      studentSectionRoute
+      studentSectionRoute,
     );
     const assCatRoute = urljoin(
       this.$route.params.sectionId,
-      "/assignmentCategories"
+      '/assignmentCategories',
     );
     this.assignmentCategoryCrud = SectionCrud.fromAppendedRoute(assCatRoute);
 
@@ -213,19 +212,19 @@ export default {
         AssignmentCategories: {
           New: [],
           Updates: [],
-          Deletes: []
+          Deletes: [],
         },
         Assignments: {
           Updates: [],
-          Deletes: []
+          Deletes: [],
         },
         GradingScale: {
-          Update: {}
+          Update: {},
         },
         Grades: {
           Updates: [],
-          Deletes: []
-        }
+          Deletes: [],
+        },
       },
 
       // Modal input details.
@@ -236,22 +235,22 @@ export default {
         // postUpdate(result) { EventBus.$emit('asscat-updated', result); },
         // postDelete(result) { EventBus.$emit('asscat-removed', result); },
         templates: {
-          name: { label: "Name", type: "input", placeholder: "Category Name" },
+          name: { label: 'Name', type: 'input', placeholder: 'Category Name' },
           weight: {
-            label: "Weight",
-            type: "input",
-            subtype: "number",
+            label: 'Weight',
+            type: 'input',
+            subtype: 'number',
             placeholder: 0.0,
             step: 0.01,
-            max: 1
+            max: 1,
           },
           lowestGradesDropped: {
-            label: "Lowest Grades Dropped",
-            type: "input",
-            subtype: "number",
-            placeholder: 0
-          }
-        }
+            label: 'Lowest Grades Dropped',
+            type: 'input',
+            subtype: 'number',
+            placeholder: 0,
+          },
+        },
       },
 
       GradeScaleInputs: {
@@ -283,81 +282,80 @@ export default {
           //   placeholder: '00',
           // },
           gradeScaleA: {
-            label: "Grade Scale: A (Out of 100)",
-            type: "input",
-            subtype: "number",
-            placeholder: "90"
+            label: 'Grade Scale: A (Out of 100)',
+            type: 'input',
+            subtype: 'number',
+            placeholder: '90',
           },
           gradeScaleB: {
-            label: "Grade Scale: B (Out of 100)",
-            type: "input",
-            subtype: "number",
-            placeholder: "80"
+            label: 'Grade Scale: B (Out of 100)',
+            type: 'input',
+            subtype: 'number',
+            placeholder: '80',
           },
           gradeScaleC: {
-            label: "Grade Scale: C (Out of 100)",
-            type: "input",
-            subtype: "number",
-            placeholder: "70"
+            label: 'Grade Scale: C (Out of 100)',
+            type: 'input',
+            subtype: 'number',
+            placeholder: '70',
           },
           gradeScaleD: {
-            label: "Grade Scale: D (Out of 100)",
-            type: "input",
-            subtype: "number",
-            placeholder: "60"
-          }
-        }
+            label: 'Grade Scale: D (Out of 100)',
+            type: 'input',
+            subtype: 'number',
+            placeholder: '60',
+          },
+        },
       },
 
       assignmentInputs: {
         crudTarget: AssignmentCrud,
         postCreate(result) {
-          EventBus.$emit("assignment-added", result);
+          EventBus.$emit('assignment-added', result);
         },
         postUpdate(result) {
-          EventBus.$emit("assignment-updated", result);
+          EventBus.$emit('assignment-updated', result);
         },
         postDelete(result) {
-          EventBus.$emit("assignment-removed", result);
+          EventBus.$emit('assignment-removed', result);
         },
         templates: {
           assignmentCategoryId: {
-            label: "Assignment Category",
-            type: "dropdown",
+            label: 'Assignment Category',
+            type: 'dropdown',
             getData: null,
-            value: "id",
-            key: "id,",
-            display: option => option.name
+            value: 'id',
+            key: 'id,',
+            display: option => option.name,
           },
           name: {
-            label: "Name",
-            type: "input",
-            placeholder: "Assignment name"
+            label: 'Name',
+            type: 'input',
+            placeholder: 'Assignment name',
           },
           totalPoints: {
-            label: "Total Points",
-            type: "input",
-            subtype: "number",
+            label: 'Total Points',
+            type: 'input',
+            subtype: 'number',
             placeholder: 100,
-            min: 1
+            min: 1,
           },
           dueDate: {
-            label: "Due Date",
-            type: "datepicker",
-            placeholder: Date(Date.now())
-          }
-        }
+            label: 'Due Date',
+            type: 'datepicker',
+            placeholder: Date(Date.now()),
+          },
+        },
       },
 
       init() {
-        this.assignmentInputs.templates.assignmentCategoryId.getData = () =>
-          this.assCats;
+        this.assignmentInputs.templates.assignmentCategoryId.getData = () => this.assCats;
         this.assignmentCategoryInputs.preCreate = staged => {
           // Retrieve the desired course and term ID
           const sectionId = this.section.id;
           return Object.assign({ sectionId }, staged);
         };
-      }
+      },
     };
     data.init();
     return data;
@@ -382,7 +380,7 @@ export default {
 
       // Append an array of assignments to the assignment categories
       const assPromises = this.assCats.map(async ac => {
-        const newUrl = urljoin(String(ac.id), "/assignments");
+        const newUrl = urljoin(String(ac.id), '/assignments');
         const asscatAssCrud = AssignmentCategoryCrud.fromAppendedRoute(newUrl);
         const assignments = (await asscatAssCrud.get()).data;
         assignments.forEach(a => {
@@ -395,7 +393,7 @@ export default {
       // If there are assignments, map the correct grade to each student
       const gradePromises = this.students.map(async s => {
         const studentGradeCrud = StudentCrud.fromAppendedRoute(
-          urljoin(String(s.id), "/grades")
+          urljoin(String(s.id), '/grades'),
         );
         const rawStudentGrades = (await studentGradeCrud.get()).data;
         rawStudentGrades.forEach(g => this.grades.push(g));
@@ -406,6 +404,7 @@ export default {
     },
 
     updateGS(GS) {
+      console.log('GS', GS);
       this.section.gradeScaleA = GS.gradeScaleA;
       this.section.gradeScaleB = GS.gradeScaleB;
       this.section.gradeScaleC = GS.gradeScaleC;
@@ -424,24 +423,24 @@ export default {
       if (AC.new) {
         this.changeQueue.AssignmentCategories.New.splice(
           this.changeQueue.AssignmentCategories.New.findIndex(
-            ac => ac.id === AC.id
+            ac => ac.id === AC.id,
           ),
           1,
-          AC
+          AC,
         );
       } else {
         const cqIndex = this.changeQueue.AssignmentCategories.Updates.findIndex(
-          ac => ac.id === AC.id
+          ac => ac.id === AC.id,
         );
         if (cqIndex >= 0) {
           this.changeQueue.AssignmentCategories.splice(
             cqIndex,
             1,
-            Object.assign({}, AC)
+            Object.assign({}, AC),
           );
         } else {
           this.changeQueue.AssignmentCategories.Updates.push(
-            Object.assign({}, AC)
+            Object.assign({}, AC),
           );
         }
       }
@@ -460,19 +459,19 @@ export default {
             this.changeQueue.Assignments.Deletes.push(Object.assign({}, a));
           });
         this.assignments = this.assignments.filter(
-          a => a.assignmentCategoryId !== AC.id
+          a => a.assignmentCategoryId !== AC.id,
         );
       }
       if (AC.new) {
         this.changeQueue.AssignmentCategories.New.splice(
           this.changeQueue.AssignmentCategories.New.findIndex(
-            ac => ac.id === AC.id
+            ac => ac.id === AC.id,
           ),
-          1
+          1,
         );
       } else {
         this.changeQueue.AssignmentCategories.Deletes.push(
-          Object.assign({}, AC)
+          Object.assign({}, AC),
         );
       }
       this.assCats.splice(this.assCats.findIndex(ac => ac.id === AC.id), 1);
@@ -486,13 +485,13 @@ export default {
             .forEach(g => {
               g.score *= a.totalPoints / oldA.totalPoints;
               const guIndex = this.changeQueue.Grades.Updates.findIndex(
-                gu => gu.id === g.id
+                gu => gu.id === g.id,
               );
               if (guIndex >= 0) {
                 this.changeQueue.Grades.Updates.splice(
                   guIndex,
                   1,
-                  Object.assign({}, g)
+                  Object.assign({}, g),
                 );
               } else this.changeQueue.Grades.Updates.push(Object.assign({}, g));
             });
@@ -501,16 +500,16 @@ export default {
       this.assignments.splice(
         this.assignments.findIndex(oa => oa.id === a.id),
         1,
-        Object.assign({}, a)
+        Object.assign({}, a),
       );
       const uaIndex = this.changeQueue.Assignments.Updates.findIndex(
-        ua => ua.id === a.id
+        ua => ua.id === a.id,
       );
       if (uaIndex) {
         this.changeQueue.Assignments.Updates.splice(
           uaIndex,
           1,
-          Object.assign({}, a)
+          Object.assign({}, a),
         );
       } else this.changeQueue.Assignments.Updates.push(Object.assign({}, a));
     },
@@ -526,7 +525,7 @@ export default {
       this.changeQueue.Assignments.Deletes.push(Object.assign({}, a));
       this.assignments.splice(
         this.assignments.findIndex(da => da.id === a.id),
-        1
+        1,
       );
     },
     async flushChangeQueue() {
@@ -540,22 +539,21 @@ export default {
             ac = (await AssignmentCategoryCrud.post(ac)).data;
             ac.oldId = oldACId;
             cq.Assignments.Updates.forEach(a => {
-              if (a.assignmentCategoryId === ac.oldId)
-                a.assignmentCategoryId = ac.id;
+              if (a.assignmentCategoryId === ac.oldId) a.assignmentCategoryId = ac.id;
             });
           });
           await Promise.all(newACPromises);
         }
         if (cq.GradingScale.Update.id) {
           await SectionCrud.put(cq.GradingScale.Update.id, {
-            data: cq.GradingScale.Update
+            data: cq.GradingScale.Update,
           });
         }
         if (cq.AssignmentCategories.Updates.length) {
           const updateACPromises = cq.AssignmentCategories.Updates.map(
             async ac => {
               await AssignmentCategoryCrud.put(ac.id, { data: ac });
-            }
+            },
           );
           await Promise.all(updateACPromises);
         }
@@ -587,7 +585,7 @@ export default {
           const deleteACPromises = cq.AssignmentCategories.Deletes.map(
             async ac => {
               await AssignmentCategoryCrud.delete(ac.id);
-            }
+            },
           );
           await Promise.all(deleteACPromises);
         }
@@ -601,19 +599,19 @@ export default {
       const B = this.section.gradeScaleB;
       const C = this.section.gradeScaleC;
       const D = this.section.gradeScaleD;
-      let letterGrade = "";
+      let letterGrade = '';
       if (grade >= A) {
-        letterGrade = "A";
+        letterGrade = 'A';
       } else if (grade < A && grade >= B) {
-        letterGrade = "B";
+        letterGrade = 'B';
       } else if (grade < B && grade >= C) {
-        letterGrade = "C";
+        letterGrade = 'C';
       } else if (grade < C && grade >= D) {
-        letterGrade = "D";
+        letterGrade = 'D';
       } else if (grade < D) {
-        letterGrade = "F";
-      } else if (grade === "None") {
-        letterGrade = "";
+        letterGrade = 'F';
+      } else if (grade === 'None') {
+        letterGrade = '';
       }
       return letterGrade;
     },
@@ -626,16 +624,16 @@ export default {
         id: Number,
         createdAt: Date(Date.now() - 24 * 60 * 60 * 1000),
         lowestGradesDropped: 1,
-        name: "Bullshit",
+        name: 'Bullshit',
         sectionId: this.sectionStructure.id,
         weight: 0.35,
-        updatedAt: Date(Date.now())
+        updatedAt: Date(Date.now()),
       };
     },
     moveAssTo(ass, ac) {
       ass.assignmentCategoryId = ac.id;
       this.updateAssignment(ass);
-    }
+    },
   },
   computed: {
     assignmentCategoryRows() {
@@ -649,15 +647,15 @@ export default {
         s.assCats.forEach(ac => {
           ac.assignments = JSON.parse(
             JSON.stringify(
-              this.assignments.filter(a => a.assignmentCategoryId === ac.id)
-            )
+              this.assignments.filter(a => a.assignmentCategoryId === ac.id),
+            ),
           );
           ac.assignments.forEach(a => {
             a.grade = Object.assign(
               {},
               this.grades.find(
-                g => g.assignmentId === a.id && g.studentId === s.id
-              )
+                g => g.assignmentId === a.id && g.studentId === s.id,
+              ),
             );
           });
         });
@@ -669,7 +667,7 @@ export default {
       const assignments = JSON.parse(JSON.stringify(this.assignments));
       assignments.forEach(a => {
         a.acName = this.assCats.find(
-          ac => ac.id === a.assignmentCategoryId
+          ac => ac.id === a.assignmentCategoryId,
         ).name;
       });
       return assignments;
@@ -677,24 +675,24 @@ export default {
     assCatColumns() {
       return [
         {
-          headerName: "Student ID",
-          field: "studentId",
-          pinned: "left",
-          hide: true
+          headerName: 'Student ID',
+          field: 'studentId',
+          pinned: 'left',
+          hide: true,
         },
         {
-          headerName: "Student",
-          field: "studentName",
-          pinned: "left",
-          editable: false
-        }
+          headerName: 'Student',
+          field: 'studentName',
+          pinned: 'left',
+          editable: false,
+        },
       ].concat(
         this.assCats.map(ac => ({
           headerName: ac.name,
           field: `AC${ac.id}`,
           editable: false,
-          assCatId: ac.id
-        }))
+          assCatId: ac.id,
+        })),
       );
     },
     assCatRows() {
@@ -702,14 +700,13 @@ export default {
         const student = Object.assign({}, realStudent);
         const data = {
           studentId: student.id,
-          studentName: `${student.lastName}, ${student.firstName}`
+          studentName: `${student.lastName}, ${student.firstName}`,
         };
         student.assCats.forEach(ac => {
           ac.assignments = ac.assignments
             .filter(
-              a =>
-                typeof a.grade !== "undefined" &&
-                typeof a.grade.score === "number"
+              a => typeof a.grade !== 'undefined'
+                && typeof a.grade.score === 'number',
             )
             .sort((a, b) => {
               const aScore = a.grade.score / a.totalPoints;
@@ -724,8 +721,8 @@ export default {
             });
 
           if (
-            ac.assignments &&
-            ac.assignments.length > ac.lowestGradesDropped
+            ac.assignments
+            && ac.assignments.length > ac.lowestGradesDropped
           ) {
             let totalPossible = 0;
             let actualTotal = 0;
@@ -742,12 +739,12 @@ export default {
 
           data[`AC${ac.id}`] = !Number.isNaN(ac.categoryAverage)
             ? `${Number(ac.categoryAverage * 100).toFixed(2)}%`
-            : "None";
+            : 'None';
         });
         return data;
       });
       return rows;
-    }
-  }
+    },
+  },
 };
 </script>
