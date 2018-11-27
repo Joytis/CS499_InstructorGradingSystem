@@ -12,9 +12,6 @@
         placeholder="Filter Results..."
         style="padding-top: .3em;"
       ></b-input>
-      <button class="button is-success is-small" :disabled="checkedRows.length==0">
-        Add All To Section
-      </button>
       
       <b-table
         :data="filteredData"
