@@ -1,5 +1,4 @@
 <template>
-  <keep-alive>
     <section>
       <crud-modal-bar
         createTitle="Create Student"
@@ -16,7 +15,7 @@
       <b-table
         :data="filteredData"
         paginated
-        per-page="8"
+        per-page="15"
         checkable=""
         :checked-rows.sync="checkedRows"
       >
@@ -36,7 +35,6 @@
         </template>
       </b-table>
     </section>
-  </keep-alive>
 </template>
 
 
@@ -67,6 +65,7 @@ export default {
       studentModalInputs: {
         crudTarget: StudentCrud,
         postCreate(student) { EventBus.$emit('student-added', student); },
+        postDelete(student) { EventBus.$emit('student-removed', student); },
         templates: {
           aNumber: {
             label: 'A-Number', type: 'input', subtype: 'number', placeholder: 'A########',
@@ -86,7 +85,10 @@ export default {
     },
 
     studentAdded(student) { this.students.push(student); },
-    studentRemoved(student) { this.students = this.students.filter(s => s.id !== student.id); },
+    studentRemoved(student) {
+      this.students = this.students.filter(s => s.id !== student.id);
+      this.checkedRows = [];
+    },
     studentUpdated(student) {
       this.students[this.students.findIndex(s => s.id === student.id)] = student;
     },
@@ -107,11 +109,13 @@ export default {
 
   computed: {
     filteredData() {
-      return this.students.filter((student) => (
+      const filtered = this.students.filter((student) => (
         student.email.toLowerCase().includes(this.searchString.toLowerCase())
         || student.firstName.toLowerCase().includes(this.searchString.toLowerCase())
         || student.lastName.toLowerCase().includes(this.searchString.toLowerCase())
         || student.aNumber.toString().includes(this.searchString.toLowerCase())));
+
+      return filtered;
     },
   },
 };

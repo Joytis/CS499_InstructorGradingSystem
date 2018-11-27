@@ -16,7 +16,7 @@ const menu = [
     title: 'General',
     menuItems: [
       {
-        itemTitle: 'Sections',
+        itemTitle: 'My Sections',
         itemLink: '/sections',
       },
       {
