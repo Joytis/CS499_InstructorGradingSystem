@@ -19,7 +19,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "instructor_grading_system",
+    "productName": "GradeBook++",
     "appId": "com.igs.app",
     "directories": {
       "output": "build"
