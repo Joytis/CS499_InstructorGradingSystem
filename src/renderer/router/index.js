@@ -18,7 +18,7 @@ export default new Router({
     },
     {
       path: '/sections/:courseId/:sectionId/whatIf',
-      name: 'Student Page',
+      name: 'Student Page/WhatIf',
       component: require('../components/Sections/WhatIf.vue').default,
     },
     {
