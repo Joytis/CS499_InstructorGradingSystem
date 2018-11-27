@@ -26,9 +26,10 @@
             :target="selectedStudent"
             :removed="['edit']"
           />
-          <b-checkbox v-model="gradesIsVisible">
-            Grades
-          </b-checkbox>
+        </div>
+        <div id="gradeCheckbox">
+          <b-switch class="is-small" v-model="gradesIsVisible"/>
+          Display Grades
         </div>
         <b-table :data="students" paginated per-page="10" :selected.sync="selectedStudent">
             <template slot-scope="props">
@@ -374,13 +375,13 @@ export default {
     OnExport() {
       this.gridApi.exportDataAsCsv({
         columnDefs: this.assignmentColumns,
-        fileName: 'Test',
+        fileName: 'Grades',
       });
     },
     OnAnalyticsExport() {
       this.gridApi.exportDataAsCsv({
         columnDefs: this.assignmentColumns,
-        fileName: 'Test',
+        fileName: 'Grade Analytics',
       });
     },
     async studentUnenrolled(student) {
@@ -474,6 +475,7 @@ export default {
     },
     asscatUpdated(assCat) {
       this.assCats.splice(this.assCats.findIndex(a => a.id === assCat.id), 1, assCat);
+      EventBus.$emit('screw-it-reload-everything');
     },
     asscatRemoved(assCat) {
       this.assCats = this.assCats.filter(a => a.id !== assCat.id);
@@ -796,5 +798,8 @@ export default {
 <style>
   #gradeCrudBar{
     width: 25%;
+  }
+  #gradeCheckbox{
+    padding-top: .2em;
   }
 </style>

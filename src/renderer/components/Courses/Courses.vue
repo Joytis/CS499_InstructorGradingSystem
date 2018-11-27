@@ -11,7 +11,7 @@
     <b-table
       :data="courses"
       paginated
-      per-page="10"
+      per-page="15"
       :selected.sync="selected"
     >
       <template slot-scope="props">
