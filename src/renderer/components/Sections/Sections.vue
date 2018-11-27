@@ -55,11 +55,13 @@ export default {
     EventBus.$on('section-added', this.sectionAdded);
     EventBus.$on('section-updated', this.sectionUpdated);
     EventBus.$on('section-removed', this.sectionRemoved);
+    EventBus.$on('term-swapped', this.fetchData);
   },
   beforeDestroy() {
     EventBus.$off('section-added', this.sectionAdded);
     EventBus.$off('section-updated', this.sectionUpdated);
     EventBus.$off('section-removed', this.sectionRemoved);
+    EventBus.$off('term-swapped', this.fetchData);
   },
 
   components: {
@@ -143,7 +145,9 @@ export default {
       this.courses = (await CourseCrud.get()).data;
       const rawSections = (await SectionCrud.get()).data;
       const instructor = await Finders.CurrentInstructor();
-      const filteredSections = rawSections.filter(s => s.instructorId === instructor.id);
+      const term = await Finders.SelectedTerm();
+      let filteredSections = rawSections.filter(s => s.instructorId === instructor.id);
+      filteredSections = filteredSections.filter(s => s.termId === term.id);
       filteredSections.forEach(section => {
         section.course = this.courses.find(c => c.id === section.courseId);
       });
