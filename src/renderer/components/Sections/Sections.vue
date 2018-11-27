@@ -90,7 +90,6 @@ export default {
             value: 'id',
             key: 'id',
             display: option => `${option.courseLabel} - ${option.title}`,
-            // display: () => 'TEST',
           },
           sectionNumber: {
             label: 'Section Number', type: 'input', subtype: 'number', placeholder: '00',
@@ -110,13 +109,7 @@ export default {
         },
       },
       init() {
-        this.modalInputs.templates.courseId.getData = () => this.courses.sort((a, b) => {
-          const nameA = a.courseLabel.toUpperCase();
-          const nameB = b.courseLabel.toUpperCase();
-          if (nameA < nameB) return -1;
-          if (nameA > nameB) return 1;
-          return 0;
-        });
+        this.modalInputs.templates.courseId.getData = () => this.courses;
         this.modalInputs.preCreate = async (staged) => {
           // Retrieve the desired course and term ID
           // Querying events here because we don't have access to other members in data asection.
