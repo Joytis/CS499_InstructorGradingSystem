@@ -21,19 +21,19 @@
               <span> {{ CurrentTerm.title }} </span>
               <b-icon icon="chevron-down"></b-icon>
             </button>
-            <div v-for="Term in Terms">
+            <div v-for="Term in Terms" :key="Term">
               <b-dropdown-item v-on:click="swapTerms(Term)">{{ Term.title }}</b-dropdown-item>
             </div>
           </b-dropdown>
         </div>
       </div>
     </div>
-    <div v-if="navIsActive" class="navbar-menu is-active">
+    <div class="navbar-menu is-active">
       <div class="navbar-end">
         <!-- This allows users to change their account stuff up! -->
         <a class="navbar-item is-right">
           <b-dropdown style="justify-content: flex-end">
-            <button class="button is-primary" slot="trigger" click>
+            <button class="button is-primary" slot="trigger">
               <b-icon icon="account" type="is-medium"></b-icon>
             </button>
             <b-dropdown-item @click="isLogoutModalActive = true">Logout</b-dropdown-item>
@@ -92,6 +92,7 @@ export default {
       navIsActive: true,
       isLogoutModalActive: false,
       isEditModalActive: false,
+      isDeleteModalActive: false,
       instructor: {},
       Terms: [],
       CurrentTerm: {},
@@ -164,6 +165,10 @@ export default {
     },
     async logout() {
       const result = (await LogoutCrud.post());
+      EventBus.$emit('logout', result);
+    },
+    async deleteAccount() {
+      const result = (await AccountCrud.delete(this.instructor.id));
       EventBus.$emit('logout', result);
     },
     close() {
